@@ -998,7 +998,7 @@ function initializeSubmitRating() {
     }
 }
 
-// Course Forum Data - Simplified
+// Course Forum Data - Simplified -דוגמאות לנתונים
 const courseForumData = {
     math101: {
         name: 'מתמטיקה 101',
