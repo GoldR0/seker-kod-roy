@@ -17,7 +17,6 @@ import {
   CardContent,
   Paper,
   Chip,
-  Avatar,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -29,70 +28,13 @@ import {
   MenuItem,
   Alert,
   Snackbar,
-  Grid,
-  Divider,
-  Tabs,
-  Tab,
-  ListItemAvatar,
-  Badge,
-  Fab,
-  FormHelperText,
   InputAdornment,
-  Switch,
   FormControlLabel,
-  Checkbox,
-  Radio,
-  RadioGroup,
-  Slider,
-  Rating,
-  Autocomplete,
-  Chip as MuiChip,
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
-  Breadcrumbs,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Tooltip,
-  Zoom,
-  Fade,
-  Slide,
-  Grow,
-  Collapse,
-  Backdrop,
-  CircularProgress,
-  LinearProgress,
-  Skeleton,
-  AlertTitle,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  SpeedDial,
-  SpeedDialAction,
-  SpeedDialIcon,
-  CardMedia,
-  CardActions,
-  CardActionArea,
-  CardHeader
+  Checkbox
 } from '@mui/material';
 import {
   Home as HomeIcon,
   School as SchoolIcon,
-  Event as EventIcon,
   Restaurant as RestaurantIcon,
   Search as SearchIcon,
   ShoppingCart as ShoppingCartIcon,
@@ -104,127 +46,12 @@ import {
   Login as LoginIcon,
   Logout as LogoutIcon,
   Menu as MenuIcon,
-  Close as CloseIcon,
   CalendarToday as CalendarIcon,
   LocationOn as LocationIcon,
   AccessTime as TimeIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
-  Error as ErrorIcon,
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Save as SaveIcon,
-  Cancel as CancelIcon,
-  Send as SendIcon,
-  AttachFile as AttachFileIcon,
-  PhotoCamera as PhotoCameraIcon,
-  Phone as PhoneIcon,
-  Email as EmailIcon,
-  Work as WorkIcon,
-  LocalOffer as LocalOfferIcon,
-  Star as StarIcon,
-  StarBorder as StarBorderIcon,
-  ThumbUp as ThumbUpIcon,
-  ThumbDown as ThumbDownIcon,
-  Reply as ReplyIcon,
-  Share as ShareIcon,
-  Bookmark as BookmarkIcon,
-  BookmarkBorder as BookmarkBorderIcon,
-  Notifications as NotificationsIcon,
-  NotificationsNone as NotificationsNoneIcon,
-  Settings as SettingsIcon,
-  AccountCircle as AccountCircleIcon,
-  VpnKey as VpnKeyIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
-  Lock as LockIcon,
-  LockOpen as LockOpenIcon,
-  Security as SecurityIcon,
-  VerifiedUser as VerifiedUserIcon,
-  Report as ReportIcon,
-  Flag as FlagIcon,
-  Block as BlockIcon,
-  Archive as ArchiveIcon,
-  Unarchive as UnarchiveIcon,
-  Refresh as RefreshIcon,
-  FilterList as FilterListIcon,
-  Sort as SortIcon,
-  ViewList as ViewListIcon,
-  ViewModule as ViewModuleIcon,
-  GridView as GridViewIcon,
-  List as ListIcon,
-  Dashboard as DashboardIcon,
-  Assessment as AssessmentIcon,
-  Analytics as AnalyticsIcon,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
-  ShowChart as ShowChartIcon,
-  BarChart as BarChartIcon,
-  PieChart as PieChartIcon,
-  DonutLarge as DonutLargeIcon,
-  DonutSmall as DonutSmallIcon,
-  InsertChart as InsertChartIcon,
-  BubbleChart as BubbleChartIcon,
-  ScatterPlot as ScatterPlotIcon,
-  Schedule as ScheduleIcon,
-  AccessTimeFilled as AccessTimeFilledIcon,
-  Today as TodayIcon,
-  DateRange as DateRangeIcon,
-  EventAvailable as EventAvailableIcon,
-  EventBusy as EventBusyIcon,
-  EventNote as EventNoteIcon,
-  LocationCity as LocationCityIcon,
-  LocationSearching as LocationSearchingIcon,
-  MyLocation as MyLocationIcon,
-  Place as PlaceIcon,
-  Room as RoomIcon,
-  Store as StoreIcon,
-  Storefront as StorefrontIcon,
-  ShoppingBasket as ShoppingBasketIcon,
-  ShoppingCartCheckout as ShoppingCartCheckoutIcon,
-  AddShoppingCart as AddShoppingCartIcon,
-  RemoveShoppingCart as RemoveShoppingCartIcon,
-  LocalGroceryStore as LocalGroceryStoreIcon,
-  LocalMall as LocalMallIcon,
-  LocalOffer as LocalOfferIcon2,
-  LocalShipping as LocalShippingIcon,
-  LocalTaxi as LocalTaxiIcon,
-  DirectionsCar as DirectionsCarIcon,
-  DirectionsBus as DirectionsBusIcon,
-  DirectionsWalk as DirectionsWalkIcon,
-  DirectionsBike as DirectionsBikeIcon,
-  DirectionsSubway as DirectionsSubwayIcon,
-  DirectionsBoat as DirectionsBoatIcon,
-  Flight as FlightIcon,
-  Hotel as HotelIcon,
-  Restaurant as RestaurantIcon2,
-  LocalBar as LocalBarIcon,
-  LocalCafe as LocalCafeIcon,
-  LocalPizza as LocalPizzaIcon,
-  LocalDining as LocalDiningIcon,
-  LocalDrink as LocalDrinkIcon,
-  LocalConvenienceStore as LocalConvenienceStoreIcon,
-  LocalPharmacy as LocalPharmacyIcon,
-  LocalHospital as LocalHospitalIcon,
-  LocalPolice as LocalPoliceIcon,
-  LocalFireDepartment as LocalFireDepartmentIcon,
-  LocalLibrary as LocalLibraryIcon,
-  LocalPostOffice as LocalPostOfficeIcon,
-  LocalGasStation as LocalGasStationIcon,
-  LocalCarWash as LocalCarWashIcon,
-  LocalAtm as LocalAtmIcon,
-  LocalPrintshop as LocalPrintshopIcon,
-  LocalFlorist as LocalFloristIcon,
-  LocalLaundryService as LocalLaundryServiceIcon,
-  LocalParking as LocalParkingIcon,
-  LocalAirport as LocalAirportIcon,
-  LocalMovies as LocalMoviesIcon,
-  LocalPlay as LocalPlayIcon,
-  LocalActivity as LocalActivityIcon,
-  BeachAccess as BeachAccessIcon,
-  GolfCourse as GolfCourseIcon,
-  IceSkating as IceSkatingIcon
+  Add as AddIcon
 } from '@mui/icons-material';
 import { 
   User, 
@@ -235,10 +62,8 @@ import {
   MarketplaceItem,
   ServiceRequest,
   ForumPost,
-  ForumReply,
   CafeteriaOrder,
   CafeteriaOrderItem,
-  CafeteriaMenuItem,
   CommunityEvent,
   HelpTicket
 } from './types';
@@ -519,7 +344,7 @@ function App() {
   };
 
   const validatePhone = (phone: string): boolean => {
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+    const phoneRegex = /^[\d\s\-+()]+$/;
     return phoneRegex.test(phone) && phone.length >= 9;
   };
 
@@ -860,14 +685,7 @@ function App() {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'error';
-      case 'medium': return 'warning';
-      case 'low': return 'success';
-      default: return 'default';
-    }
-  };
+
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -1101,33 +919,35 @@ function App() {
               </Button>
             </Box>
             
-            <Grid container spacing={3}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+              gap: 3 
+            }}>
               {lostFoundItems.map((item) => (
-                <Grid item xs={12} md={6} lg={4} key={item.id}>
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Chip 
-                          label={item.type === 'lost' ? 'אבד' : 'נמצא'} 
-                          color={item.type === 'lost' ? 'error' : 'success'}
-                        />
-                        <Chip 
-                          label={item.status === 'open' ? 'פתוח' : item.status === 'claimed' ? 'נטען' : 'סגור'} 
-                          color={item.status === 'open' ? 'primary' : item.status === 'claimed' ? 'warning' : 'default'}
-                        />
-                      </Box>
-                      <Typography variant="h6" gutterBottom>{item.title}</Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph>{item.description}</Typography>
-                      <Typography variant="body2"><strong>מיקום:</strong> {item.location}</Typography>
-                      <Typography variant="body2"><strong>תאריך:</strong> {item.date}</Typography>
-                      <Typography variant="body2"><strong>איש קשר:</strong> {item.contactName}</Typography>
-                      <Typography variant="body2"><strong>טלפון:</strong> {item.contactPhone}</Typography>
-                      <Typography variant="body2"><strong>אימייל:</strong> {item.contactEmail}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card key={item.id}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Chip 
+                        label={item.type === 'lost' ? 'אבד' : 'נמצא'} 
+                        color={item.type === 'lost' ? 'error' : 'success'}
+                      />
+                      <Chip 
+                        label={item.status === 'open' ? 'פתוח' : item.status === 'claimed' ? 'נטען' : 'סגור'} 
+                        color={item.status === 'open' ? 'primary' : item.status === 'claimed' ? 'warning' : 'default'}
+                      />
+                    </Box>
+                    <Typography variant="h6" gutterBottom>{item.title}</Typography>
+                    <Typography variant="body2" color="text.secondary" paragraph>{item.description}</Typography>
+                    <Typography variant="body2"><strong>מיקום:</strong> {item.location}</Typography>
+                    <Typography variant="body2"><strong>תאריך:</strong> {item.date}</Typography>
+                    <Typography variant="body2"><strong>איש קשר:</strong> {item.contactName}</Typography>
+                    <Typography variant="body2"><strong>טלפון:</strong> {item.contactPhone}</Typography>
+                    <Typography variant="body2"><strong>אימייל:</strong> {item.contactEmail}</Typography>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
             
             {lostFoundItems.length === 0 && (
               <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -1161,33 +981,35 @@ function App() {
               </Button>
             </Box>
             
-            <Grid container spacing={3}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+              gap: 3 
+            }}>
               {marketplaceItems.map((item) => (
-                <Grid item xs={12} md={6} lg={4} key={item.id}>
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Chip 
-                          label={item.status === 'available' ? 'זמין' : item.status === 'sold' ? 'נמכר' : 'שמור'} 
-                          color={item.status === 'available' ? 'success' : item.status === 'sold' ? 'error' : 'warning'}
-                        />
-                        <Typography variant="h6" color="primary">₪{item.price}</Typography>
-                      </Box>
-                      <Typography variant="h6" gutterBottom>{item.title}</Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph>{item.description}</Typography>
-                      <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                        <Chip label={item.category} size="small" />
-                        <Chip label={item.condition} size="small" />
-                      </Box>
-                      <Typography variant="body2"><strong>מוכר:</strong> {item.sellerName}</Typography>
-                      <Typography variant="body2"><strong>טלפון:</strong> {item.sellerPhone}</Typography>
-                      <Typography variant="body2"><strong>אימייל:</strong> {item.sellerEmail}</Typography>
-                      <Typography variant="body2"><strong>תאריך פרסום:</strong> {item.datePosted}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card key={item.id}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Chip 
+                        label={item.status === 'available' ? 'זמין' : item.status === 'sold' ? 'נמכר' : 'שמור'} 
+                        color={item.status === 'available' ? 'success' : item.status === 'sold' ? 'error' : 'warning'}
+                      />
+                      <Typography variant="h6" color="primary">₪{item.price}</Typography>
+                    </Box>
+                    <Typography variant="h6" gutterBottom>{item.title}</Typography>
+                    <Typography variant="body2" color="text.secondary" paragraph>{item.description}</Typography>
+                    <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                      <Chip label={item.category} size="small" />
+                      <Chip label={item.condition} size="small" />
+                    </Box>
+                    <Typography variant="body2"><strong>מוכר:</strong> {item.sellerName}</Typography>
+                    <Typography variant="body2"><strong>טלפון:</strong> {item.sellerPhone}</Typography>
+                    <Typography variant="body2"><strong>אימייל:</strong> {item.sellerEmail}</Typography>
+                    <Typography variant="body2"><strong>תאריך פרסום:</strong> {item.datePosted}</Typography>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
             
             {marketplaceItems.length === 0 && (
               <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -1221,38 +1043,40 @@ function App() {
               </Button>
             </Box>
             
-            <Grid container spacing={3}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+              gap: 3 
+            }}>
               {serviceRequests.map((request) => (
-                <Grid item xs={12} md={6} lg={4} key={request.id}>
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Chip 
-                          label={request.type} 
-                          color="primary"
-                        />
-                        <Chip 
-                          label={request.priority} 
-                          color={request.priority === 'urgent' ? 'error' : request.priority === 'high' ? 'warning' : 'success'}
-                        />
-                      </Box>
-                      <Typography variant="h6" gutterBottom>{request.title}</Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph>{request.description}</Typography>
-                      <Typography variant="body2"><strong>מיקום:</strong> {request.location}</Typography>
-                      <Typography variant="body2"><strong>מבקש:</strong> {request.requesterName}</Typography>
-                      <Typography variant="body2"><strong>טלפון:</strong> {request.requesterPhone}</Typography>
-                      <Typography variant="body2"><strong>אימייל:</strong> {request.requesterEmail}</Typography>
-                      <Typography variant="body2"><strong>תאריך בקשה:</strong> {request.dateRequested}</Typography>
+                <Card key={request.id}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                       <Chip 
-                        label={request.status === 'pending' ? 'ממתין' : request.status === 'in-progress' ? 'בטיפול' : request.status === 'completed' ? 'הושלם' : 'בוטל'} 
-                        color={request.status === 'pending' ? 'warning' : request.status === 'in-progress' ? 'info' : request.status === 'completed' ? 'success' : 'default'}
-                        sx={{ mt: 1 }}
+                        label={request.type} 
+                        color="primary"
                       />
-                    </CardContent>
-                  </Card>
-                </Grid>
+                      <Chip 
+                        label={request.priority} 
+                        color={request.priority === 'urgent' ? 'error' : request.priority === 'high' ? 'warning' : 'success'}
+                      />
+                    </Box>
+                    <Typography variant="h6" gutterBottom>{request.title}</Typography>
+                    <Typography variant="body2" color="text.secondary" paragraph>{request.description}</Typography>
+                    <Typography variant="body2"><strong>מיקום:</strong> {request.location}</Typography>
+                    <Typography variant="body2"><strong>מבקש:</strong> {request.requesterName}</Typography>
+                    <Typography variant="body2"><strong>טלפון:</strong> {request.requesterPhone}</Typography>
+                    <Typography variant="body2"><strong>אימייל:</strong> {request.requesterEmail}</Typography>
+                    <Typography variant="body2"><strong>תאריך בקשה:</strong> {request.dateRequested}</Typography>
+                    <Chip 
+                      label={request.status === 'pending' ? 'ממתין' : request.status === 'in-progress' ? 'בטיפול' : request.status === 'completed' ? 'הושלם' : 'בוטל'} 
+                      color={request.status === 'pending' ? 'warning' : request.status === 'in-progress' ? 'info' : request.status === 'completed' ? 'success' : 'default'}
+                      sx={{ mt: 1 }}
+                    />
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
             
             {serviceRequests.length === 0 && (
               <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -1286,32 +1110,30 @@ function App() {
               </Button>
             </Box>
             
-            <Grid container spacing={3}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               {forumPosts.map((post) => (
-                <Grid item xs={12} key={post.id}>
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Typography variant="h6">{post.title}</Typography>
-                        <Chip 
-                          label={post.status === 'active' ? 'פעיל' : post.status === 'closed' ? 'סגור' : 'נמחק'} 
-                          color={post.status === 'active' ? 'success' : post.status === 'closed' ? 'warning' : 'default'}
-                        />
-                      </Box>
-                      <Typography variant="body2" color="text.secondary" paragraph>{post.content}</Typography>
-                      <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                        {post.tags.map((tag, index) => (
-                          <Chip key={index} label={tag} size="small" />
-                        ))}
-                      </Box>
-                      <Typography variant="body2"><strong>מחבר:</strong> {post.authorName}</Typography>
-                      <Typography variant="body2"><strong>תאריך:</strong> {post.datePosted}</Typography>
-                      <Typography variant="body2"><strong>תגובות:</strong> {post.replies.length}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card key={post.id}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h6">{post.title}</Typography>
+                      <Chip 
+                        label={post.status === 'active' ? 'פעיל' : post.status === 'closed' ? 'סגור' : 'נמחק'} 
+                        color={post.status === 'active' ? 'success' : post.status === 'closed' ? 'warning' : 'default'}
+                      />
+                    </Box>
+                    <Typography variant="body2" color="text.secondary" paragraph>{post.content}</Typography>
+                    <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                      {post.tags.map((tag, index) => (
+                        <Chip key={index} label={tag} size="small" />
+                      ))}
+                    </Box>
+                    <Typography variant="body2"><strong>מחבר:</strong> {post.authorName}</Typography>
+                    <Typography variant="body2"><strong>תאריך:</strong> {post.datePosted}</Typography>
+                    <Typography variant="body2"><strong>תגובות:</strong> {post.replies.length}</Typography>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
             
             {forumPosts.length === 0 && (
               <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -1345,33 +1167,35 @@ function App() {
               </Button>
             </Box>
             
-            <Grid container spacing={3}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+              gap: 3 
+            }}>
               {cafeteriaOrders.map((order) => (
-                <Grid item xs={12} md={6} lg={4} key={order.id}>
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Typography variant="h6">הזמנה #{order.id.slice(-6)}</Typography>
-                        <Chip 
-                          label={order.status === 'pending' ? 'ממתין' : order.status === 'preparing' ? 'בהכנה' : order.status === 'ready' ? 'מוכן' : order.status === 'completed' ? 'הושלם' : 'בוטל'} 
-                          color={order.status === 'pending' ? 'warning' : order.status === 'preparing' ? 'info' : order.status === 'ready' ? 'success' : order.status === 'completed' ? 'default' : 'error'}
-                        />
-                      </Box>
-                      <Typography variant="body2"><strong>לקוח:</strong> {order.customerName}</Typography>
-                      <Typography variant="body2"><strong>טלפון:</strong> {order.customerPhone}</Typography>
-                      <Typography variant="body2"><strong>אימייל:</strong> {order.customerEmail}</Typography>
-                      <Typography variant="body2"><strong>פריטים:</strong> {order.items.length}</Typography>
-                      <Typography variant="body2"><strong>סה"כ:</strong> ₪{order.totalPrice}</Typography>
-                      <Typography variant="body2"><strong>זמן איסוף:</strong> {order.pickupTime}</Typography>
-                      <Typography variant="body2"><strong>תאריך הזמנה:</strong> {order.orderDate}</Typography>
-                      {order.specialInstructions && (
-                        <Typography variant="body2"><strong>הערות:</strong> {order.specialInstructions}</Typography>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card key={order.id}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h6">הזמנה #{order.id.slice(-6)}</Typography>
+                      <Chip 
+                        label={order.status === 'pending' ? 'ממתין' : order.status === 'preparing' ? 'בהכנה' : order.status === 'ready' ? 'מוכן' : order.status === 'completed' ? 'הושלם' : 'בוטל'} 
+                        color={order.status === 'pending' ? 'warning' : order.status === 'preparing' ? 'info' : order.status === 'ready' ? 'success' : order.status === 'completed' ? 'default' : 'error'}
+                      />
+                    </Box>
+                    <Typography variant="body2"><strong>לקוח:</strong> {order.customerName}</Typography>
+                    <Typography variant="body2"><strong>טלפון:</strong> {order.customerPhone}</Typography>
+                    <Typography variant="body2"><strong>אימייל:</strong> {order.customerEmail}</Typography>
+                    <Typography variant="body2"><strong>פריטים:</strong> {order.items.length}</Typography>
+                    <Typography variant="body2"><strong>סה"כ:</strong> ₪{order.totalPrice}</Typography>
+                    <Typography variant="body2"><strong>זמן איסוף:</strong> {order.pickupTime}</Typography>
+                    <Typography variant="body2"><strong>תאריך הזמנה:</strong> {order.orderDate}</Typography>
+                    {order.specialInstructions && (
+                      <Typography variant="body2"><strong>הערות:</strong> {order.specialInstructions}</Typography>
+                    )}
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
             
             {cafeteriaOrders.length === 0 && (
               <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -1405,35 +1229,37 @@ function App() {
               </Button>
             </Box>
             
-            <Grid container spacing={3}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+              gap: 3 
+            }}>
               {communityEvents.map((event) => (
-                <Grid item xs={12} md={6} lg={4} key={event.id}>
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Chip 
-                          label={event.category} 
-                          color="primary"
-                        />
-                        <Chip 
-                          label={event.status === 'upcoming' ? 'קרוב' : event.status === 'ongoing' ? 'מתקיים' : event.status === 'completed' ? 'הושלם' : 'בוטל'} 
-                          color={event.status === 'upcoming' ? 'success' : event.status === 'ongoing' ? 'info' : event.status === 'completed' ? 'default' : 'error'}
-                        />
-                      </Box>
-                      <Typography variant="h6" gutterBottom>{event.title}</Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph>{event.description}</Typography>
-                      <Typography variant="body2"><strong>תאריך:</strong> {event.date}</Typography>
-                      <Typography variant="body2"><strong>שעה:</strong> {event.time}</Typography>
-                      <Typography variant="body2"><strong>מיקום:</strong> {event.location}</Typography>
-                      <Typography variant="body2"><strong>מארגן:</strong> {event.organizerName}</Typography>
-                      <Typography variant="body2"><strong>משתתפים:</strong> {event.currentParticipants}/{event.maxParticipants}</Typography>
-                      <Typography variant="body2"><strong>טלפון:</strong> {event.organizerPhone}</Typography>
-                      <Typography variant="body2"><strong>אימייל:</strong> {event.organizerEmail}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card key={event.id}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Chip 
+                        label={event.category} 
+                        color="primary"
+                      />
+                      <Chip 
+                        label={event.status === 'upcoming' ? 'קרוב' : event.status === 'ongoing' ? 'מתקיים' : event.status === 'completed' ? 'הושלם' : 'בוטל'} 
+                        color={event.status === 'upcoming' ? 'success' : event.status === 'ongoing' ? 'info' : event.status === 'completed' ? 'default' : 'error'}
+                      />
+                    </Box>
+                    <Typography variant="h6" gutterBottom>{event.title}</Typography>
+                    <Typography variant="body2" color="text.secondary" paragraph>{event.description}</Typography>
+                    <Typography variant="body2"><strong>תאריך:</strong> {event.date}</Typography>
+                    <Typography variant="body2"><strong>שעה:</strong> {event.time}</Typography>
+                    <Typography variant="body2"><strong>מיקום:</strong> {event.location}</Typography>
+                    <Typography variant="body2"><strong>מארגן:</strong> {event.organizerName}</Typography>
+                    <Typography variant="body2"><strong>משתתפים:</strong> {event.currentParticipants}/{event.maxParticipants}</Typography>
+                    <Typography variant="body2"><strong>טלפון:</strong> {event.organizerPhone}</Typography>
+                    <Typography variant="body2"><strong>אימייל:</strong> {event.organizerEmail}</Typography>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
             
             {communityEvents.length === 0 && (
               <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -1467,37 +1293,39 @@ function App() {
               </Button>
             </Box>
             
-            <Grid container spacing={3}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+              gap: 3 
+            }}>
               {helpTickets.map((ticket) => (
-                <Grid item xs={12} md={6} lg={4} key={ticket.id}>
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Chip 
-                          label={ticket.category} 
-                          color="primary"
-                        />
-                        <Chip 
-                          label={ticket.priority} 
-                          color={ticket.priority === 'urgent' ? 'error' : ticket.priority === 'high' ? 'warning' : ticket.priority === 'medium' ? 'info' : 'success'}
-                        />
-                      </Box>
-                      <Typography variant="h6" gutterBottom>{ticket.title}</Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph>{ticket.description}</Typography>
-                      <Typography variant="body2"><strong>מבקש:</strong> {ticket.requesterName}</Typography>
-                      <Typography variant="body2"><strong>טלפון:</strong> {ticket.requesterPhone}</Typography>
-                      <Typography variant="body2"><strong>אימייל:</strong> {ticket.requesterEmail}</Typography>
-                      <Typography variant="body2"><strong>תאריך יצירה:</strong> {ticket.dateCreated}</Typography>
+                <Card key={ticket.id}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                       <Chip 
-                        label={ticket.status === 'open' ? 'פתוח' : ticket.status === 'in-progress' ? 'בטיפול' : ticket.status === 'resolved' ? 'נפתר' : 'סגור'} 
-                        color={ticket.status === 'open' ? 'warning' : ticket.status === 'in-progress' ? 'info' : ticket.status === 'resolved' ? 'success' : 'default'}
-                        sx={{ mt: 1 }}
+                        label={ticket.category} 
+                        color="primary"
                       />
-                    </CardContent>
-                  </Card>
-                </Grid>
+                      <Chip 
+                        label={ticket.priority} 
+                        color={ticket.priority === 'urgent' ? 'error' : ticket.priority === 'high' ? 'warning' : ticket.priority === 'medium' ? 'info' : 'success'}
+                      />
+                    </Box>
+                    <Typography variant="h6" gutterBottom>{ticket.title}</Typography>
+                    <Typography variant="body2" color="text.secondary" paragraph>{ticket.description}</Typography>
+                    <Typography variant="body2"><strong>מבקש:</strong> {ticket.requesterName}</Typography>
+                    <Typography variant="body2"><strong>טלפון:</strong> {ticket.requesterPhone}</Typography>
+                    <Typography variant="body2"><strong>אימייל:</strong> {ticket.requesterEmail}</Typography>
+                    <Typography variant="body2"><strong>תאריך יצירה:</strong> {ticket.dateCreated}</Typography>
+                    <Chip 
+                      label={ticket.status === 'open' ? 'פתוח' : ticket.status === 'in-progress' ? 'בטיפול' : ticket.status === 'resolved' ? 'נפתר' : 'סגור'} 
+                      color={ticket.status === 'open' ? 'warning' : ticket.status === 'in-progress' ? 'info' : ticket.status === 'resolved' ? 'success' : 'default'}
+                      sx={{ mt: 1 }}
+                    />
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
             
             {helpTickets.length === 0 && (
               <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -1584,8 +1412,8 @@ function App() {
       <Dialog open={lostFoundDialogOpen} onClose={() => setLostFoundDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>הוסף פריט למציאות ואבדות</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <Box>
               <FormControl fullWidth>
                 <InputLabel>סוג</InputLabel>
                 <Select
@@ -1596,8 +1424,8 @@ function App() {
                   <MenuItem value="found">נמצא</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="כותרת"
@@ -1606,8 +1434,8 @@ function App() {
                 error={!!formErrors.title}
                 helperText={formErrors.title}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="תיאור"
@@ -1618,8 +1446,8 @@ function App() {
                 error={!!formErrors.description}
                 helperText={formErrors.description}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="מיקום"
@@ -1628,8 +1456,6 @@ function App() {
                 error={!!formErrors.location}
                 helperText={formErrors.location}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="תאריך"
@@ -1640,8 +1466,8 @@ function App() {
                 helperText={formErrors.date}
                 InputLabelProps={{ shrink: true }}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="שם איש קשר"
@@ -1650,8 +1476,6 @@ function App() {
                 error={!!formErrors.contactName}
                 helperText={formErrors.contactName}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="טלפון"
@@ -1660,8 +1484,8 @@ function App() {
                 error={!!formErrors.contactPhone}
                 helperText={formErrors.contactPhone}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="אימייל"
@@ -1671,8 +1495,8 @@ function App() {
                 error={!!formErrors.contactEmail}
                 helperText={formErrors.contactEmail}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setLostFoundDialogOpen(false)}>ביטול</Button>
@@ -1684,8 +1508,8 @@ function App() {
       <Dialog open={marketplaceDialogOpen} onClose={() => setMarketplaceDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>הוסף פריט למכירה</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <Box>
               <TextField
                 fullWidth
                 label="כותרת"
@@ -1694,8 +1518,8 @@ function App() {
                 error={!!formErrors.title}
                 helperText={formErrors.title}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="תיאור"
@@ -1706,8 +1530,8 @@ function App() {
                 error={!!formErrors.description}
                 helperText={formErrors.description}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="מחיר"
@@ -1720,8 +1544,6 @@ function App() {
                   startAdornment: <InputAdornment position="start">₪</InputAdornment>,
                 }}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>קטגוריה</InputLabel>
                 <Select
@@ -1735,8 +1557,8 @@ function App() {
                   <MenuItem value="other">אחר</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <FormControl fullWidth>
                 <InputLabel>מצב</InputLabel>
                 <Select
@@ -1750,8 +1572,6 @@ function App() {
                   <MenuItem value="poor">גרוע</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="שם המוכר"
@@ -1760,8 +1580,8 @@ function App() {
                 error={!!formErrors.sellerName}
                 helperText={formErrors.sellerName}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="טלפון"
@@ -1770,8 +1590,6 @@ function App() {
                 error={!!formErrors.sellerPhone}
                 helperText={formErrors.sellerPhone}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="אימייל"
@@ -1781,8 +1599,8 @@ function App() {
                 error={!!formErrors.sellerEmail}
                 helperText={formErrors.sellerEmail}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setMarketplaceDialogOpen(false)}>ביטול</Button>
@@ -1794,8 +1612,8 @@ function App() {
       <Dialog open={serviceRequestDialogOpen} onClose={() => setServiceRequestDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>בקש שירות</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} md={6}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <FormControl fullWidth>
                 <InputLabel>סוג שירות</InputLabel>
                 <Select
@@ -1809,8 +1627,6 @@ function App() {
                   <MenuItem value="other">אחר</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>עדיפות</InputLabel>
                 <Select
@@ -1823,8 +1639,8 @@ function App() {
                   <MenuItem value="urgent">דחופה</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="כותרת"
@@ -1833,8 +1649,8 @@ function App() {
                 error={!!formErrors.title}
                 helperText={formErrors.title}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="תיאור"
@@ -1845,8 +1661,8 @@ function App() {
                 error={!!formErrors.description}
                 helperText={formErrors.description}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="מיקום"
@@ -1855,8 +1671,8 @@ function App() {
                 error={!!formErrors.location}
                 helperText={formErrors.location}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="שם המבקש"
@@ -1865,8 +1681,6 @@ function App() {
                 error={!!formErrors.requesterName}
                 helperText={formErrors.requesterName}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="טלפון"
@@ -1875,8 +1689,8 @@ function App() {
                 error={!!formErrors.requesterPhone}
                 helperText={formErrors.requesterPhone}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="אימייל"
@@ -1886,8 +1700,8 @@ function App() {
                 error={!!formErrors.requesterEmail}
                 helperText={formErrors.requesterEmail}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setServiceRequestDialogOpen(false)}>ביטול</Button>
@@ -1899,8 +1713,8 @@ function App() {
       <Dialog open={forumPostDialogOpen} onClose={() => setForumPostDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>צור פוסט חדש</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <Box>
               <TextField
                 fullWidth
                 label="קורס"
@@ -1909,8 +1723,8 @@ function App() {
                 error={!!formErrors.courseId}
                 helperText={formErrors.courseId}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="כותרת"
@@ -1919,8 +1733,8 @@ function App() {
                 error={!!formErrors.title}
                 helperText={formErrors.title}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="תוכן"
@@ -1931,8 +1745,8 @@ function App() {
                 error={!!formErrors.content}
                 helperText={formErrors.content}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="שם המחבר"
@@ -1941,8 +1755,6 @@ function App() {
                 error={!!formErrors.authorName}
                 helperText={formErrors.authorName}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="אימייל"
@@ -1952,8 +1764,8 @@ function App() {
                 error={!!formErrors.authorEmail}
                 helperText={formErrors.authorEmail}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setForumPostDialogOpen(false)}>ביטול</Button>
@@ -1965,8 +1777,8 @@ function App() {
       <Dialog open={cafeteriaOrderDialogOpen} onClose={() => setCafeteriaOrderDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>הזמן אוכל</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} md={6}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="שם הלקוח"
@@ -1975,8 +1787,6 @@ function App() {
                 error={!!formErrors.customerName}
                 helperText={formErrors.customerName}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="טלפון"
@@ -1985,8 +1795,8 @@ function App() {
                 error={!!formErrors.customerPhone}
                 helperText={formErrors.customerPhone}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="אימייל"
@@ -1996,8 +1806,8 @@ function App() {
                 error={!!formErrors.customerEmail}
                 helperText={formErrors.customerEmail}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="זמן איסוף"
@@ -2008,8 +1818,8 @@ function App() {
                 helperText={formErrors.pickupTime}
                 InputLabelProps={{ shrink: true }}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="הערות מיוחדות"
@@ -2018,8 +1828,8 @@ function App() {
                 value={cafeteriaOrderForm.specialInstructions}
                 onChange={(e) => setCafeteriaOrderForm({...cafeteriaOrderForm, specialInstructions: e.target.value})}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCafeteriaOrderDialogOpen(false)}>ביטול</Button>
@@ -2031,8 +1841,8 @@ function App() {
       <Dialog open={communityEventDialogOpen} onClose={() => setCommunityEventDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>צור אירוע קהילתי</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <Box>
               <TextField
                 fullWidth
                 label="כותרת"
@@ -2041,8 +1851,8 @@ function App() {
                 error={!!formErrors.title}
                 helperText={formErrors.title}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="תיאור"
@@ -2053,8 +1863,8 @@ function App() {
                 error={!!formErrors.description}
                 helperText={formErrors.description}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="תאריך"
@@ -2065,8 +1875,6 @@ function App() {
                 helperText={formErrors.date}
                 InputLabelProps={{ shrink: true }}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="שעה"
@@ -2077,8 +1885,8 @@ function App() {
                 helperText={formErrors.time}
                 InputLabelProps={{ shrink: true }}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="מיקום"
@@ -2087,8 +1895,8 @@ function App() {
                 error={!!formErrors.location}
                 helperText={formErrors.location}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <FormControl fullWidth>
                 <InputLabel>קטגוריה</InputLabel>
                 <Select
@@ -2102,8 +1910,6 @@ function App() {
                   <MenuItem value="other">אחר</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="מספר משתתפים מקסימלי"
@@ -2113,8 +1919,8 @@ function App() {
                 error={!!formErrors.maxParticipants}
                 helperText={formErrors.maxParticipants}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="שם המארגן"
@@ -2123,8 +1929,6 @@ function App() {
                 error={!!formErrors.organizerName}
                 helperText={formErrors.organizerName}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="טלפון"
@@ -2133,8 +1937,8 @@ function App() {
                 error={!!formErrors.organizerPhone}
                 helperText={formErrors.organizerPhone}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="אימייל"
@@ -2144,8 +1948,8 @@ function App() {
                 error={!!formErrors.organizerEmail}
                 helperText={formErrors.organizerEmail}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -2155,8 +1959,8 @@ function App() {
                 }
                 label="נדרשת הרשמה מוקדמת"
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCommunityEventDialogOpen(false)}>ביטול</Button>
@@ -2168,8 +1972,8 @@ function App() {
       <Dialog open={helpTicketDialogOpen} onClose={() => setHelpTicketDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>פתח כרטיס עזרה</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} md={6}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <FormControl fullWidth>
                 <InputLabel>קטגוריה</InputLabel>
                 <Select
@@ -2183,8 +1987,6 @@ function App() {
                   <MenuItem value="other">אחר</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>עדיפות</InputLabel>
                 <Select
@@ -2197,8 +1999,8 @@ function App() {
                   <MenuItem value="urgent">דחופה</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="כותרת"
@@ -2207,8 +2009,8 @@ function App() {
                 error={!!formErrors.title}
                 helperText={formErrors.title}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="תיאור הבעיה"
@@ -2219,8 +2021,8 @@ function App() {
                 error={!!formErrors.description}
                 helperText={formErrors.description}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 fullWidth
                 label="שם המבקש"
@@ -2229,8 +2031,6 @@ function App() {
                 error={!!formErrors.requesterName}
                 helperText={formErrors.requesterName}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="טלפון"
@@ -2239,8 +2039,8 @@ function App() {
                 error={!!formErrors.requesterPhone}
                 helperText={formErrors.requesterPhone}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Box>
+            <Box>
               <TextField
                 fullWidth
                 label="אימייל"
@@ -2250,8 +2050,8 @@ function App() {
                 error={!!formErrors.requesterEmail}
                 helperText={formErrors.requesterEmail}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setHelpTicketDialogOpen(false)}>ביטול</Button>
