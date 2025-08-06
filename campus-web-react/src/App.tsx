@@ -10,11 +10,11 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Card,
   CardContent,
-  Grid,
   Paper,
   Chip,
   Avatar,
@@ -264,17 +264,17 @@ function App() {
         <Box sx={{ width: 250, pt: 2 }}>
           <List>
             {navigationItems.map((item) => (
-              <ListItem 
-                button 
-                key={item.id}
-                onClick={() => {
-                  setActiveSection(item.id);
-                  setDrawerOpen(false);
-                }}
-                selected={activeSection === item.id}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} />
+              <ListItem key={item.id} disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    setActiveSection(item.id);
+                    setDrawerOpen(false);
+                  }}
+                  selected={activeSection === item.id}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.label} />
+                </ListItemButton>
               </ListItem>
             ))}
           </List>
@@ -307,128 +307,130 @@ function App() {
             </Paper>
 
             {/* Navigation Grid */}
-            <Grid container spacing={2} sx={{ mb: 4 }}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(6, 1fr)' },
+              gap: 2, 
+              mb: 4 
+            }}>
               {navigationItems.slice(1, 7).map((item) => (
-                <Grid item xs={6} sm={4} md={2} key={item.id}>
-                  <Card 
-                    sx={{ 
-                      height: '100%',
-                      cursor: 'pointer',
-                      '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 }
-                    }}
-                    onClick={() => setActiveSection(item.id)}
-                  >
-                    <CardContent sx={{ textAlign: 'center', p: 2 }}>
-                      {item.icon}
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        {item.label}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card 
+                  key={item.id}
+                  sx={{ 
+                    height: '100%',
+                    cursor: 'pointer',
+                    '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 }
+                  }}
+                  onClick={() => setActiveSection(item.id)}
+                >
+                  <CardContent sx={{ textAlign: 'center', p: 2 }}>
+                    {item.icon}
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {item.label}
+                    </Typography>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
 
             {/* Content Cards */}
-            <Grid container spacing={3}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+              gap: 3 
+            }}>
               {/* Events Card */}
-              <Grid item xs={12} md={4}>
-                <Card>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <CalendarIcon sx={{ mr: 1 }} />
-                      <Typography variant="h6">לוח אירועים</Typography>
-                    </Box>
-                    <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
-                      {demoEvents.map((event) => (
-                        <Box 
-                          key={event.id} 
-                          sx={{ 
-                            p: 2, 
-                            mb: 1, 
-                            border: '1px solid #e0e0e0',
-                            borderRadius: 1,
-                            backgroundColor: event.urgent ? '#ffebee' : 'transparent'
-                          }}
-                        >
-                          <Typography variant="subtitle2" color={event.urgent ? 'error' : 'primary'}>
-                            {event.title} - {event.date}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {event.description}
-                          </Typography>
-                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                            <TimeIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                            <Typography variant="caption">{event.time}</Typography>
-                            <LocationIcon sx={{ fontSize: 16, ml: 2, mr: 0.5 }} />
-                            <Typography variant="caption">{event.location}</Typography>
-                          </Box>
-                        </Box>
-                      ))}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Facilities Card */}
-              <Grid item xs={12} md={4}>
-                <Card>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <LocationIcon sx={{ mr: 1 }} />
-                      <Typography variant="h6">מצב מתקנים</Typography>
-                    </Box>
-                    {demoFacilities.map((facility) => (
-                      <Box key={facility.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Typography variant="body2">{facility.name}:</Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Chip 
-                            label={facility.status === 'open' ? 'פתוח' : facility.status === 'busy' ? 'עמוס' : 'סגור'}
-                            color={getStatusColor(facility.status) as any}
-                            size="small"
-                          />
-                          <Typography variant="caption">{facility.hours}</Typography>
-                        </Box>
-                      </Box>
-                    ))}
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Tasks Card */}
-              <Grid item xs={12} md={4}>
-                <Card>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <CheckCircleIcon sx={{ mr: 1 }} />
-                      <Typography variant="h6">תזכורות יומיות</Typography>
-                    </Box>
-                    {demoTasks.map((task) => (
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <CalendarIcon sx={{ mr: 1 }} />
+                    <Typography variant="h6">לוח אירועים</Typography>
+                  </Box>
+                  <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+                    {demoEvents.map((event) => (
                       <Box 
-                        key={task.id} 
+                        key={event.id} 
                         sx={{ 
                           p: 2, 
                           mb: 1, 
                           border: '1px solid #e0e0e0',
                           borderRadius: 1,
-                          backgroundColor: task.priority === 'urgent' ? '#ffebee' : '#e3f2fd'
+                          backgroundColor: event.urgent ? '#ffebee' : 'transparent'
                         }}
                       >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          {task.priority === 'urgent' ? <WarningIcon color="error" /> : <TimeIcon color="primary" />}
-                          <Typography variant="body2" fontWeight="bold">
-                            {task.title}
-                          </Typography>
-                        </Box>
-                        <Typography variant="caption" color="text.secondary">
-                          {task.course} - {task.dueDate}
+                        <Typography variant="subtitle2" color={event.urgent ? 'error' : 'primary'}>
+                          {event.title} - {event.date}
                         </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {event.description}
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                          <TimeIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                          <Typography variant="caption">{event.time}</Typography>
+                          <LocationIcon sx={{ fontSize: 16, ml: 2, mr: 0.5 }} />
+                          <Typography variant="caption">{event.location}</Typography>
+                        </Box>
                       </Box>
                     ))}
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
+                  </Box>
+                </CardContent>
+              </Card>
+
+              {/* Facilities Card */}
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <LocationIcon sx={{ mr: 1 }} />
+                    <Typography variant="h6">מצב מתקנים</Typography>
+                  </Box>
+                  {demoFacilities.map((facility) => (
+                    <Box key={facility.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="body2">{facility.name}:</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Chip 
+                          label={facility.status === 'open' ? 'פתוח' : facility.status === 'busy' ? 'עמוס' : 'סגור'}
+                          color={getStatusColor(facility.status) as any}
+                          size="small"
+                        />
+                        <Typography variant="caption">{facility.hours}</Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Tasks Card */}
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <CheckCircleIcon sx={{ mr: 1 }} />
+                    <Typography variant="h6">תזכורות יומיות</Typography>
+                  </Box>
+                  {demoTasks.map((task) => (
+                    <Box 
+                      key={task.id} 
+                      sx={{ 
+                        p: 2, 
+                        mb: 1, 
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 1,
+                        backgroundColor: task.priority === 'urgent' ? '#ffebee' : '#e3f2fd'
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        {task.priority === 'urgent' ? <WarningIcon color="error" /> : <TimeIcon color="primary" />}
+                        <Typography variant="body2" fontWeight="bold">
+                          {task.title}
+                        </Typography>
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {task.course} - {task.dueDate}
+                      </Typography>
+                    </Box>
+                  ))}
+                </CardContent>
+              </Card>
+            </Box>
           </Box>
         )}
 
