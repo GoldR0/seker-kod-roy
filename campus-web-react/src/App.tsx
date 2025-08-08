@@ -2608,152 +2608,136 @@ function App() {
                 </IconButton>
               </Box>
               
-                             {/* Course Images Grid */}
-               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(4, 1fr)', lg: 'repeat(6, 1fr)' }, gap: 2 }}>
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/1.png"
-                     alt="Course 1"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">מתמטיקה 1</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/2.png"
-                     alt="Course 2"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">פיזיקה 1</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/3.png"
-                     alt="Course 3"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">תכנות</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/4.png"
-                     alt="Course 4"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">כימיה</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/5.png"
-                     alt="Course 5"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">ביולוגיה</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/6.png"
-                     alt="Course 6"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">סטטיסטיקה</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/7.png"
-                     alt="Course 7"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">אנגלית</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/8.png"
-                     alt="Course 8"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">היסטוריה</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/9.png"
-                     alt="Course 9"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">גיאוגרפיה</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/10.png"
-                     alt="Course 10"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">פסיכולוגיה</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/11.png"
-                     alt="Course 11"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">סוציולוגיה</Typography>
-                   </CardContent>
-                 </Card>
-                 
-                 <Card sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.05)', transition: 'transform 0.2s' } }}>
-                   <CardMedia
-                     component="img"
-                     height="120"
-                     image="/12.png"
-                     alt="Course 12"
-                   />
-                   <CardContent sx={{ p: 1, textAlign: 'center' }}>
-                     <Typography variant="caption">פילוסופיה</Typography>
-                   </CardContent>
-                 </Card>
-               </Box>
+              {/* Course List */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Paper 
+                  sx={{ 
+                    p: 2, 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: '#f5f5f5' },
+                    borderLeft: '4px solid #2e7d32'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
+                    מתמטיקה 1
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    מרצה: ד"ר יוסי כהן | נקודות זכות: 6 | מערכת: א' 10:00-12:00, ג' 14:00-16:00
+                  </Typography>
+                </Paper>
+                
+                <Paper 
+                  sx={{ 
+                    p: 2, 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: '#f5f5f5' },
+                    borderLeft: '4px solid #1976d2'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                    פיזיקה 1
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    מרצה: פרופ' שרה לוי | נקודות זכות: 5 | מערכת: ב' 09:00-11:00, ד' 13:00-15:00
+                  </Typography>
+                </Paper>
+                
+                <Paper 
+                  sx={{ 
+                    p: 2, 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: '#f5f5f5' },
+                    borderLeft: '4px solid #ed6c02'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#ed6c02' }}>
+                    תכנות מתקדם
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    מרצה: ד"ר דוד ישראלי | נקודות זכות: 4 | מערכת: א' 14:00-16:00, ה' 10:00-12:00
+                  </Typography>
+                </Paper>
+                
+                <Paper 
+                  sx={{ 
+                    p: 2, 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: '#f5f5f5' },
+                    borderLeft: '4px solid #9c27b0'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
+                    כימיה כללית
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    מרצה: ד"ר רות כהן | נקודות זכות: 5 | מערכת: ב' 12:00-14:00, ד' 09:00-11:00
+                  </Typography>
+                </Paper>
+                
+                <Paper 
+                  sx={{ 
+                    p: 2, 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: '#f5f5f5' },
+                    borderLeft: '4px solid #2e7d32'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
+                    ביולוגיה תאית
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    מרצה: פרופ' משה גולדברג | נקודות זכות: 4 | מערכת: ג' 10:00-12:00, ו' 09:00-11:00
+                  </Typography>
+                </Paper>
+                
+                <Paper 
+                  sx={{ 
+                    p: 2, 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: '#f5f5f5' },
+                    borderLeft: '4px solid #d32f2f'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#d32f2f' }}>
+                    סטטיסטיקה והסתברות
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    מרצה: ד"ר אנה פטרוב | נקודות זכות: 3 | מערכת: א' 16:00-18:00, ד' 16:00-18:00
+                  </Typography>
+                </Paper>
+                
+                <Paper 
+                  sx={{ 
+                    p: 2, 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: '#f5f5f5' },
+                    borderLeft: '4px solid #1976d2'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                    אנגלית אקדמית
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    מרצה: גב' לינדה סמית | נקודות זכות: 2 | מערכת: ב' 16:00-18:00, ה' 14:00-16:00
+                  </Typography>
+                </Paper>
+                
+                <Paper 
+                  sx={{ 
+                    p: 2, 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: '#f5f5f5' },
+                    borderLeft: '4px solid #ed6c02'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#ed6c02' }}>
+                    היסטוריה של המדע
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    מרצה: ד"ר יעל ברק | נקודות זכות: 3 | מערכת: ג' 14:00-16:00, ו' 12:00-14:00
+                  </Typography>
+                </Paper>
+              </Box>
             </Paper>
           </Box>
         )}
