@@ -27,7 +27,7 @@ import {
   TrendingUp as TrendingUpIcon,
   Warning as WarningIcon
 } from '@mui/icons-material';
-import StudentsTable from '../components/tables/StudentsTable';
+import { StudentsTable } from '../components/tables';
 import { Student } from '../types/Student';
 import { 
   getAllStudents, 
@@ -37,6 +37,7 @@ import {
 } from '../data/studentsData';
 
 const StudentsPage: React.FC = () => {
+  const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -71,6 +72,21 @@ const StudentsPage: React.FC = () => {
   // Confirm delete
   const confirmDelete = () => {
     if (selectedStudent) {
+      // Update students state
+      setStudents(prev => {
+        const updatedStudents = prev.filter(s => s.id !== selectedStudent.id);
+        
+        // Save updated data to localStorage
+        try {
+          const studentsJson = JSON.stringify(updatedStudents);
+          localStorage.setItem('campus-students-data', studentsJson);
+        } catch (error) {
+          console.error('Error saving to localStorage:', error);
+        }
+        
+        return updatedStudents;
+      });
+      
       setNotification({
         message: `הסטודנט ${selectedStudent.fullName} נמחק בהצלחה`,
         type: 'success'
@@ -83,6 +99,112 @@ const StudentsPage: React.FC = () => {
   // Get statistics
   const getActiveStudents = () => getStudentsByStatus('active');
   const getHighGPAStudentsList = () => getHighGPAStudents();
+
+  // Add new student and save to localStorage
+  const addNewStudent = () => {
+    try {
+      // Generate unique ID and student number
+      const newId = Date.now().toString();
+      const newStudentNumber = `2024${String(students.length + 1).padStart(3, '0')}`;
+      
+      // Create new student object
+      const newStudent: Student = {
+        id: newId,
+        studentNumber: newStudentNumber,
+        firstName: 'סטודנט',
+        lastName: 'חדש',
+        fullName: 'סטודנט חדש',
+        email: `student${students.length + 1}@campus.ac.il`,
+        phone: `050-${String(Math.floor(Math.random() * 9000000) + 1000000)}`,
+        address: 'כתובת לדוגמה',
+        department: 'מדעי המחשב',
+        year: 1,
+        semester: 'א',
+        creditsCompleted: 0,
+        gpa: 0.0,
+        birthDate: new Date().toISOString().split('T')[0],
+        age: 18,
+        gender: 'male',
+        city: 'תל אביב',
+        status: 'active',
+        enrollmentDate: new Date().toISOString().split('T')[0],
+        lastActive: new Date().toISOString().split('T')[0],
+        emergencyContact: 'הורה',
+        emergencyPhone: '050-1234567',
+        notes: 'סטודנט חדש שנוסף למערכת'
+      };
+
+      // Add to students array
+      const updatedStudents = [...students, newStudent];
+      setStudents(updatedStudents);
+
+      // Save to localStorage
+      const studentsJson = JSON.stringify(updatedStudents);
+      localStorage.setItem('campus-students-data', studentsJson);
+
+      setNotification({
+        message: `סטודנט חדש נוסף בהצלחה! מספר סטודנט: ${newStudentNumber}`,
+        type: 'success'
+      });
+      
+      console.log('New student added:', newStudent);
+      console.log('Updated students list:', updatedStudents);
+    } catch (error) {
+      console.error('Error adding new student:', error);
+      setNotification({
+        message: 'שגיאה בהוספת סטודנט חדש',
+        type: 'error'
+      });
+    }
+  };
+
+  // Save students data to localStorage (legacy function)
+  const saveStudentsToLocalStorage = () => {
+    try {
+      const studentsJson = JSON.stringify(students);
+      localStorage.setItem('campus-students-data', studentsJson);
+      setNotification({
+        message: `נשמרו ${students.length} סטודנטים ב-localStorage בהצלחה`,
+        type: 'success'
+      });
+      console.log('Students saved to localStorage:', students);
+    } catch (error) {
+      console.error('Error saving students to localStorage:', error);
+      setNotification({
+        message: 'שגיאה בשמירת הנתונים ב-localStorage',
+        type: 'error'
+      });
+    }
+  };
+
+  // Load students from localStorage on component mount
+  useEffect(() => {
+    const loadStudentsFromLocalStorage = () => {
+      try {
+        const savedStudents = localStorage.getItem('campus-students-data');
+        if (savedStudents) {
+          const parsedStudents = JSON.parse(savedStudents);
+          setStudents(parsedStudents);
+          setStatistics(getStudentsStatistics());
+          console.log('Students loaded from localStorage:', parsedStudents);
+        } else {
+          // If no data in localStorage, load from demo data
+          const allStudents = getAllStudents();
+          setStudents(allStudents);
+          setStatistics(getStudentsStatistics());
+          console.log('Students loaded from demo data:', allStudents);
+        }
+      } catch (error) {
+        console.error('Error loading students from localStorage:', error);
+        // Fallback to demo data
+        const allStudents = getAllStudents();
+        setStudents(allStudents);
+        setStatistics(getStudentsStatistics());
+      }
+    };
+
+    loadStudentsFromLocalStorage();
+  }, []);
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
@@ -172,6 +294,7 @@ const StudentsPage: React.FC = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
+          onClick={addNewStudent}
           sx={{ 
             backgroundColor: 'rgb(179, 209, 53)',
             '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
@@ -209,6 +332,7 @@ const StudentsPage: React.FC = () => {
 
       {/* Students Table */}
       <StudentsTable
+        students={students}
         onViewStudent={handleViewStudent}
         onEditStudent={handleEditStudent}
         onDeleteStudent={handleDeleteStudent}
