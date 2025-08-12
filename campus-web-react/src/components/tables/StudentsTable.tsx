@@ -74,38 +74,100 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
   // Dialog states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info'>('info');
 
-  // Initialize students data
-  useEffect(() => {
-    const loadStudents = () => {
-      try {
-        setLoading(true);
-        const initialStudents = getAllStudents();
-        setStudents(initialStudents);
-        setError(null);
-      } catch (err) {
-        setError('שגיאה בטעינת נתוני סטודנטים');
-        console.error('Error loading students:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Form state for new student
+  const [newStudent, setNewStudent] = useState<Partial<Student>>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    department: '',
+    year: 1,
+    semester: 'א',
+    gpa: 0.0,
+    status: 'active'
+  });
 
-    loadStudents();
+  // Load students from localStorage on component mount
+  useEffect(() => {
+    try {
+      setLoading(true);
+      const storedStudents = localStorage.getItem('students');
+      const initialStudents = storedStudents ? JSON.parse(storedStudents) : getAllStudents();
+      setStudents(initialStudents);
+    } catch (err) {
+      setError('שגיאה בטעינת נתונים');
+      setStudents(getAllStudents()); // fallback to default data
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   // CRUD Operations
-  const addStudent = (newStudent: Student) => {
+  const addStudent = (studentData: Partial<Student>) => {
     try {
-      const errors = validateStudent(newStudent);
+      // Generate unique ID and student number
+      const newId = Date.now().toString();
+      const newStudentNumber = `2024${String(students.length + 1).padStart(3, '0')}`;
+      
+      // Create complete student object
+      const completeStudent: Student = {
+        id: newId,
+        studentNumber: newStudentNumber,
+        firstName: studentData.firstName || '',
+        lastName: studentData.lastName || '',
+        fullName: `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim(),
+        email: studentData.email || '',
+        phone: studentData.phone || '',
+        address: studentData.address || '',
+        department: studentData.department || '',
+        year: studentData.year || 1,
+        semester: studentData.semester || 'א',
+        creditsCompleted: studentData.creditsCompleted || 0,
+        gpa: studentData.gpa || 0.0,
+        birthDate: studentData.birthDate || new Date().toISOString().split('T')[0],
+        age: studentData.age || 18,
+        gender: studentData.gender || 'male',
+        city: studentData.city || '',
+        status: studentData.status || 'active',
+        enrollmentDate: new Date().toISOString().split('T')[0],
+        lastActive: new Date().toISOString().split('T')[0],
+        emergencyContact: studentData.emergencyContact || '',
+        emergencyPhone: studentData.emergencyPhone || '',
+        notes: studentData.notes || ''
+      };
+
+      // Validate the complete student object
+      const errors = validateStudent(completeStudent);
       if (errors.length > 0) {
         throw new Error(errors.join(', '));
       }
 
-      setStudents(prevStudents => [...prevStudents, newStudent]);
+      // Create new array with the new student (immutable update)
+      setStudents(prevStudents => {
+        const updatedStudents = [...prevStudents, completeStudent];
+        localStorage.setItem('students', JSON.stringify(updatedStudents));
+        return updatedStudents;
+      });
+
+      // Reset form and close dialog
+      setNewStudent({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        department: '',
+        year: 1,
+        semester: 'א',
+        gpa: 0.0,
+        status: 'active'
+      });
+      setAddDialogOpen(false);
+      
       showSnackbar('סטודנט נוסף בהצלחה', 'success');
     } catch (err) {
       showSnackbar(`שגיאה בהוספת סטודנט: ${err instanceof Error ? err.message : 'שגיאה לא ידועה'}`, 'error');
@@ -119,11 +181,13 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
         throw new Error(errors.join(', '));
       }
 
-      setStudents(prevStudents => 
-        prevStudents.map(student => 
+      setStudents(prevStudents => {
+        const updatedStudents = prevStudents.map(student => 
           student.id === updatedStudent.id ? updatedStudent : student
-        )
-      );
+        );
+        localStorage.setItem('students', JSON.stringify(updatedStudents));
+        return updatedStudents;
+      });
       showSnackbar('סטודנט עודכן בהצלחה', 'success');
     } catch (err) {
       showSnackbar(`שגיאה בעדכון סטודנט: ${err instanceof Error ? err.message : 'שגיאה לא ידועה'}`, 'error');
@@ -137,9 +201,11 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
 
   const confirmDelete = () => {
     if (studentToDelete) {
-      setStudents(prevStudents => 
-        prevStudents.filter(student => student.id !== studentToDelete.id)
-      );
+      setStudents(prevStudents => {
+        const updatedStudents = prevStudents.filter(student => student.id !== studentToDelete.id);
+        localStorage.setItem('students', JSON.stringify(updatedStudents));
+        return updatedStudents;
+      });
       showSnackbar('סטודנט נמחק בהצלחה', 'success');
     }
     setDeleteDialogOpen(false);
@@ -151,6 +217,7 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
       setLoading(true);
       const refreshedStudents = getAllStudents();
       setStudents(refreshedStudents);
+      localStorage.setItem('students', JSON.stringify(refreshedStudents));
       showSnackbar('רשימת סטודנטים רועננה', 'info');
     } catch (err) {
       showSnackbar('שגיאה ברענון נתונים', 'error');
@@ -378,7 +445,7 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => showSnackbar('פונקציונליות הוספת סטודנט תתווסף בקרוב', 'info')}
+              onClick={() => setAddDialogOpen(true)}
               size="small"
             >
               הוסף סטודנט
@@ -423,14 +490,14 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
           >
             רענן
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => showSnackbar('פונקציונליות הוספת סטודנט תתווסף בקרוב', 'info')}
-            size="small"
-          >
-            הוסף סטודנט
-          </Button>
+                      <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setAddDialogOpen(true)}
+              size="small"
+            >
+              הוסף סטודנט
+            </Button>
         </Box>
       </Box>
 
@@ -559,8 +626,123 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
 
 
 
-             {/* Add Student Dialog - Placeholder for future implementation */}
-       {/* This dialog will be implemented in the next phase */}
+             {/* Add Student Dialog */}
+       <Dialog 
+         open={addDialogOpen} 
+         onClose={() => setAddDialogOpen(false)}
+         maxWidth="md"
+         fullWidth
+       >
+         <DialogTitle sx={{ backgroundColor: 'rgb(179, 209, 53)', color: 'white' }}>
+           הוספת סטודנט חדש
+         </DialogTitle>
+         <DialogContent sx={{ pt: 3 }}>
+           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
+             <TextField
+               fullWidth
+               label="שם פרטי *"
+               variant="outlined"
+               value={newStudent.firstName}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, firstName: e.target.value }))}
+               required
+             />
+             <TextField
+               fullWidth
+               label="שם משפחה *"
+               variant="outlined"
+               value={newStudent.lastName}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, lastName: e.target.value }))}
+               required
+             />
+             <TextField
+               fullWidth
+               label="אימייל *"
+               variant="outlined"
+               type="email"
+               value={newStudent.email}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, email: e.target.value }))}
+               required
+             />
+             <TextField
+               fullWidth
+               label="טלפון *"
+               variant="outlined"
+               value={newStudent.phone}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, phone: e.target.value }))}
+               required
+             />
+             <TextField
+               fullWidth
+               label="חוג/מחלקה *"
+               variant="outlined"
+               value={newStudent.department}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, department: e.target.value }))}
+               required
+             />
+             <TextField
+               fullWidth
+               label="שנת לימודים"
+               variant="outlined"
+               type="number"
+               value={newStudent.year}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, year: parseInt(e.target.value) || 1 }))}
+               inputProps={{ min: 1, max: 4 }}
+             />
+             <TextField
+               fullWidth
+               label="ממוצע ציונים"
+               variant="outlined"
+               type="number"
+               value={newStudent.gpa}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, gpa: parseFloat(e.target.value) || 0.0 }))}
+               inputProps={{ min: 0, max: 4, step: 0.1 }}
+             />
+             <TextField
+               fullWidth
+               label="כתובת"
+               variant="outlined"
+               value={newStudent.address}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, address: e.target.value }))}
+             />
+             <TextField
+               fullWidth
+               label="עיר"
+               variant="outlined"
+               value={newStudent.city}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, city: e.target.value }))}
+             />
+             <TextField
+               fullWidth
+               label="איש קשר לשעת חירום"
+               variant="outlined"
+               value={newStudent.emergencyContact}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, emergencyContact: e.target.value }))}
+             />
+             <TextField
+               fullWidth
+               label="טלפון לשעת חירום"
+               variant="outlined"
+               value={newStudent.emergencyPhone}
+               onChange={(e) => setNewStudent(prev => ({ ...prev, emergencyPhone: e.target.value }))}
+             />
+           </Box>
+         </DialogContent>
+         <DialogActions>
+           <Button onClick={() => setAddDialogOpen(false)}>
+             ביטול
+           </Button>
+           <Button 
+             onClick={() => addStudent(newStudent)}
+             variant="contained"
+             sx={{ 
+               backgroundColor: 'rgb(179, 209, 53)',
+               '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
+             }}
+           >
+             הוסף סטודנט
+           </Button>
+         </DialogActions>
+       </Dialog>
        
        {/* Edit Student Dialog - Placeholder for future implementation */}
        {/* This dialog will be implemented in the next phase */}
