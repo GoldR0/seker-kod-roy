@@ -37,22 +37,15 @@ import {
 } from '../data/studentsData';
 
 const StudentsPage: React.FC = () => {
-  const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [statistics, setStatistics] = useState<any>(null);
 
-  // Load students data on component mount
+  // Load statistics on component mount
   useEffect(() => {
-    const loadStudents = () => {
-      const allStudents = getAllStudents();
-      setStudents(allStudents);
-      setStatistics(getStudentsStatistics());
-    };
-
-    loadStudents();
+    setStatistics(getStudentsStatistics());
   }, []);
 
   // Handle view student
@@ -78,8 +71,6 @@ const StudentsPage: React.FC = () => {
   // Confirm delete
   const confirmDelete = () => {
     if (selectedStudent) {
-      // In a real app, this would call an API
-      setStudents(prev => prev.filter(s => s.id !== selectedStudent.id));
       setNotification({
         message: `הסטודנט ${selectedStudent.fullName} נמחק בהצלחה`,
         type: 'success'
@@ -218,7 +209,6 @@ const StudentsPage: React.FC = () => {
 
       {/* Students Table */}
       <StudentsTable
-        students={students}
         onViewStudent={handleViewStudent}
         onEditStudent={handleEditStudent}
         onDeleteStudent={handleDeleteStudent}
