@@ -303,6 +303,16 @@ const StudentsPage: React.FC = () => {
           הוספת סטודנט חדש
         </Button>
         <Button
+          variant="contained"
+          onClick={saveStudentsToLocalStorage}
+          sx={{ 
+            backgroundColor: 'rgb(179, 209, 53)',
+            '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
+          }}
+        >
+          שמירה
+        </Button>
+        <Button
           variant="outlined"
           sx={{ 
             borderColor: 'rgb(179, 209, 53)',
