@@ -16,9 +16,6 @@ const PlaceholderContent: React.FC<PlaceholderContentProps> = ({ activeSection, 
       case 'learning': return 'מרכז הלימודים';
       case 'cafeteria': return 'קפיטריה';
       case 'lost-found': return 'מציאות ואבדות';
-      case 'marketplace': return 'שוק יד שנייה';
-      case 'services': return 'שירותים בקמפוס';
-      case 'community': return 'קהילה';
       case 'forum': return 'פורום קורס';
       case 'help': return 'עזרה';
       default: return 'דף לא נמצא';

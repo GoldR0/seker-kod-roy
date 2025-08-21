@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Box, Typography } from '@mui/material';
 import { CheckCircle as CheckCircleIcon, Warning as WarningIcon, AccessTime as TimeIcon } from '@mui/icons-material';
-import { Task } from '../../types';
+
 import { demoTasks } from '../../data/demoData';
 
 interface TasksCardProps {

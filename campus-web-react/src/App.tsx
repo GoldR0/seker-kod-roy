@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Dashboard from './components/dashboard/Dashboard';
 import PlaceholderContent from './components/PlaceholderContent';
 import StudentsPage from './pages/StudentsPage';
+import CommunityPage from './components/CommunityPage';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
 
@@ -52,9 +53,14 @@ function App() {
         {activeSection === 'students' && (
           <StudentsPage />
         )}
+
+        {/* Community Page */}
+        {activeSection === 'community' && (
+          <CommunityPage currentUser={currentUser} />
+        )}
         
         {/* Other sections */}
-        {activeSection !== 'home' && activeSection !== 'students' && (
+        {activeSection !== 'home' && activeSection !== 'students' && activeSection !== 'community' && (
           <PlaceholderContent activeSection={activeSection} customColors={customColors} />
         )}
       </Container>

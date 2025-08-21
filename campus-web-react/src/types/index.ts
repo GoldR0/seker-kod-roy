@@ -35,6 +35,9 @@ export interface Facility {
   name: string;
   status: 'open' | 'closed' | 'busy';
   hours: string;
+  rating?: number;
+  totalRatings?: number;
+  averageRating?: number;
 }
 
 export interface Course {

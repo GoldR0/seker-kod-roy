@@ -66,10 +66,42 @@ export const demoEvents: Event[] = [
 
 // Demo Facilities
 export const demoFacilities: Facility[] = [
-  { id: '1', name: 'ספרייה', status: 'open', hours: '6:30-22:30' },
-  { id: '2', name: 'קפיטריה', status: 'busy', hours: '7:00-22:00' },
-  { id: '3', name: 'חדר כושר', status: 'open', hours: '6:30-8:00' },
-  { id: '4', name: 'חניה', status: 'busy', hours: '24/7' }
+  { 
+    id: '1', 
+    name: 'ספרייה', 
+    status: 'open', 
+    hours: '6:30-22:30',
+    rating: 0,
+    totalRatings: 0,
+    averageRating: 0
+  },
+  { 
+    id: '2', 
+    name: 'קפיטריה', 
+    status: 'busy', 
+    hours: '7:00-22:00',
+    rating: 0,
+    totalRatings: 0,
+    averageRating: 0
+  },
+  { 
+    id: '3', 
+    name: 'חדר כושר', 
+    status: 'open', 
+    hours: '6:30-8:00',
+    rating: 0,
+    totalRatings: 0,
+    averageRating: 0
+  },
+  { 
+    id: '4', 
+    name: 'חניה', 
+    status: 'busy', 
+    hours: '24/7',
+    rating: 0,
+    totalRatings: 0,
+    averageRating: 0
+  }
 ];
 
 // Demo Tasks

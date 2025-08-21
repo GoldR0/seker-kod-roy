@@ -27,19 +27,15 @@ import {
 import {
   Home as HomeIcon,
   School as SchoolIcon,
-  Event as EventIcon,
   Restaurant as RestaurantIcon,
   Search as SearchIcon,
-  ShoppingCart as ShoppingCartIcon,
-  Build as BuildIcon,
   Group as GroupIcon,
   Forum as ForumIcon,
   Help as HelpIcon,
   Person as PersonIcon,
   Login as LoginIcon,
   Logout as LogoutIcon,
-  Menu as MenuIcon,
-  Close as CloseIcon
+  Menu as MenuIcon
 } from '@mui/icons-material';
 import { User } from '../types';
 
@@ -73,8 +69,6 @@ const Header: React.FC<HeaderProps> = ({
     { id: 'learning', label: 'מרכז הלימודים', icon: <SchoolIcon /> },
     { id: 'cafeteria', label: 'קפיטריה', icon: <RestaurantIcon /> },
     { id: 'lostfound', label: 'מציאות ואבדות', icon: <SearchIcon /> },
-    { id: 'marketplace', label: 'שוק יד שנייה', icon: <ShoppingCartIcon /> },
-    { id: 'services', label: 'שירותים בקמפוס', icon: <BuildIcon /> },
     { id: 'community', label: 'קהילה', icon: <GroupIcon /> },
     { id: 'course-forum', label: 'פורום קורס', icon: <ForumIcon /> },
     { id: 'help', label: 'עזרה', icon: <HelpIcon /> }

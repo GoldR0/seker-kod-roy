@@ -37,7 +37,6 @@ export { default as cafeteria23 } from './a23.png';
 export { default as cafeteria24 } from './a24.png';
 
 // תמונות שירותים
-export { default as campusServices } from './שירותים בקמפוס (1).png';
 export { default as courseForum } from './פורום קורס (2).png';
 
 // תמונות נוספות (מספריות)
