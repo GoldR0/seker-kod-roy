@@ -1,0 +1,48 @@
+import React from 'react';
+import { Card, CardContent, Box, Typography } from '@mui/material';
+import { CheckCircle as CheckCircleIcon, Warning as WarningIcon, AccessTime as TimeIcon } from '@mui/icons-material';
+import { Task } from '../../types';
+import { demoTasks } from '../../data/demoData';
+
+interface TasksCardProps {
+  customColors: {
+    primary: string;
+  };
+}
+
+const TasksCard: React.FC<TasksCardProps> = ({ customColors }) => {
+  return (
+    <Card sx={{ border: `2px solid ${customColors.primary}` }}>
+      <CardContent>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <CheckCircleIcon sx={{ mr: 1 }} />
+          <Typography variant="h6">תזכורות יומיות</Typography>
+        </Box>
+        {demoTasks.map((task) => (
+          <Box 
+            key={task.id} 
+            sx={{ 
+              p: 2, 
+              mb: 1, 
+              border: '1px solid #e0e0e0',
+              borderRadius: 1,
+              backgroundColor: task.priority === 'urgent' ? '#ffebee' : '#e3f2fd'
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              {task.priority === 'urgent' ? <WarningIcon color="error" /> : <TimeIcon color="primary" />}
+              <Typography variant="body2" fontWeight="bold">
+                {task.title}
+              </Typography>
+            </Box>
+            <Typography variant="caption" color="text.secondary">
+              {task.course} - {task.dueDate}
+            </Typography>
+          </Box>
+        ))}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default TasksCard;
