@@ -45,14 +45,12 @@ interface HeaderProps {
   currentUser: User | null;
   onLogin: (email: string, password: string) => void;
   onLogout: () => void;
-  currentSection: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
   currentUser,
   onLogin,
-  onLogout,
-  currentSection
+  onLogout
 }) => {
   const navigate = useNavigate();
   const [loginOpen, setLoginOpen] = useState(false);
@@ -161,7 +159,7 @@ const Header: React.FC<HeaderProps> = ({
               <ListItem key={item.id} disablePadding>
                 <ListItemButton
                   onClick={() => handleNavigation(item.path)}
-                  selected={currentSection === item.id}
+                  selected={false} // Removed currentSection prop
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.label} />

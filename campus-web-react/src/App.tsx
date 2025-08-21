@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { Box, Container, Alert, Snackbar } from '@mui/material';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -11,7 +12,6 @@ import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
 
 function App() {
-  const [activeSection, setActiveSection] = useState('home');
   const { currentUser, handleLogin, handleLogout } = useAuth();
   const { notification, showNotification, hideNotification } = useNotifications();
 
@@ -40,34 +40,41 @@ function App() {
         currentUser={currentUser}
         onLogin={onLogin}
         onLogout={onLogout}
-        currentSection={activeSection}
       />
 
       {/* Main Content */}
       <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
-        {activeSection === 'home' && (
-          <Dashboard currentUser={currentUser} />
-        )}
-
-        {/* Students Page */}
-        {activeSection === 'students' && (
-          <StudentsPage />
-        )}
-
-        {/* Community Page */}
-        {activeSection === 'community' && (
-          <CommunityPage currentUser={currentUser} />
-        )}
-
-        {/* Forms Page */}
-        {activeSection === 'forms' && (
-          <FormsPage currentUser={currentUser} />
-        )}
-        
-        {/* Other sections */}
-        {activeSection !== 'home' && activeSection !== 'students' && activeSection !== 'community' && activeSection !== 'forms' && (
-          <PlaceholderContent activeSection={activeSection} customColors={customColors} />
-        )}
+        <Routes>
+          {/* Home Page */}
+          <Route path="/" element={<Dashboard currentUser={currentUser} />} />
+          
+          {/* Students Page */}
+          <Route path="/students" element={<StudentsPage />} />
+          
+          {/* Forms Page */}
+          <Route path="/forms" element={<FormsPage currentUser={currentUser} />} />
+          
+          {/* Community Page */}
+          <Route path="/community" element={<CommunityPage currentUser={currentUser} />} />
+          
+          {/* Profile Page */}
+          <Route path="/profile" element={<PlaceholderContent activeSection="profile" customColors={customColors} />} />
+          
+          {/* Learning Center Page */}
+          <Route path="/learning" element={<PlaceholderContent activeSection="learning" customColors={customColors} />} />
+          
+          {/* Cafeteria Page */}
+          <Route path="/cafeteria" element={<PlaceholderContent activeSection="cafeteria" customColors={customColors} />} />
+          
+          {/* Lost and Found Page */}
+          <Route path="/lostfound" element={<PlaceholderContent activeSection="lostfound" customColors={customColors} />} />
+          
+          {/* Course Forum Page */}
+          <Route path="/course-forum" element={<PlaceholderContent activeSection="course-forum" customColors={customColors} />} />
+          
+          {/* Help Page */}
+          <Route path="/help" element={<PlaceholderContent activeSection="help" customColors={customColors} />} />
+        </Routes>
       </Container>
 
       {/* Footer Component */}
