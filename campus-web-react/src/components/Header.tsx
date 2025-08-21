@@ -35,7 +35,8 @@ import {
   Person as PersonIcon,
   Login as LoginIcon,
   Logout as LogoutIcon,
-  Menu as MenuIcon
+  Menu as MenuIcon,
+  Description as DescriptionIcon
 } from '@mui/icons-material';
 import { User } from '../types';
 
@@ -65,6 +66,7 @@ const Header: React.FC<HeaderProps> = ({
   const navigationItems = [
     { id: 'home', label: 'עמוד בית', icon: <HomeIcon /> },
     { id: 'students', label: 'ניהול סטודנטים', icon: <SchoolIcon /> },
+    { id: 'forms', label: 'טפסים', icon: <DescriptionIcon /> },
     { id: 'profile', label: 'פרופיל אישי', icon: <PersonIcon /> },
     { id: 'learning', label: 'מרכז הלימודים', icon: <SchoolIcon /> },
     { id: 'cafeteria', label: 'קפיטריה', icon: <RestaurantIcon /> },

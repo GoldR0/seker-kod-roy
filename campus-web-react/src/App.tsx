@@ -6,6 +6,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import PlaceholderContent from './components/PlaceholderContent';
 import StudentsPage from './pages/StudentsPage';
 import CommunityPage from './components/CommunityPage';
+import FormsPage from './pages/FormsPage';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
 
@@ -58,9 +59,14 @@ function App() {
         {activeSection === 'community' && (
           <CommunityPage currentUser={currentUser} />
         )}
+
+        {/* Forms Page */}
+        {activeSection === 'forms' && (
+          <FormsPage currentUser={currentUser} />
+        )}
         
         {/* Other sections */}
-        {activeSection !== 'home' && activeSection !== 'students' && activeSection !== 'community' && (
+        {activeSection !== 'home' && activeSection !== 'students' && activeSection !== 'community' && activeSection !== 'forms' && (
           <PlaceholderContent activeSection={activeSection} customColors={customColors} />
         )}
       </Container>
