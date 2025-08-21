@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Box, Container, Alert, Snackbar } from '@mui/material';
@@ -8,6 +9,7 @@ import PlaceholderContent from './components/PlaceholderContent';
 import StudentsPage from './pages/StudentsPage';
 import CommunityPage from './components/CommunityPage';
 import FormsPage from './pages/FormsPage';
+import CafeteriaPage from './components/CafeteriaPage';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
 
@@ -64,7 +66,7 @@ function App() {
           <Route path="/learning" element={<PlaceholderContent activeSection="learning" customColors={customColors} />} />
           
           {/* Cafeteria Page */}
-          <Route path="/cafeteria" element={<PlaceholderContent activeSection="cafeteria" customColors={customColors} />} />
+          <Route path="/cafeteria" element={<CafeteriaPage />} />
           
           {/* Lost and Found Page */}
           <Route path="/lostfound" element={<PlaceholderContent activeSection="lostfound" customColors={customColors} />} />
