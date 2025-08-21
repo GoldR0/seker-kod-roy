@@ -10,6 +10,7 @@ import StudentsPage from './pages/StudentsPage';
 import CommunityPage from './components/CommunityPage';
 import FormsPage from './pages/FormsPage';
 import CafeteriaPage from './components/CafeteriaPage';
+import HelpPage from './components/HelpPage';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
 
@@ -75,7 +76,7 @@ function App() {
           <Route path="/course-forum" element={<PlaceholderContent activeSection="course-forum" customColors={customColors} />} />
           
           {/* Help Page */}
-          <Route path="/help" element={<PlaceholderContent activeSection="help" customColors={customColors} />} />
+          <Route path="/help" element={<HelpPage />} />
         </Routes>
       </Container>
 
