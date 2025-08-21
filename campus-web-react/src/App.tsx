@@ -40,7 +40,6 @@ function App() {
         currentUser={currentUser}
         onLogin={onLogin}
         onLogout={onLogout}
-        onNavigate={setActiveSection}
         currentSection={activeSection}
       />
 

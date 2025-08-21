@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -44,7 +45,6 @@ interface HeaderProps {
   currentUser: User | null;
   onLogin: (email: string, password: string) => void;
   onLogout: () => void;
-  onNavigate: (section: string) => void;
   currentSection: string;
 }
 
@@ -52,9 +52,9 @@ const Header: React.FC<HeaderProps> = ({
   currentUser,
   onLogin,
   onLogout,
-  onNavigate,
   currentSection
 }) => {
+  const navigate = useNavigate();
   const [loginOpen, setLoginOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loginForm, setLoginForm] = useState({
@@ -64,16 +64,16 @@ const Header: React.FC<HeaderProps> = ({
   });
 
   const navigationItems = [
-    { id: 'home', label: 'עמוד בית', icon: <HomeIcon /> },
-    { id: 'students', label: 'ניהול סטודנטים', icon: <SchoolIcon /> },
-    { id: 'forms', label: 'טפסים', icon: <DescriptionIcon /> },
-    { id: 'profile', label: 'פרופיל אישי', icon: <PersonIcon /> },
-    { id: 'learning', label: 'מרכז הלימודים', icon: <SchoolIcon /> },
-    { id: 'cafeteria', label: 'קפיטריה', icon: <RestaurantIcon /> },
-    { id: 'lostfound', label: 'מציאות ואבדות', icon: <SearchIcon /> },
-    { id: 'community', label: 'קהילה', icon: <GroupIcon /> },
-    { id: 'course-forum', label: 'פורום קורס', icon: <ForumIcon /> },
-    { id: 'help', label: 'עזרה', icon: <HelpIcon /> }
+    { id: 'home', label: 'עמוד בית', icon: <HomeIcon />, path: '/' },
+    { id: 'students', label: 'ניהול סטודנטים', icon: <SchoolIcon />, path: '/students' },
+    { id: 'forms', label: 'טפסים', icon: <DescriptionIcon />, path: '/forms' },
+    { id: 'profile', label: 'פרופיל אישי', icon: <PersonIcon />, path: '/profile' },
+    { id: 'learning', label: 'מרכז הלימודים', icon: <SchoolIcon />, path: '/learning' },
+    { id: 'cafeteria', label: 'קפיטריה', icon: <RestaurantIcon />, path: '/cafeteria' },
+    { id: 'lostfound', label: 'מציאות ואבדות', icon: <SearchIcon />, path: '/lostfound' },
+    { id: 'community', label: 'קהילה', icon: <GroupIcon />, path: '/community' },
+    { id: 'course-forum', label: 'פורום קורס', icon: <ForumIcon />, path: '/course-forum' },
+    { id: 'help', label: 'עזרה', icon: <HelpIcon />, path: '/help' }
   ];
 
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -91,8 +91,8 @@ const Header: React.FC<HeaderProps> = ({
     setDrawerOpen(!drawerOpen);
   };
 
-  const handleNavigation = (section: string) => {
-    onNavigate(section);
+  const handleNavigation = (path: string) => {
+    navigate(path);
     setDrawerOpen(false);
   };
 
@@ -100,40 +100,18 @@ const Header: React.FC<HeaderProps> = ({
     <>
       <AppBar position="static" sx={{ backgroundColor: 'rgb(179, 209, 53)' }}>
         <Toolbar>
-          {/* Logo and Title */}
+          {/* Logo, Title and Hamburger Menu */}
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
             <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
               🏫 מערכת ניהול קמפוס
             </Typography>
-          </Box>
-
-          {/* Desktop Navigation */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, flexWrap: 'wrap' }}>
-            {navigationItems.slice(0, 8).map((item) => (
-              <Button
-                key={item.id}
-                color="inherit"
-                onClick={() => handleNavigation(item.id)}
-                sx={{
-                  backgroundColor: currentSection === item.id ? 'rgba(255,255,255,0.2)' : 'transparent',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.15)'
-                  },
-                  minWidth: 'auto',
-                  px: 1,
-                  py: 0.5
-                }}
-              >
-                {item.icon}
-                <Typography sx={{ 
-                  mr: 0.5, 
-                  display: { xs: 'none', lg: 'block' },
-                  fontSize: '0.875rem'
-                }}>
-                  {item.label}
-                </Typography>
-              </Button>
-            ))}
+            <IconButton
+              color="inherit"
+              onClick={toggleDrawer}
+              sx={{ ml: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
           </Box>
 
           {/* User Controls */}
@@ -167,32 +145,22 @@ const Header: React.FC<HeaderProps> = ({
                 התחברות
               </Button>
             )}
-            
-            {/* Mobile Menu Button */}
-            <IconButton
-              color="inherit"
-              onClick={toggleDrawer}
-              sx={{ display: { xs: 'block', md: 'none' } }}
-            >
-              <MenuIcon />
-            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Navigation Drawer */}
       <Drawer
         anchor="right"
         open={drawerOpen}
         onClose={toggleDrawer}
-        sx={{ display: { xs: 'block', md: 'none' } }}
       >
-        <Box sx={{ width: 250, pt: 2 }}>
+        <div style={{ width: "250px" }}>
           <List>
             {navigationItems.map((item) => (
               <ListItem key={item.id} disablePadding>
                 <ListItemButton
-                  onClick={() => handleNavigation(item.id)}
+                  onClick={() => handleNavigation(item.path)}
                   selected={currentSection === item.id}
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
@@ -201,7 +169,7 @@ const Header: React.FC<HeaderProps> = ({
               </ListItem>
             ))}
           </List>
-        </Box>
+        </div>
       </Drawer>
 
       {/* Login Dialog */}
