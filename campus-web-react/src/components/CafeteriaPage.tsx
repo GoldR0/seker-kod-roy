@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Card, CardMedia, CardContent, Container } from '@mui/material';
+import { Box, Typography, Card, CardMedia, Container } from '@mui/material';
 
 // Import all cafeteria images
 import a1 from '../assets/a1.png';
@@ -29,30 +29,30 @@ import a24 from '../assets/a24.png';
 
 const CafeteriaPage: React.FC = () => {
   const cafeteriaImages = [
-    { id: 1, src: a1, title: 'תפריט קפיטריה 1' },
-    { id: 2, src: a2, title: 'תפריט קפיטריה 2' },
-    { id: 3, src: a3, title: 'תפריט קפיטריה 3' },
-    { id: 4, src: a4, title: 'תפריט קפיטריה 4' },
-    { id: 5, src: a5, title: 'תפריט קפיטריה 5' },
-    { id: 6, src: a6, title: 'תפריט קפיטריה 6' },
-    { id: 7, src: a7, title: 'תפריט קפיטריה 7' },
-    { id: 8, src: a8, title: 'תפריט קפיטריה 8' },
-    { id: 9, src: a9, title: 'תפריט קפיטריה 9' },
-    { id: 10, src: a10, title: 'תפריט קפיטריה 10' },
-    { id: 11, src: a11, title: 'תפריט קפיטריה 11' },
-    { id: 12, src: a12, title: 'תפריט קפיטריה 12' },
-    { id: 13, src: a13, title: 'תפריט קפיטריה 13' },
-    { id: 14, src: a14, title: 'תפריט קפיטריה 14' },
-    { id: 15, src: a15, title: 'תפריט קפיטריה 15' },
-    { id: 16, src: a16, title: 'תפריט קפיטריה 16' },
-    { id: 17, src: a17, title: 'תפריט קפיטריה 17' },
-    { id: 18, src: a18, title: 'תפריט קפיטריה 18' },
-    { id: 19, src: a19, title: 'תפריט קפיטריה 19' },
-    { id: 20, src: a20, title: 'תפריט קפיטריה 20' },
-    { id: 21, src: a21, title: 'תפריט קפיטריה 21' },
-    { id: 22, src: a22, title: 'תפריט קפיטריה 22' },
-    { id: 23, src: a23, title: 'תפריט קפיטריה 23' },
-    { id: 24, src: a24, title: 'תפריט קפיטריה 24' },
+    { id: 1, src: a1 },
+    { id: 2, src: a2 },
+    { id: 3, src: a3 },
+    { id: 4, src: a4 },
+    { id: 5, src: a5 },
+    { id: 6, src: a6 },
+    { id: 7, src: a7 },
+    { id: 8, src: a8 },
+    { id: 9, src: a9 },
+    { id: 10, src: a10 },
+    { id: 11, src: a11 },
+    { id: 12, src: a12 },
+    { id: 13, src: a13 },
+    { id: 14, src: a14 },
+    { id: 15, src: a15 },
+    { id: 16, src: a16 },
+    { id: 17, src: a17 },
+    { id: 18, src: a18 },
+    { id: 19, src: a19 },
+    { id: 20, src: a20 },
+    { id: 21, src: a21 },
+    { id: 22, src: a22 },
+    { id: 23, src: a23 },
+    { id: 24, src: a24 },
   ];
 
   return (
@@ -69,37 +69,30 @@ const CafeteriaPage: React.FC = () => {
             mb: 4
           }}
         >
-          🍽️ קפיטריה - תפריטים ומנות
-        </Typography>
-        
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            textAlign: 'center', 
-            color: 'text.secondary',
-            mb: 4
-          }}
-        >
-          גלריית תמונות של התפריטים והמנות הזמינות בקפיטריה
+          🍽️ קפיטריה
         </Typography>
 
         <Box 
           sx={{ 
             display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(3, 1fr)',
-              lg: 'repeat(4, 1fr)'
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 2,
+            '@media (max-width: 1200px)': {
+              gridTemplateColumns: 'repeat(3, 1fr)',
             },
-            gap: 3
+            '@media (max-width: 900px)': {
+              gridTemplateColumns: 'repeat(2, 1fr)',
+            },
+            '@media (max-width: 600px)': {
+              gridTemplateColumns: 'repeat(1, 1fr)',
+            }
           }}
         >
           {cafeteriaImages.map((image) => (
             <Card 
               key={image.id}
               sx={{ 
-                height: '100%',
+                height: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
                 transition: 'transform 0.2s ease-in-out',
@@ -111,23 +104,15 @@ const CafeteriaPage: React.FC = () => {
             >
               <CardMedia
                 component="img"
-                height="200"
                 image={image.src}
-                alt={image.title}
+                alt={תפריט קפיטריה ${image.id}}
                 sx={{ 
-                  objectFit: 'cover',
-                  cursor: 'pointer'
+                  objectFit: 'contain',
+                  width: '100%',
+                  height: 'auto',
+                  minHeight: '200px'
                 }}
-                onClick={() => window.open(image.src, '_blank')}
               />
-              <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-                <Typography variant="h6" component="h2" gutterBottom>
-                  {image.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  לחץ על התמונה להגדלה
-                </Typography>
-              </CardContent>
             </Card>
           ))}
         </Box>
