@@ -105,7 +105,7 @@ const CafeteriaPage: React.FC = () => {
               <CardMedia
                 component="img"
                 image={image.src}
-                alt={תפריט קפיטריה ${image.id}}
+                alt={`תפריט קפיטריה ${image.id}`}
                 sx={{ 
                   objectFit: 'contain',
                   width: '100%',
