@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Card, CardMedia, Container } from '@mui/material';
+import { Box, Typography, Card, CardMedia, CardContent, Container } from '@mui/material';
 
 // Import all cafeteria images
 import a1 from '../assets/a1.png';
@@ -69,23 +69,25 @@ const CafeteriaPage: React.FC = () => {
             mb: 4
           }}
         >
-          🍽️ קפיטריה
+          🍽️ קפיטריה - תפריטים ומנות
+        </Typography>
+        
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            textAlign: 'center', 
+            color: 'text.secondary',
+            mb: 4
+          }}
+        >
+          גלריית תמונות של התפריטים והמנות הזמינות בקפיטריה
         </Typography>
 
         <Box 
           sx={{ 
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 2,
-            '@media (max-width: 1200px)': {
-              gridTemplateColumns: 'repeat(3, 1fr)',
-            },
-            '@media (max-width: 900px)': {
-              gridTemplateColumns: 'repeat(2, 1fr)',
-            },
-            '@media (max-width: 600px)': {
-              gridTemplateColumns: 'repeat(1, 1fr)',
-            }
+            gap: 3
           }}
         >
           {cafeteriaImages.map((image) => (
@@ -105,12 +107,12 @@ const CafeteriaPage: React.FC = () => {
               <CardMedia
                 component="img"
                 image={image.src}
-                alt={תפריט קפיטריה ${image.id}}
+                alt={`תפריט קפיטריה ${image.id}`}
                 sx={{ 
                   objectFit: 'contain',
                   width: '100%',
                   height: 'auto',
-                  minHeight: '200px'
+                  minHeight: '300px'
                 }}
               />
             </Card>
