@@ -24,7 +24,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  IconButton
+  IconButton,
+  Checkbox,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -61,6 +66,7 @@ interface CourseFormData {
   year: string;
   students: string;
   credits: string;
+  selectedStudents: string[];
 }
 
 interface Task extends TaskFormData {
@@ -69,6 +75,7 @@ interface Task extends TaskFormData {
 
 interface Course extends CourseFormData {
   createdAt: string;
+  selectedStudents: string[];
 }
 
 const StudentsPage: React.FC = () => {
@@ -96,7 +103,8 @@ const StudentsPage: React.FC = () => {
     semester: '',
     year: '2025',
     students: '',
-    credits: ''
+    credits: '',
+    selectedStudents: []
   });
 
   // Tables data
@@ -108,6 +116,11 @@ const StudentsPage: React.FC = () => {
   const [deleteCourseDialogOpen, setDeleteCourseDialogOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+
+  // Student selection dialog state
+  const [studentSelectionDialogOpen, setStudentSelectionDialogOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [editMode, setEditMode] = useState(false);
 
   // Load statistics on component mount
   useEffect(() => {
@@ -327,7 +340,8 @@ const StudentsPage: React.FC = () => {
     // Create new course with creation date
     const newCourse: Course = {
       ...courseFormData,
-      createdAt: new Date().toLocaleString('he-IL')
+      createdAt: new Date().toLocaleString('he-IL'),
+      selectedStudents: courseFormData.selectedStudents
     };
 
     // Add to courses array
@@ -346,8 +360,92 @@ const StudentsPage: React.FC = () => {
       semester: '',
       year: '2025',
       students: '',
-      credits: ''
+      credits: '',
+      selectedStudents: []
     });
+  };
+
+  // Student selection functions
+  const handleOpenStudentSelection = () => {
+    setStudentSelectionDialogOpen(true);
+  };
+
+  const handleStudentToggle = (studentId: string) => {
+    setCourseFormData(prev => ({
+      ...prev,
+      selectedStudents: prev.selectedStudents.includes(studentId)
+        ? prev.selectedStudents.filter(id => id !== studentId)
+        : [...prev.selectedStudents, studentId]
+    }));
+  };
+
+  const handleConfirmStudentSelection = () => {
+    const selectedCount = courseFormData.selectedStudents.length;
+    setCourseFormData(prev => ({
+      ...prev,
+      students: selectedCount.toString()
+    }));
+    setStudentSelectionDialogOpen(false);
+    setNotification({
+      message: `נבחרו ${selectedCount} סטודנטים לקורס`,
+      type: 'success'
+    });
+  };
+
+  const getSelectedStudentNames = () => {
+    return courseFormData.selectedStudents
+      .map(studentId => students.find(s => s.id === studentId)?.fullName)
+      .filter(Boolean)
+      .join(', ');
+  };
+
+  // Edit course students functions
+  const handleEditCourseStudents = (course: Course) => {
+    setEditingCourse(course);
+    setCourseFormData(prev => ({
+      ...prev,
+      selectedStudents: course.selectedStudents || []
+    }));
+    setEditMode(true);
+    setStudentSelectionDialogOpen(true);
+  };
+
+  const handleConfirmEditStudentSelection = () => {
+    if (editingCourse) {
+      const selectedCount = courseFormData.selectedStudents.length;
+      
+      // Update the course in the courses array
+      setCourses(prev => prev.map(course => {
+        if (course.courseId === editingCourse.courseId) {
+          return {
+            ...course,
+            students: selectedCount.toString(),
+            selectedStudents: courseFormData.selectedStudents
+          };
+        }
+        return course;
+      }));
+
+      setNotification({
+        message: `עודכנו ${selectedCount} סטודנטים בקורס ${editingCourse.courseName}`,
+        type: 'success'
+      });
+    }
+    
+    setStudentSelectionDialogOpen(false);
+    setEditMode(false);
+    setEditingCourse(null);
+    setCourseFormData(prev => ({
+      ...prev,
+      selectedStudents: []
+    }));
+  };
+
+  const getCourseStudentNames = (course: Course) => {
+    return (course.selectedStudents || [])
+      .map(studentId => students.find(s => s.id === studentId)?.fullName)
+      .filter(Boolean)
+      .join(', ');
   };
 
   // Delete functions
@@ -723,7 +821,26 @@ const StudentsPage: React.FC = () => {
                 onChange={(e) => handleCourseInputChange('students', e.target.value)}
                 type="number"
                 inputProps={{ min: 0 }}
+                InputProps={{
+                  readOnly: true,
+                  endAdornment: (
+                    <Button
+                      size="small"
+                      onClick={handleOpenStudentSelection}
+                      sx={{ mr: -1 }}
+                    >
+                      בחר סטודנטים
+                    </Button>
+                  )
+                }}
               />
+              {courseFormData.selectedStudents.length > 0 && (
+                <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' }, mt: -2, mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    סטודנטים נבחרים: {getSelectedStudentNames()}
+                  </Typography>
+                </Box>
+              )}
               <TextField
                 fullWidth
                 label="נקודות זכות"
@@ -850,7 +967,7 @@ const StudentsPage: React.FC = () => {
               <Box sx={{ overflowX: 'auto' }}>
                 <Box sx={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr 1fr auto auto',
+                  gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr 1fr auto auto auto',
                   gap: 2,
                   p: 2,
                   backgroundColor: '#f5f5f5',
@@ -872,7 +989,7 @@ const StudentsPage: React.FC = () => {
                 {courses.map((course, index) => (
                   <Box key={course.courseId} sx={{ 
                     display: 'grid', 
-                    gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr 1fr auto auto',
+                    gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr 1fr auto auto auto',
                     gap: 2,
                     p: 2,
                     borderBottom: '1px solid #e0e0e0',
@@ -891,8 +1008,22 @@ const StudentsPage: React.FC = () => {
                       />
                     </Box>
                     <Box>{course.year}</Box>
-                    <Box>{course.students || '-'}</Box>
+                    <Box>
+                      <Typography variant="body2">
+                        {course.students || '-'}
+                      </Typography>
+                    </Box>
                     <Box>{course.credits || '-'}</Box>
+                    <Box>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleEditCourseStudents(course)}
+                        sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.1)' } }}
+                      >
+                        <PeopleIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
                     <Box>
                       <IconButton
                         size="small"
@@ -1089,7 +1220,7 @@ const StudentsPage: React.FC = () => {
         <DialogTitle>אישור מחיקת קורס</DialogTitle>
         <DialogContent>
           <Typography>
-            האם אתה בטוח שברצונך למחוק את הקורס "{courseToDelete?.courseName}"?
+            האם אתה בטוח שברצונך למחוק את הקורס {courseToDelete?.courseName}?
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             פעולה זו אינה הפיכה.
@@ -1103,6 +1234,74 @@ const StudentsPage: React.FC = () => {
             variant="contained"
           >
             מחיקה
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Student Selection Dialog */}
+      <Dialog 
+        open={studentSelectionDialogOpen} 
+        onClose={() => {
+          setStudentSelectionDialogOpen(false);
+          setEditMode(false);
+          setEditingCourse(null);
+        }}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {editMode ? `עריכת סטודנטים בקורס ${editingCourse?.courseName}` : 'בחירת סטודנטים לקורס'}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {editMode ? 'עדכן את הסטודנטים בקורס:' : 'סמן את הסטודנטים שברצונך לצרף לקורס:'}
+          </Typography>
+          <List sx={{ maxHeight: 400, overflow: 'auto' }}>
+            {students.map((student) => (
+              <ListItem key={student.id} disablePadding>
+                <ListItemButton 
+                  dense
+                  onClick={() => handleStudentToggle(student.id)}
+                >
+                  <Checkbox
+                    edge="start"
+                    checked={courseFormData.selectedStudents.includes(student.id)}
+                    tabIndex={-1}
+                    disableRipple
+                  />
+                  <ListItemText
+                    primary={student.fullName}
+                    secondary={`${student.studentNumber} - ${student.department}`}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          {courseFormData.selectedStudents.length > 0 && (
+            <Box sx={{ mt: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                נבחרו {courseFormData.selectedStudents.length} סטודנטים
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setStudentSelectionDialogOpen(false);
+            setEditMode(false);
+            setEditingCourse(null);
+          }}>
+            ביטול
+          </Button>
+          <Button 
+            onClick={editMode ? handleConfirmEditStudentSelection : handleConfirmStudentSelection}
+            variant="contained"
+            sx={{ 
+              backgroundColor: 'rgb(179, 209, 53)',
+              '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
+            }}
+          >
+            {editMode ? 'עדכן בחירה' : 'אישור בחירה'}
           </Button>
         </DialogActions>
       </Dialog>
