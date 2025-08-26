@@ -18,14 +18,23 @@ import {
   Alert,
   Snackbar,
   Chip,
-  Divider
+  Divider,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  IconButton
 } from '@mui/material';
 import {
   Add as AddIcon,
   School as SchoolIcon,
   People as PeopleIcon,
   TrendingUp as TrendingUpIcon,
-  Warning as WarningIcon
+  Warning as WarningIcon,
+  Assignment as AssignmentIcon,
+  Book as BookIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material';
 import { StudentsTable } from '../components/tables';
 import { Student } from '../types/Student';
@@ -36,6 +45,32 @@ import {
   getHighGPAStudents
 } from '../data/studentsData';
 
+interface TaskFormData {
+  taskId: string;
+  title: string;
+  type: string;
+  date: string;
+  course: string;
+}
+
+interface CourseFormData {
+  courseId: string;
+  courseName: string;
+  lecturer: string;
+  semester: string;
+  year: string;
+  students: string;
+  credits: string;
+}
+
+interface Task extends TaskFormData {
+  createdAt: string;
+}
+
+interface Course extends CourseFormData {
+  createdAt: string;
+}
+
 const StudentsPage: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
@@ -43,6 +78,36 @@ const StudentsPage: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [statistics, setStatistics] = useState<any>(null);
+  
+  // Form states
+  const [taskCounter, setTaskCounter] = useState(1);
+  const [courseCounter, setCourseCounter] = useState(1);
+  const [taskFormData, setTaskFormData] = useState<TaskFormData>({
+    taskId: `TASK-${String(taskCounter).padStart(3, '0')}`,
+    title: '',
+    type: '',
+    date: '',
+    course: ''
+  });
+  const [courseFormData, setCourseFormData] = useState<CourseFormData>({
+    courseId: `COURSE-${String(courseCounter).padStart(3, '0')}`,
+    courseName: '',
+    lecturer: '',
+    semester: '',
+    year: '2025',
+    students: '',
+    credits: ''
+  });
+
+  // Tables data
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+
+  // Delete dialogs state
+  const [deleteTaskDialogOpen, setDeleteTaskDialogOpen] = useState(false);
+  const [deleteCourseDialogOpen, setDeleteCourseDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
   // Load statistics on component mount
   useEffect(() => {
@@ -206,6 +271,131 @@ const StudentsPage: React.FC = () => {
     loadStudentsFromLocalStorage();
   }, []);
 
+  // Task form handlers
+  const handleTaskInputChange = (field: string, value: any) => {
+    setTaskFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleTaskSubmit = () => {
+    // בדיקה שהקורס קיים בטבלת הקורסים
+    const courseExists = courses.some(course => course.courseId === taskFormData.course);
+    
+    if (!courseExists) {
+      setNotification({
+        message: 'לא ניתן ליצור מטלה עבור קורס שלא קיים. אנא בחר קורס מהרשימה.',
+        type: 'error'
+      });
+      return;
+    }
+
+    // Create new task with creation date
+    const newTask: Task = {
+      ...taskFormData,
+      createdAt: new Date().toLocaleString('he-IL')
+    };
+
+    // Add to tasks array
+    setTasks(prev => [...prev, newTask]);
+
+    setNotification({
+      message: `מטלה חדשה נוצרה בהצלחה! מזהה: ${taskFormData.taskId}`,
+      type: 'success'
+    });
+    
+    setTaskCounter(prev => prev + 1);
+    setTaskFormData({
+      taskId: `TASK-${String(taskCounter + 1).padStart(3, '0')}`,
+      title: '',
+      type: '',
+      date: '',
+      course: ''
+    });
+  };
+
+  // Course form handlers
+  const handleCourseInputChange = (field: string, value: any) => {
+    setCourseFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleCourseSubmit = () => {
+    // Create new course with creation date
+    const newCourse: Course = {
+      ...courseFormData,
+      createdAt: new Date().toLocaleString('he-IL')
+    };
+
+    // Add to courses array
+    setCourses(prev => [...prev, newCourse]);
+
+    setNotification({
+      message: `קורס חדש נוצר בהצלחה! מזהה: ${courseFormData.courseId}`,
+      type: 'success'
+    });
+    
+    setCourseCounter(prev => prev + 1);
+    setCourseFormData({
+      courseId: `COURSE-${String(courseCounter + 1).padStart(3, '0')}`,
+      courseName: '',
+      lecturer: '',
+      semester: '',
+      year: '2025',
+      students: '',
+      credits: ''
+    });
+  };
+
+  // Delete functions
+  const handleDeleteTask = (task: Task) => {
+    setTaskToDelete(task);
+    setDeleteTaskDialogOpen(true);
+  };
+
+  const handleDeleteCourse = (course: Course) => {
+    // בדיקה אם יש מטלות שמשתמשות בקורס זה
+    const tasksUsingCourse = tasks.filter(task => task.course === course.courseId);
+    
+    if (tasksUsingCourse.length > 0) {
+      setNotification({
+        message: `לא ניתן למחוק קורס זה כי יש ${tasksUsingCourse.length} מטלות שמשתמשות בו. מחק תחילה את המטלות.`,
+        type: 'error'
+      });
+      return;
+    }
+
+    setCourseToDelete(course);
+    setDeleteCourseDialogOpen(true);
+  };
+
+  const confirmDeleteTask = () => {
+    if (taskToDelete) {
+      setTasks(prev => prev.filter(task => task.taskId !== taskToDelete.taskId));
+      setNotification({
+        message: `המטלה "${taskToDelete.title}" נמחקה בהצלחה`,
+        type: 'success'
+      });
+      setDeleteTaskDialogOpen(false);
+      setTaskToDelete(null);
+    }
+  };
+
+  const confirmDeleteCourse = () => {
+    if (courseToDelete) {
+      setCourses(prev => prev.filter(course => course.courseId !== courseToDelete.courseId));
+      setNotification({
+        message: `הקורס "${courseToDelete.courseName}" נמחק בהצלחה`,
+        type: 'success'
+      });
+      setDeleteCourseDialogOpen(false);
+      setCourseToDelete(null);
+    }
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Page Header */}
@@ -347,6 +537,379 @@ const StudentsPage: React.FC = () => {
         onEditStudent={handleEditStudent}
         onDeleteStudent={handleDeleteStudent}
       />
+
+      {/* Forms Section */}
+      <Box sx={{ mt: 6 }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)', mb: 3 }}>
+          <SchoolIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+          ניהול קורסים ומטלות
+        </Typography>
+        
+        {/* Task Form */}
+        <Card sx={{ mb: 4, border: '2px solid rgb(179, 209, 53)' }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <AssignmentIcon sx={{ mr: 1, color: 'rgb(179, 209, 53)' }} />
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)' }}>
+                יצירת מטלה חדשה
+              </Typography>
+            </Box>
+            
+            {courses.length === 0 ? (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                  אין קורסים זמינים. יש ליצור קורס תחילה לפני יצירת מטלה.
+                </Typography>
+                <Chip 
+                  label="צור קורס חדש" 
+                  color="primary" 
+                  variant="outlined"
+                  onClick={() => {
+                    // Scroll to course form
+                    const courseForm = document.querySelector('[data-course-form]');
+                    if (courseForm) {
+                      courseForm.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  sx={{ cursor: 'pointer' }}
+                />
+              </Box>
+            ) : (
+              <>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="מזהה מטלה"
+                    value={taskFormData.taskId}
+                    InputProps={{ 
+                      readOnly: true,
+                      sx: { 
+                        backgroundColor: '#f5f5f5',
+                        '& .MuiInputBase-input': {
+                          color: '#666',
+                          fontWeight: 'bold'
+                        }
+                      }
+                    }}
+                    helperText="נוצר אוטומטית"
+                    sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="כותרת"
+                    value={taskFormData.title}
+                    onChange={(e) => handleTaskInputChange('title', e.target.value)}
+                    required
+                  />
+                  <FormControl fullWidth required>
+                    <InputLabel>סוג</InputLabel>
+                    <Select
+                      value={taskFormData.type}
+                      onChange={(e) => handleTaskInputChange('type', e.target.value)}
+                    >
+                      <MenuItem value="assignment">מטלה</MenuItem>
+                      <MenuItem value="exam">מבחן</MenuItem>
+                      <MenuItem value="quiz">בוחן</MenuItem>
+                      <MenuItem value="presentation">הצגה</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    fullWidth
+                    type="date"
+                    label="תאריך"
+                    value={taskFormData.date}
+                    onChange={(e) => handleTaskInputChange('date', e.target.value)}
+                    required
+                    InputLabelProps={{ shrink: true }}
+                  />
+                  <FormControl fullWidth required>
+                    <InputLabel>קורס</InputLabel>
+                    <Select
+                      value={taskFormData.course}
+                      onChange={(e) => handleTaskInputChange('course', e.target.value)}
+                    >
+                      <MenuItem value="">בחר קורס</MenuItem>
+                      {courses.map(course => (
+                        <MenuItem key={course.courseId} value={course.courseId}>
+                          {course.courseName} ({course.courseId})
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+                
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    onClick={handleTaskSubmit}
+                    sx={{
+                      backgroundColor: 'rgb(179, 209, 53)',
+                      '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
+                    }}
+                  >
+                    יצירת מטלה
+                  </Button>
+                </Box>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Course Form */}
+        <Card sx={{ border: '2px solid rgb(179, 209, 53)' }} data-course-form>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <BookIcon sx={{ mr: 1, color: 'rgb(179, 209, 53)' }} />
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)' }}>
+                יצירת קורס חדש
+              </Typography>
+            </Box>
+            
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
+              <TextField
+                fullWidth
+                label="מזהה קורס"
+                value={courseFormData.courseId}
+                InputProps={{ 
+                  readOnly: true,
+                  sx: { 
+                    backgroundColor: '#f5f5f5',
+                    '& .MuiInputBase-input': {
+                      color: '#666',
+                      fontWeight: 'bold'
+                    }
+                  }
+                }}
+                helperText="נוצר אוטומטית"
+                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
+              />
+              <TextField
+                fullWidth
+                label="שם קורס"
+                value={courseFormData.courseName}
+                onChange={(e) => handleCourseInputChange('courseName', e.target.value)}
+                required
+              />
+              <TextField
+                fullWidth
+                label="מרצה אחראי"
+                value={courseFormData.lecturer}
+                onChange={(e) => handleCourseInputChange('lecturer', e.target.value)}
+                required
+              />
+              <FormControl fullWidth required>
+                <InputLabel>סמסטר</InputLabel>
+                <Select
+                  value={courseFormData.semester}
+                  onChange={(e) => handleCourseInputChange('semester', e.target.value)}
+                >
+                  <MenuItem value="a">סמסטר א</MenuItem>
+                  <MenuItem value="b">סמסטר ב</MenuItem>
+                  <MenuItem value="summer">סמסטר קיץ</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                fullWidth
+                label="שנה"
+                value={courseFormData.year}
+                onChange={(e) => handleCourseInputChange('year', e.target.value)}
+                required
+                inputProps={{ min: '2025' }}
+              />
+              <TextField
+                fullWidth
+                label="סטודנטים רשומים"
+                value={courseFormData.students}
+                onChange={(e) => handleCourseInputChange('students', e.target.value)}
+                type="number"
+                inputProps={{ min: 0 }}
+              />
+              <TextField
+                fullWidth
+                label="נקודות זכות"
+                value={courseFormData.credits}
+                onChange={(e) => handleCourseInputChange('credits', e.target.value)}
+                type="number"
+                inputProps={{ min: 0, max: 10 }}
+              />
+            </Box>
+            
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+              <Button
+                variant="contained"
+                onClick={handleCourseSubmit}
+                sx={{
+                  backgroundColor: 'rgb(179, 209, 53)',
+                  '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
+                }}
+              >
+                יצירת קורס
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+
+      {/* Tables Section */}
+      <Box sx={{ mt: 6 }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)', mb: 3 }}>
+          <SchoolIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+          רשימת מטלות וקורסים
+        </Typography>
+
+        {/* Tasks Table */}
+        <Card sx={{ mb: 4, border: '2px solid rgb(179, 209, 53)' }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <AssignmentIcon sx={{ mr: 1, color: 'rgb(179, 209, 53)' }} />
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)' }}>
+                מטלות שנוצרו ({tasks.length})
+              </Typography>
+            </Box>
+            
+            {tasks.length === 0 ? (
+              <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                אין מטלות עדיין. צור מטלה חדשה באמצעות הטופס למעלה.
+              </Typography>
+            ) : (
+              <Box sx={{ overflowX: 'auto' }}>
+                <Box sx={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'auto 1fr 1fr 1fr auto auto',
+                  gap: 2,
+                  p: 2,
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: 1,
+                  mb: 2,
+                  fontWeight: 'bold',
+                  fontSize: '0.875rem'
+                }}>
+                  <Box>מזהה</Box>
+                  <Box>כותרת</Box>
+                  <Box>סוג</Box>
+                  <Box>תאריך</Box>
+                  <Box>קורס</Box>
+                  <Box>פעולות</Box>
+                </Box>
+                
+                {tasks.map((task, index) => (
+                  <Box key={task.taskId} sx={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'auto 1fr 1fr 1fr auto auto',
+                    gap: 2,
+                    p: 2,
+                    borderBottom: '1px solid #e0e0e0',
+                    '&:hover': { backgroundColor: '#f9f9f9' },
+                    '&:last-child': { borderBottom: 'none' }
+                  }}>
+                    <Box sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)' }}>{task.taskId}</Box>
+                    <Box>{task.title}</Box>
+                    <Box>
+                      <Chip 
+                        label={task.type === 'assignment' ? 'מטלה' : 
+                               task.type === 'exam' ? 'מבחן' : 
+                               task.type === 'quiz' ? 'בוחן' : 'הצגה'} 
+                        size="small" 
+                        color="primary"
+                      />
+                    </Box>
+                    <Box>{task.date}</Box>
+                    <Box>{task.course}</Box>
+                    <Box>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteTask(task)}
+                        sx={{ '&:hover': { backgroundColor: 'rgba(244, 67, 54, 0.1)' } }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Courses Table */}
+        <Card sx={{ border: '2px solid rgb(179, 209, 53)' }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <BookIcon sx={{ mr: 1, color: 'rgb(179, 209, 53)' }} />
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)' }}>
+                קורסים שנוצרו ({courses.length})
+              </Typography>
+            </Box>
+            
+            {courses.length === 0 ? (
+              <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                אין קורסים עדיין. צור קורס חדש באמצעות הטופס למעלה.
+              </Typography>
+            ) : (
+              <Box sx={{ overflowX: 'auto' }}>
+                <Box sx={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr 1fr auto auto',
+                  gap: 2,
+                  p: 2,
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: 1,
+                  mb: 2,
+                  fontWeight: 'bold',
+                  fontSize: '0.875rem'
+                }}>
+                  <Box>מזהה</Box>
+                  <Box>שם קורס</Box>
+                  <Box>מרצה</Box>
+                  <Box>סמסטר</Box>
+                  <Box>שנה</Box>
+                  <Box>סטודנטים</Box>
+                  <Box>נקודות</Box>
+                  <Box>פעולות</Box>
+                </Box>
+                
+                {courses.map((course, index) => (
+                  <Box key={course.courseId} sx={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr 1fr auto auto',
+                    gap: 2,
+                    p: 2,
+                    borderBottom: '1px solid #e0e0e0',
+                    '&:hover': { backgroundColor: '#f9f9f9' },
+                    '&:last-child': { borderBottom: 'none' }
+                  }}>
+                    <Box sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)' }}>{course.courseId}</Box>
+                    <Box>{course.courseName}</Box>
+                    <Box>{course.lecturer}</Box>
+                    <Box>
+                      <Chip 
+                        label={course.semester === 'a' ? 'סמסטר א' : 
+                               course.semester === 'b' ? 'סמסטר ב' : 'סמסטר קיץ'} 
+                        size="small" 
+                        color="secondary"
+                      />
+                    </Box>
+                    <Box>{course.year}</Box>
+                    <Box>{course.students || '-'}</Box>
+                    <Box>{course.credits || '-'}</Box>
+                    <Box>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteCourse(course)}
+                        sx={{ '&:hover': { backgroundColor: 'rgba(244, 67, 54, 0.1)' } }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
 
       {/* View Student Dialog */}
       <Dialog 
@@ -497,6 +1060,52 @@ const StudentsPage: React.FC = () => {
           {notification?.message}
         </Alert>
       </Snackbar>
+
+      {/* Delete Task Confirmation Dialog */}
+      <Dialog open={deleteTaskDialogOpen} onClose={() => setDeleteTaskDialogOpen(false)}>
+        <DialogTitle>אישור מחיקת מטלה</DialogTitle>
+        <DialogContent>
+          <Typography>
+            האם אתה בטוח שברצונך למחוק את המטלה "{taskToDelete?.title}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            פעולה זו אינה הפיכה.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteTaskDialogOpen(false)}>ביטול</Button>
+          <Button 
+            onClick={confirmDeleteTask} 
+            color="error" 
+            variant="contained"
+          >
+            מחיקה
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Course Confirmation Dialog */}
+      <Dialog open={deleteCourseDialogOpen} onClose={() => setDeleteCourseDialogOpen(false)}>
+        <DialogTitle>אישור מחיקת קורס</DialogTitle>
+        <DialogContent>
+          <Typography>
+            האם אתה בטוח שברצונך למחוק את הקורס "{courseToDelete?.courseName}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            פעולה זו אינה הפיכה.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteCourseDialogOpen(false)}>ביטול</Button>
+          <Button 
+            onClick={confirmDeleteCourse} 
+            color="error" 
+            variant="contained"
+          >
+            מחיקה
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

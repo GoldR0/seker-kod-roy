@@ -65,29 +65,10 @@ interface FormData {
     priority: string;
     course: string;
   };
-  newTask: {
-    taskId: string;
-    title: string;
-    type: string;
-    date: string;
-    course: string;
-    grade: string;
-  };
-  course: {
-    courseId: string;
-    courseName: string;
-    lecturer: string;
-    semester: string;
-    year: string;
-    students: string;
-    credits: string;
-  };
 }
 
 const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [activeForm, setActiveForm] = useState<string | null>(null);
-  const [taskCounter, setTaskCounter] = useState(1);
-  const [courseCounter, setCourseCounter] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     registration: {
       firstName: '',
@@ -116,23 +97,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       dueDate: '',
       priority: '',
       course: ''
-    },
-    newTask: {
-      taskId: `TASK-${String(taskCounter).padStart(3, '0')}`,
-      title: '',
-      type: '',
-      date: '',
-      course: '',
-      grade: ''
-    },
-    course: {
-      courseId: `COURSE-${String(courseCounter).padStart(3, '0')}`,
-      courseName: '',
-      lecturer: '',
-      semester: '',
-      year: '',
-      students: '',
-      credits: ''
     }
   });
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -172,20 +136,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       description: 'הוספת מטלה או מבחן',
       icon: <AssignmentIcon sx={{ fontSize: 40 }} />,
       color: '#607D8B'
-    },
-    {
-      id: 'newTask',
-      title: 'יצירת מטלה',
-      description: 'יצירת מטלה חדשה',
-      icon: <AssignmentIcon sx={{ fontSize: 40 }} />,
-      color: '#9C27B0'
-    },
-    {
-      id: 'course',
-      title: 'יצירת קורס',
-      description: 'יצירת קורס חדש',
-      icon: <SchoolIcon sx={{ fontSize: 40 }} />,
-      color: '#E91E63'
     }
   ];
 
@@ -196,46 +146,14 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     });
     setActiveForm(null);
     
-    // יצירת מזהה חדש אם זה טופס מטלה או קורס
-    if (formType === 'newTask') {
-      setTaskCounter(prev => prev + 1);
-      setFormData(prev => ({
-        ...prev,
-        newTask: {
-          ...prev.newTask,
-          taskId: `TASK-${String(taskCounter + 1).padStart(3, '0')}`,
-          title: '',
-          type: '',
-          date: '',
-          course: '',
-          grade: ''
-        }
-      }));
-    } else if (formType === 'course') {
-      setCourseCounter(prev => prev + 1);
-      setFormData(prev => ({
-        ...prev,
-        course: {
-          ...prev.course,
-          courseId: `COURSE-${String(courseCounter + 1).padStart(3, '0')}`,
-          courseName: '',
-          lecturer: '',
-          semester: '',
-          year: '',
-          students: '',
-          credits: ''
-        }
-      }));
-    } else {
-      // איפוס טופס רגיל
-      setFormData(prev => ({
-        ...prev,
-        [formType]: Object.keys(prev[formType as keyof FormData]).reduce((acc, key) => ({
-          ...acc,
-          [key]: typeof (prev[formType as keyof FormData] as any)[key] === 'boolean' ? false : ''
-        }), {}) as any
-      }));
-    }
+    // איפוס טופס רגיל
+    setFormData(prev => ({
+      ...prev,
+      [formType]: Object.keys(prev[formType as keyof FormData]).reduce((acc, key) => ({
+        ...acc,
+        [key]: typeof (prev[formType as keyof FormData] as any)[key] === 'boolean' ? false : ''
+      }), {}) as any
+    }));
   };
 
   const handleInputChange = (formType: string, field: string, value: any) => {
@@ -250,34 +168,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
   // פונקציה ליצירת מזהה חדש בעת פתיחת טופס
   const handleOpenForm = (formId: string) => {
-    if (formId === 'newTask') {
-      setFormData(prev => ({
-        ...prev,
-        newTask: {
-          ...prev.newTask,
-          taskId: `TASK-${String(taskCounter).padStart(3, '0')}`,
-          title: '',
-          type: '',
-          date: '',
-          course: '',
-          grade: ''
-        }
-      }));
-    } else if (formId === 'course') {
-      setFormData(prev => ({
-        ...prev,
-        course: {
-          ...prev.course,
-          courseId: `COURSE-${String(courseCounter).padStart(3, '0')}`,
-          courseName: '',
-          lecturer: '',
-          semester: '',
-          year: '',
-          students: '',
-          credits: ''
-        }
-      }));
-    }
     setActiveForm(formId);
   };
 
@@ -477,150 +367,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
                 value={formData.task.course}
                 onChange={(e) => handleInputChange('task', 'course', e.target.value)}
                 required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
-              />
-            </Box>
-          </Box>
-        );
-
-      case 'newTask':
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>יצירת מטלה</Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
-              <TextField
-                fullWidth
-                label="מזהה מטלה"
-                value={formData.newTask.taskId}
-                InputProps={{ 
-                  readOnly: true,
-                  sx: { 
-                    backgroundColor: '#f5f5f5',
-                    '& .MuiInputBase-input': {
-                      color: '#666',
-                      fontWeight: 'bold'
-                    }
-                  }
-                }}
-                helperText="נוצר אוטומטית"
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
-              />
-              <TextField
-                fullWidth
-                label="כותרת"
-                value={formData.newTask.title}
-                onChange={(e) => handleInputChange('newTask', 'title', e.target.value)}
-                required
-              />
-              <FormControl fullWidth required>
-                <InputLabel>סוג</InputLabel>
-                <Select
-                  value={formData.newTask.type}
-                  onChange={(e) => handleInputChange('newTask', 'type', e.target.value)}
-                >
-                  <MenuItem value="assignment">מטלה</MenuItem>
-                  <MenuItem value="exam">מבחן</MenuItem>
-                  <MenuItem value="quiz">בוחן</MenuItem>
-                  <MenuItem value="presentation">הצגה</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                fullWidth
-                type="date"
-                label="תאריך"
-                value={formData.newTask.date}
-                onChange={(e) => handleInputChange('newTask', 'date', e.target.value)}
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                fullWidth
-                label="קורס"
-                value={formData.newTask.course}
-                onChange={(e) => handleInputChange('newTask', 'course', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                label="ציון"
-                value={formData.newTask.grade}
-                onChange={(e) => handleInputChange('newTask', 'grade', e.target.value)}
-                type="number"
-                inputProps={{ min: 0, max: 100 }}
-              />
-            </Box>
-          </Box>
-        );
-
-      case 'course':
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>יצירת קורס</Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
-              <TextField
-                fullWidth
-                label="מזהה קורס"
-                value={formData.course.courseId}
-                InputProps={{ 
-                  readOnly: true,
-                  sx: { 
-                    backgroundColor: '#f5f5f5',
-                    '& .MuiInputBase-input': {
-                      color: '#666',
-                      fontWeight: 'bold'
-                    }
-                  }
-                }}
-                helperText="נוצר אוטומטית"
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
-              />
-              <TextField
-                fullWidth
-                label="שם קורס"
-                value={formData.course.courseName}
-                onChange={(e) => handleInputChange('course', 'courseName', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                label="מרצה אחראי"
-                value={formData.course.lecturer}
-                onChange={(e) => handleInputChange('course', 'lecturer', e.target.value)}
-                required
-              />
-              <FormControl fullWidth required>
-                <InputLabel>סמסטר</InputLabel>
-                <Select
-                  value={formData.course.semester}
-                  onChange={(e) => handleInputChange('course', 'semester', e.target.value)}
-                >
-                  <MenuItem value="a">סמסטר א</MenuItem>
-                  <MenuItem value="b">סמסטר ב</MenuItem>
-                  <MenuItem value="summer">סמסטר קיץ</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                fullWidth
-                label="שנה"
-                value={formData.course.year}
-                onChange={(e) => handleInputChange('course', 'year', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                label="סטודנטים רשומים"
-                value={formData.course.students}
-                onChange={(e) => handleInputChange('course', 'students', e.target.value)}
-                type="number"
-                inputProps={{ min: 0 }}
-              />
-              <TextField
-                fullWidth
-                label="נקודות זכות"
-                value={formData.course.credits}
-                onChange={(e) => handleInputChange('course', 'credits', e.target.value)}
-                type="number"
-                inputProps={{ min: 0, max: 10 }}
                 sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
               />
             </Box>
