@@ -32,7 +32,7 @@ export const demoEvents: Event[] = [
     description: 'מפגש עם יזמים מובילים בתעשייה',
     date: '15/12',
     time: '18:00',
-    location: 'אודיטוריום',
+    roomId: 'A101',
     urgent: true
   },
   {
@@ -41,7 +41,7 @@ export const demoEvents: Event[] = [
     description: 'ד"ר כהן על בינה מלאכותית',
     date: '20/12',
     time: '14:00',
-    location: 'חדר 301',
+    roomId: 'B301',
     urgent: false
   },
   {
@@ -50,7 +50,7 @@ export const demoEvents: Event[] = [
     description: 'סדנה מעשית בפיתוח אפליקציות',
     date: '25/12',
     time: '10:00',
-    location: 'מעבדת מחשבים',
+    roomId: 'C205',
     urgent: false
   },
   {
@@ -59,7 +59,7 @@ export const demoEvents: Event[] = [
     description: 'יום כיף עם פעילויות מגוונות',
     date: '30/12',
     time: '09:00',
-    location: 'קמפוס',
+    roomId: 'D150',
     urgent: false
   }
 ];

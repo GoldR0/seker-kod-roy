@@ -49,15 +49,6 @@ interface FormData {
     password: string;
     rememberMe: boolean;
   };
-  profile: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    address: string;
-    department: string;
-    year: string;
-  };
   event: {
     title: string;
     description: string;
@@ -90,15 +81,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       email: '',
       password: '',
       rememberMe: false
-    },
-    profile: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      address: '',
-      department: '',
-      year: ''
     },
     event: {
       title: '',
@@ -139,13 +121,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       description: 'התחברות למערכת',
       icon: <LoginIcon sx={{ fontSize: 40 }} />,
       color: '#4CAF50'
-    },
-    {
-      id: 'profile',
-      title: 'פרופיל משתמש',
-      description: 'עדכון פרטי המשתמש',
-      icon: <PersonIcon sx={{ fontSize: 40 }} />,
-      color: '#9C27B0'
     },
     {
       id: 'event',
@@ -271,74 +246,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
                 onChange={(e) => handleInputChange('login', 'password', e.target.value)}
                 required
               />
-            </Box>
-          </Box>
-        );
-
-      case 'profile':
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>עדכון פרופיל</Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
-              <TextField
-                fullWidth
-                label="שם פרטי"
-                value={formData.profile.firstName}
-                onChange={(e) => handleInputChange('profile', 'firstName', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                label="שם משפחה"
-                value={formData.profile.lastName}
-                onChange={(e) => handleInputChange('profile', 'lastName', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                type="email"
-                label="אימייל"
-                value={formData.profile.email}
-                onChange={(e) => handleInputChange('profile', 'email', e.target.value)}
-                required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
-              />
-              <TextField
-                fullWidth
-                label="טלפון"
-                value={formData.profile.phone}
-                onChange={(e) => handleInputChange('profile', 'phone', e.target.value)}
-              />
-              <TextField
-                fullWidth
-                label="כתובת"
-                value={formData.profile.address}
-                onChange={(e) => handleInputChange('profile', 'address', e.target.value)}
-              />
-              <FormControl fullWidth>
-                <InputLabel>חוג</InputLabel>
-                <Select
-                  value={formData.profile.department}
-                  onChange={(e) => handleInputChange('profile', 'department', e.target.value)}
-                >
-                  <MenuItem value="computer-science">מדעי המחשב</MenuItem>
-                  <MenuItem value="engineering">הנדסה</MenuItem>
-                  <MenuItem value="business">ניהול</MenuItem>
-                  <MenuItem value="arts">אמנויות</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>שנה</InputLabel>
-                <Select
-                  value={formData.profile.year}
-                  onChange={(e) => handleInputChange('profile', 'year', e.target.value)}
-                >
-                  <MenuItem value="1">שנה א</MenuItem>
-                  <MenuItem value="2">שנה ב</MenuItem>
-                  <MenuItem value="3">שנה ג</MenuItem>
-                  <MenuItem value="4">שנה ד</MenuItem>
-                </Select>
-              </FormControl>
             </Box>
           </Box>
         );

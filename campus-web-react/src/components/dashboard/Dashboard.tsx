@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { User } from '../../types';
 import WelcomeBanner from './WelcomeBanner';
 import TasksCard from './TasksCard';
+import EventsCard from './EventsCard';
 
 interface DashboardProps {
   currentUser: User | null;
@@ -25,11 +26,14 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser }) => {
       {/* Content Cards */}
       <Box sx={{ 
         display: 'grid', 
-        gridTemplateColumns: { xs: '1fr', md: 'repeat(1, 1fr)' },
+        gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, 1fr)' },
         gap: 3 
       }}>
         {/* Tasks Card */}
         <TasksCard customColors={customColors} />
+        
+        {/* Events Card */}
+        <EventsCard customColors={customColors} />
       </Box>
     </Box>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, Box, Typography } from '@mui/material';
-import { CalendarToday as CalendarIcon, AccessTime as TimeIcon, LocationOn as LocationIcon } from '@mui/icons-material';
+import { CalendarToday as CalendarIcon, AccessTime as TimeIcon, MeetingRoom as RoomIcon } from '@mui/icons-material';
 
 import { demoEvents } from '../../data/demoData';
 
@@ -100,9 +100,9 @@ const EventsCard: React.FC<EventsCardProps> = ({ customColors }) => {
                 </Box>
                 
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <LocationIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
+                  <RoomIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
                   <Typography variant="caption" sx={{ fontWeight: 'medium' }}>
-                    {event.location}
+                    חדר {event.roomId}
                   </Typography>
                 </Box>
               </Box>

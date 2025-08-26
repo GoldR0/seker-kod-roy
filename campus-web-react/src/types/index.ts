@@ -26,7 +26,7 @@ export interface Event {
   description: string;
   date: string;
   time: string;
-  location: string;
+  roomId: string;
   urgent: boolean;
 }
 

@@ -11,6 +11,7 @@ import CommunityPage from './components/CommunityPage';
 import FormsPage from './pages/FormsPage';
 import CafeteriaPage from './components/CafeteriaPage';
 import LostFoundPage from './components/LostFoundPage';
+import ProfilePage from './components/ProfilePage';
 import HelpPage from './components/HelpPage';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
@@ -62,7 +63,7 @@ function App() {
           <Route path="/community" element={<CommunityPage currentUser={currentUser} />} />
           
           {/* Profile Page */}
-          <Route path="/profile" element={<PlaceholderContent activeSection="profile" customColors={customColors} />} />
+          <Route path="/profile" element={<ProfilePage currentUser={currentUser} />} />
           
           {/* Learning Center Page */}
           <Route path="/learning" element={<PlaceholderContent activeSection="learning" customColors={customColors} />} />

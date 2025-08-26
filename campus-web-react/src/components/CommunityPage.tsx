@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Typography, Container } from '@mui/material';
 import { Group as GroupIcon } from '@mui/icons-material';
-import EventsCard from './dashboard/EventsCard';
 import FacilitiesCard from './dashboard/FacilitiesCard';
 
 interface CommunityPageProps {
@@ -35,25 +34,18 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
             קהילת הקמפוס
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            מידע על אירועים ומתקנים בקמפוס
+            מידע על מתקנים בקמפוס
           </Typography>
         </Box>
       </Box>
 
-      {/* Content Grid */}
+      {/* Content */}
       <Box sx={{ 
-        display: 'grid', 
-        gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, 1fr)' },
-        gap: 4,
-        alignItems: 'start' // מיישר את הכרטיסים לחלק העליון
+        display: 'flex', 
+        justifyContent: 'center'
       }}>
-        {/* Events Card */}
-        <Box sx={{ height: 'fit-content' }}>
-          <EventsCard customColors={customColors} />
-        </Box>
-
         {/* Facilities Card */}
-        <Box sx={{ height: 'fit-content' }}>
+        <Box sx={{ maxWidth: 800, width: '100%' }}>
           <FacilitiesCard customColors={customColors} />
         </Box>
       </Box>
