@@ -66,14 +66,6 @@ interface FormData {
     location: string;
     maxParticipants: number;
   };
-  lostFound: {
-    type: 'lost' | 'found';
-    itemName: string;
-    description: string;
-    location: string;
-    date: string;
-    contactPhone: string;
-  };
   task: {
     title: string;
     description: string;
@@ -115,14 +107,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       time: '',
       location: '',
       maxParticipants: 10
-    },
-    lostFound: {
-      type: 'lost',
-      itemName: '',
-      description: '',
-      location: '',
-      date: '',
-      contactPhone: ''
     },
     task: {
       title: '',
@@ -169,13 +153,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       description: 'יצירת אירוע חדש',
       icon: <EventIcon sx={{ fontSize: 40 }} />,
       color: '#FF9800'
-    },
-    {
-      id: 'lostFound',
-      title: 'אבידות ומציאות',
-      description: 'דיווח על אבידה או מציאה',
-      icon: <SearchIcon sx={{ fontSize: 40 }} />,
-      color: '#E91E63'
     },
     {
       id: 'task',
@@ -421,67 +398,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
                 value={formData.event.maxParticipants}
                 onChange={(e) => handleInputChange('event', 'maxParticipants', parseInt(e.target.value))}
                 required
-              />
-            </Box>
-          </Box>
-        );
-
-      case 'lostFound':
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>אבידות ומציאות</Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
-              <FormControl fullWidth required sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
-                <InputLabel>סוג הדיווח</InputLabel>
-                <Select
-                  value={formData.lostFound.type}
-                  onChange={(e) => handleInputChange('lostFound', 'type', e.target.value)}
-                >
-                  <MenuItem value="lost">אבידה</MenuItem>
-                  <MenuItem value="found">מציאה</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                fullWidth
-                label="שם הפריט"
-                value={formData.lostFound.itemName}
-                onChange={(e) => handleInputChange('lostFound', 'itemName', e.target.value)}
-                required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
-              />
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                label="תיאור הפריט"
-                value={formData.lostFound.description}
-                onChange={(e) => handleInputChange('lostFound', 'description', e.target.value)}
-                required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
-              />
-              <TextField
-                fullWidth
-                label="מיקום"
-                value={formData.lostFound.location}
-                onChange={(e) => handleInputChange('lostFound', 'location', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                type="date"
-                label="תאריך"
-                value={formData.lostFound.date}
-                onChange={(e) => handleInputChange('lostFound', 'date', e.target.value)}
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                fullWidth
-                label="טלפון ליצירת קשר"
-                value={formData.lostFound.contactPhone}
-                onChange={(e) => handleInputChange('lostFound', 'contactPhone', e.target.value)}
-                required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
               />
             </Box>
           </Box>

@@ -10,6 +10,7 @@ import StudentsPage from './pages/StudentsPage';
 import CommunityPage from './components/CommunityPage';
 import FormsPage from './pages/FormsPage';
 import CafeteriaPage from './components/CafeteriaPage';
+import LostFoundPage from './components/LostFoundPage';
 import HelpPage from './components/HelpPage';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
@@ -70,7 +71,7 @@ function App() {
           <Route path="/cafeteria" element={<CafeteriaPage />} />
           
           {/* Lost and Found Page */}
-          <Route path="/lostfound" element={<PlaceholderContent activeSection="lostfound" customColors={customColors} />} />
+          <Route path="/lostfound" element={<LostFoundPage currentUser={currentUser} />} />
           
           {/* Course Forum Page */}
           <Route path="/course-forum" element={<PlaceholderContent activeSection="course-forum" customColors={customColors} />} />
