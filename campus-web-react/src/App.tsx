@@ -13,6 +13,7 @@ import CafeteriaPage from './components/CafeteriaPage';
 import LostFoundPage from './components/LostFoundPage';
 import ProfilePage from './components/ProfilePage';
 import HelpPage from './components/HelpPage';
+import LearningCenterPage from './components/LearningCenterPage';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
 
@@ -54,7 +55,7 @@ function App() {
           <Route path="/" element={<Dashboard currentUser={currentUser} />} />
           
           {/* Students Page */}
-          <Route path="/students" element={<StudentsPage />} />
+          <Route path="/students" element={<StudentsPage currentUser={currentUser} />} />
           
           {/* Forms Page */}
           <Route path="/forms" element={<FormsPage currentUser={currentUser} />} />
@@ -66,7 +67,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage currentUser={currentUser} />} />
           
           {/* Learning Center Page */}
-          <Route path="/learning" element={<PlaceholderContent activeSection="learning" customColors={customColors} />} />
+          <Route path="/learning" element={<LearningCenterPage currentUser={currentUser} />} />
           
           {/* Cafeteria Page */}
           <Route path="/cafeteria" element={<CafeteriaPage />} />

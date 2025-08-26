@@ -78,7 +78,7 @@ interface Course extends CourseFormData {
   selectedStudents: string[];
 }
 
-const StudentsPage: React.FC = () => {
+const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -262,12 +262,76 @@ const StudentsPage: React.FC = () => {
         const savedStudents = localStorage.getItem('campus-students-data');
         if (savedStudents) {
           const parsedStudents = JSON.parse(savedStudents);
+          
+          // Ensure Israel Israeli is in the students list
+          const israelExists = parsedStudents.some((student: Student) => student.id === '123456789');
+          if (!israelExists) {
+            const israelStudent: Student = {
+              id: '123456789',
+              studentNumber: '2024001',
+              firstName: 'ישראל',
+              lastName: 'ישראלי',
+              fullName: 'ישראל ישראלי',
+              email: 'student@campus.ac.il',
+              phone: '050-1234567',
+              address: 'רחוב הרצל 15, תל אביב',
+              department: 'מדעי המחשב',
+              year: 2,
+              semester: 'א',
+              creditsCompleted: 45,
+              gpa: 3.8,
+              birthDate: '2002-05-15',
+              age: 22,
+              gender: 'male',
+              city: 'תל אביב',
+              status: 'active',
+              enrollmentDate: '2022-10-01',
+              lastActive: '2024-12-01',
+              emergencyContact: 'שרה ישראלי',
+              emergencyPhone: '050-9876543',
+              notes: 'סטודנט מצטיין'
+            };
+            parsedStudents.unshift(israelStudent);
+          }
+          
           setStudents(parsedStudents);
           setStatistics(getStudentsStatistics());
           console.log('Students loaded from localStorage:', parsedStudents);
         } else {
           // If no data in localStorage, load from demo data
           const allStudents = getAllStudents();
+          
+          // Ensure Israel Israeli is in the students list
+          const israelExists = allStudents.some(student => student.id === '123456789');
+          if (!israelExists) {
+            const israelStudent: Student = {
+              id: '123456789',
+              studentNumber: '2024001',
+              firstName: 'ישראל',
+              lastName: 'ישראלי',
+              fullName: 'ישראל ישראלי',
+              email: 'student@campus.ac.il',
+              phone: '050-1234567',
+              address: 'רחוב הרצל 15, תל אביב',
+              department: 'מדעי המחשב',
+              year: 2,
+              semester: 'א',
+              creditsCompleted: 45,
+              gpa: 3.8,
+              birthDate: '2002-05-15',
+              age: 22,
+              gender: 'male',
+              city: 'תל אביב',
+              status: 'active',
+              enrollmentDate: '2022-10-01',
+              lastActive: '2024-12-01',
+              emergencyContact: 'שרה ישראלי',
+              emergencyPhone: '050-9876543',
+              notes: 'סטודנט מצטיין'
+            };
+            allStudents.unshift(israelStudent); // Add to beginning of array
+          }
+          
           setStudents(allStudents);
           setStatistics(getStudentsStatistics());
           console.log('Students loaded from demo data:', allStudents);
@@ -311,7 +375,15 @@ const StudentsPage: React.FC = () => {
     };
 
     // Add to tasks array
-    setTasks(prev => [...prev, newTask]);
+    const updatedTasks = [...tasks, newTask];
+    setTasks(updatedTasks);
+
+    // Save to localStorage
+    try {
+      localStorage.setItem('campus-tasks-data', JSON.stringify(updatedTasks));
+    } catch (error) {
+      console.error('Error saving tasks to localStorage:', error);
+    }
 
     setNotification({
       message: `מטלה חדשה נוצרה בהצלחה! מזהה: ${taskFormData.taskId}`,
@@ -345,7 +417,15 @@ const StudentsPage: React.FC = () => {
     };
 
     // Add to courses array
-    setCourses(prev => [...prev, newCourse]);
+    const updatedCourses = [...courses, newCourse];
+    setCourses(updatedCourses);
+
+    // Save to localStorage
+    try {
+      localStorage.setItem('campus-courses-data', JSON.stringify(updatedCourses));
+    } catch (error) {
+      console.error('Error saving courses to localStorage:', error);
+    }
 
     setNotification({
       message: `קורס חדש נוצר בהצלחה! מזהה: ${courseFormData.courseId}`,
@@ -415,7 +495,7 @@ const StudentsPage: React.FC = () => {
       const selectedCount = courseFormData.selectedStudents.length;
       
       // Update the course in the courses array
-      setCourses(prev => prev.map(course => {
+      const updatedCourses = courses.map(course => {
         if (course.courseId === editingCourse.courseId) {
           return {
             ...course,
@@ -424,7 +504,16 @@ const StudentsPage: React.FC = () => {
           };
         }
         return course;
-      }));
+      });
+      
+      setCourses(updatedCourses);
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-courses-data', JSON.stringify(updatedCourses));
+      } catch (error) {
+        console.error('Error saving courses to localStorage:', error);
+      }
 
       setNotification({
         message: `עודכנו ${selectedCount} סטודנטים בקורס ${editingCourse.courseName}`,
@@ -472,7 +561,16 @@ const StudentsPage: React.FC = () => {
 
   const confirmDeleteTask = () => {
     if (taskToDelete) {
-      setTasks(prev => prev.filter(task => task.taskId !== taskToDelete.taskId));
+      const updatedTasks = tasks.filter(task => task.taskId !== taskToDelete.taskId);
+      setTasks(updatedTasks);
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-tasks-data', JSON.stringify(updatedTasks));
+      } catch (error) {
+        console.error('Error saving tasks to localStorage:', error);
+      }
+      
       setNotification({
         message: `המטלה "${taskToDelete.title}" נמחקה בהצלחה`,
         type: 'success'
@@ -484,7 +582,16 @@ const StudentsPage: React.FC = () => {
 
   const confirmDeleteCourse = () => {
     if (courseToDelete) {
-      setCourses(prev => prev.filter(course => course.courseId !== courseToDelete.courseId));
+      const updatedCourses = courses.filter(course => course.courseId !== courseToDelete.courseId);
+      setCourses(updatedCourses);
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-courses-data', JSON.stringify(updatedCourses));
+      } catch (error) {
+        console.error('Error saving courses to localStorage:', error);
+      }
+      
       setNotification({
         message: `הקורס "${courseToDelete.courseName}" נמחק בהצלחה`,
         type: 'success'
@@ -625,6 +732,30 @@ const StudentsPage: React.FC = () => {
           }}
         >
           סינון מתקדם
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={() => {
+            // Clear localStorage and reload students
+            localStorage.removeItem('campus-students-data');
+            const allStudents = getAllStudents();
+            setStudents(allStudents);
+            setStatistics(getStudentsStatistics());
+            setNotification({
+              message: 'נתוני הסטודנטים אופסו והוטענו מחדש',
+              type: 'success'
+            });
+          }}
+          sx={{ 
+            borderColor: '#FF5722',
+            color: '#FF5722',
+            '&:hover': { 
+              borderColor: '#D84315',
+              backgroundColor: 'rgba(255, 87, 34, 0.1)'
+            }
+          }}
+        >
+          אופס נתונים
         </Button>
       </Box>
 
