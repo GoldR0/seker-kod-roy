@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Box, Container, Alert, Snackbar } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { CssBaseline, Box, Container, Alert, Snackbar } from '@mui/material';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Dashboard from './components/dashboard/Dashboard';
@@ -14,8 +15,11 @@ import LostFoundPage from './components/LostFoundPage';
 import ProfilePage from './components/ProfilePage';
 import HelpPage from './components/HelpPage';
 import LearningCenterPage from './components/LearningCenterPage';
+import ForumPage from './components/ForumPage';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
+import { User } from './types';
+import { demoUsers } from './data/demoData';
 
 function App() {
   const { currentUser, handleLogin, handleLogout } = useAuth();
@@ -51,34 +55,15 @@ function App() {
       {/* Main Content */}
       <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
         <Routes>
-          {/* Home Page */}
           <Route path="/" element={<Dashboard currentUser={currentUser} />} />
-          
-          {/* Students Page */}
           <Route path="/students" element={<StudentsPage currentUser={currentUser} />} />
-          
-          {/* Forms Page */}
           <Route path="/forms" element={<FormsPage currentUser={currentUser} />} />
-          
-          {/* Community Page */}
-          <Route path="/community" element={<CommunityPage currentUser={currentUser} />} />
-          
-          {/* Profile Page */}
           <Route path="/profile" element={<ProfilePage currentUser={currentUser} />} />
-          
-          {/* Learning Center Page */}
           <Route path="/learning" element={<LearningCenterPage currentUser={currentUser} />} />
-          
-          {/* Cafeteria Page */}
           <Route path="/cafeteria" element={<CafeteriaPage />} />
-          
-          {/* Lost and Found Page */}
-          <Route path="/lostfound" element={<LostFoundPage currentUser={currentUser} />} />
-          
-          {/* Course Forum Page */}
-          <Route path="/course-forum" element={<PlaceholderContent activeSection="course-forum" customColors={customColors} />} />
-          
-          {/* Help Page */}
+          <Route path="/lost-found" element={<LostFoundPage currentUser={currentUser} />} />
+          <Route path="/community" element={<CommunityPage currentUser={currentUser} />} />
+          <Route path="/forum" element={<ForumPage currentUser={currentUser} />} />
           <Route path="/help" element={<HelpPage />} />
         </Routes>
       </Container>

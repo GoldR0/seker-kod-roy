@@ -68,9 +68,9 @@ const Header: React.FC<HeaderProps> = ({
     { id: 'profile', label: 'פרופיל אישי', icon: <PersonIcon />, path: '/profile' },
     { id: 'learning', label: 'מרכז הלימודים', icon: <SchoolIcon />, path: '/learning' },
     { id: 'cafeteria', label: 'קפיטריה', icon: <RestaurantIcon />, path: '/cafeteria' },
-    { id: 'lostfound', label: 'מציאות ואבדות', icon: <SearchIcon />, path: '/lostfound' },
+    { id: 'lostfound', label: 'מציאות ואבדות', icon: <SearchIcon />, path: '/lost-found' },
     { id: 'community', label: 'קהילה', icon: <GroupIcon />, path: '/community' },
-    { id: 'course-forum', label: 'פורום קורס', icon: <ForumIcon />, path: '/course-forum' },
+    { id: 'forum', label: 'פורום קורס', icon: <ForumIcon />, path: '/forum' },
     { id: 'help', label: 'עזרה', icon: <HelpIcon />, path: '/help' }
   ];
 
