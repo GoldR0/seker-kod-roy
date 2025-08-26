@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, Box, Typography, Chip, Divider } from '@mui/material';
-import { LocationOn as LocationIcon } from '@mui/icons-material';
+import { 
+  LocationOn as LocationIcon,
+  LocalLibrary as LibraryIcon,
+  Restaurant as CafeteriaIcon,
+  FitnessCenter as GymIcon,
+  LocalParking as ParkingIcon
+} from '@mui/icons-material';
 import RatingStars from '../RatingStars';
 
 import { demoFacilities } from '../../data/demoData';
@@ -20,6 +26,21 @@ const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
       case 'busy': return 'warning';
       case 'closed': return 'error';
       default: return 'default';
+    }
+  };
+
+  const getFacilityIcon = (facilityName: string) => {
+    switch (facilityName) {
+      case 'ספרייה':
+        return <LibraryIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+      case 'קפיטריה':
+        return <CafeteriaIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+      case 'חדר כושר':
+        return <GymIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+      case 'חניה':
+        return <ParkingIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+      default:
+        return <LocationIcon sx={{ fontSize: 24, color: customColors.primary }} />;
     }
   };
 
@@ -65,9 +86,12 @@ const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
               border: '1px solid rgba(0,0,0,0.05)'
             }}>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  {facility.name}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  {getFacilityIcon(facility.name)}
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', ml: 1 }}>
+                    {facility.name}
+                  </Typography>
+                </Box>
                 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                   <Chip 
