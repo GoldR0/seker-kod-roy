@@ -116,6 +116,13 @@ interface CourseValidationErrors {
   credits?: string;
 }
 
+interface TaskValidationErrors {
+  title?: string;
+  type?: string;
+  date?: string;
+  course?: string;
+}
+
 const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
@@ -182,6 +189,10 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   // Course validation state
   const [courseErrors, setCourseErrors] = useState<CourseValidationErrors>({});
   const [courseTouched, setCourseTouched] = useState<Record<string, boolean>>({});
+
+  // Task validation state
+  const [taskErrors, setTaskErrors] = useState<TaskValidationErrors>({});
+  const [taskTouched, setTaskTouched] = useState<Record<string, boolean>>({});
 
   // Load statistics on component mount
   useEffect(() => {
@@ -542,6 +553,82 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
     return courseTouched[field] && !!courseErrors[field as keyof CourseValidationErrors];
   };
 
+  // Task validation functions
+  const validateTaskTitle = (title: string): string | undefined => {
+    if (!title) return 'כותרת המטלה היא שדה חובה';
+    if (title.length < 3) return 'כותרת המטלה חייב להכיל לפחות 3 תווים';
+    if (title.length > 100) return 'כותרת המטלה לא יכולה לעלות על 100 תווים';
+    return undefined;
+  };
+
+  const validateTaskType = (type: string): string | undefined => {
+    if (!type) return 'סוג המטלה הוא שדה חובה';
+    if (type.length < 2) return 'סוג המטלה חייב להכיל לפחות 2 תווים';
+    if (type.length > 50) return 'סוג המטלה לא יכול לעלות על 50 תווים';
+    return undefined;
+  };
+
+  const validateTaskDate = (date: string): string | undefined => {
+    if (!date) return 'תאריך המטלה הוא שדה חובה';
+    
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      return 'תאריך המטלה לא יכול להיות בעבר';
+    }
+    
+    return undefined;
+  };
+
+  const validateTaskCourse = (course: string): string | undefined => {
+    if (!course) return 'קורס הוא שדה חובה';
+    return undefined;
+  };
+
+  const validateTaskRequired = (value: string, fieldName: string): string | undefined => {
+    if (!value || value.trim() === '') return `${fieldName} הוא שדה חובה`;
+    return undefined;
+  };
+
+  const validateTaskField = (field: string, value: string): string | undefined => {
+    switch (field) {
+      case 'title':
+        return validateTaskTitle(value);
+      case 'type':
+        return validateTaskType(value);
+      case 'date':
+        return validateTaskDate(value);
+      case 'course':
+        return validateTaskCourse(value);
+      default:
+        return undefined;
+    }
+  };
+
+  const validateTaskForm = (): boolean => {
+    const newErrors: TaskValidationErrors = {};
+    let isValid = true;
+
+    Object.keys(taskFormData).forEach(field => {
+      if (field !== 'id' && field !== 'status' && field !== 'createdAt') {
+        const error = validateTaskField(field, taskFormData[field as keyof TaskFormData] as string);
+        if (error) {
+          newErrors[field as keyof TaskValidationErrors] = error;
+          isValid = false;
+        }
+      }
+    });
+
+    setTaskErrors(newErrors);
+    return isValid;
+  };
+
+  const shouldShowTaskError = (field: string): boolean => {
+    return taskTouched[field] && !!taskErrors[field as keyof TaskValidationErrors];
+  };
+
 
 
   // Load students from localStorage on component mount
@@ -579,50 +666,89 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       ...prev,
       [field]: value
     }));
+
+    // Clear error when user starts typing
+    if (taskErrors[field as keyof TaskValidationErrors]) {
+      setTaskErrors(prev => ({
+        ...prev,
+        [field]: undefined
+      }));
+    }
+  };
+
+  const handleTaskBlur = (field: string) => {
+    setTaskTouched(prev => ({
+      ...prev,
+      [field]: true
+    }));
+
+    const error = validateTaskField(field, taskFormData[field as keyof TaskFormData] as string);
+    setTaskErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
   };
 
   const handleTaskSubmit = () => {
-    // בדיקה שהקורס קיים בטבלת הקורסים
-    const courseExists = courses.some(course => course.courseId === taskFormData.course);
-    
-    if (!courseExists) {
+    // Mark all fields as touched
+    const allTouched = Object.keys(taskFormData).reduce((acc, field) => {
+      if (field !== 'taskId' && field !== 'createdAt') {
+        acc[field] = true;
+      }
+      return acc;
+    }, {} as Record<string, boolean>);
+    setTaskTouched(allTouched);
+
+    if (validateTaskForm()) {
+      // בדיקה שהקורס קיים בטבלת הקורסים
+      const courseExists = courses.some(course => course.courseId === taskFormData.course);
+      
+      if (!courseExists) {
+        setNotification({
+          message: 'לא ניתן ליצור מטלה עבור קורס שלא קיים. אנא בחר קורס מהרשימה.',
+          type: 'error'
+        });
+        return;
+      }
+
+      // Create new task with creation date
+      const newTask: Task = {
+        ...taskFormData,
+        createdAt: new Date().toLocaleString('he-IL')
+      };
+
+      // Add to tasks array
+      const updatedTasks = [...tasks, newTask];
+      setTasks(updatedTasks);
+
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-tasks-data', JSON.stringify(updatedTasks));
+      } catch (error) {
+        console.error('Error saving tasks to localStorage:', error);
+      }
+
       setNotification({
-        message: 'לא ניתן ליצור מטלה עבור קורס שלא קיים. אנא בחר קורס מהרשימה.',
+        message: `מטלה חדשה נוצרה בהצלחה! מזהה: ${taskFormData.taskId}`,
+        type: 'success'
+      });
+      
+      setTaskCounter(prev => prev + 1);
+      setTaskFormData({
+        taskId: `TASK-${String(taskCounter + 1).padStart(3, '0')}`,
+        title: '',
+        type: '',
+        date: '',
+        course: ''
+      });
+      setTaskErrors({});
+      setTaskTouched({});
+    } else {
+      setNotification({
+        message: 'יש שגיאות בטופס. אנא בדוק את השדות המסומנים.',
         type: 'error'
       });
-      return;
     }
-
-    // Create new task with creation date
-    const newTask: Task = {
-      ...taskFormData,
-      createdAt: new Date().toLocaleString('he-IL')
-    };
-
-    // Add to tasks array
-    const updatedTasks = [...tasks, newTask];
-    setTasks(updatedTasks);
-
-    // Save to localStorage
-    try {
-      localStorage.setItem('campus-tasks-data', JSON.stringify(updatedTasks));
-    } catch (error) {
-      console.error('Error saving tasks to localStorage:', error);
-    }
-
-    setNotification({
-      message: `מטלה חדשה נוצרה בהצלחה! מזהה: ${taskFormData.taskId}`,
-      type: 'success'
-    });
-    
-    setTaskCounter(prev => prev + 1);
-    setTaskFormData({
-      taskId: `TASK-${String(taskCounter + 1).padStart(3, '0')}`,
-      title: '',
-      type: '',
-      date: '',
-      course: ''
-    });
   };
 
   // Course form handlers
@@ -1034,19 +1160,40 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
                     label="כותרת"
                     value={taskFormData.title}
                     onChange={(e) => handleTaskInputChange('title', e.target.value)}
+                    onBlur={() => handleTaskBlur('title')}
+                    error={shouldShowTaskError('title')}
+                    helperText={shouldShowTaskError('title') ? taskErrors.title : ''}
                     required
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgb(179, 209, 53)'
+                        }
+                      }
+                    }}
                   />
-                  <FormControl fullWidth required>
+                  <FormControl fullWidth error={shouldShowTaskError('type')} required>
                     <InputLabel>סוג</InputLabel>
                     <Select
                       value={taskFormData.type}
                       onChange={(e) => handleTaskInputChange('type', e.target.value)}
+                      onBlur={() => handleTaskBlur('type')}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgb(179, 209, 53)'
+                          }
+                        }
+                      }}
                     >
                       <MenuItem value="assignment">מטלה</MenuItem>
                       <MenuItem value="exam">מבחן</MenuItem>
                       <MenuItem value="quiz">בוחן</MenuItem>
                       <MenuItem value="presentation">הצגה</MenuItem>
                     </Select>
+                    {shouldShowTaskError('type') && (
+                      <FormHelperText>{taskErrors.type}</FormHelperText>
+                    )}
                   </FormControl>
                   <TextField
                     fullWidth
@@ -1054,14 +1201,32 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
                     label="תאריך"
                     value={taskFormData.date}
                     onChange={(e) => handleTaskInputChange('date', e.target.value)}
+                    onBlur={() => handleTaskBlur('date')}
+                    error={shouldShowTaskError('date')}
+                    helperText={shouldShowTaskError('date') ? taskErrors.date : 'תאריך לא יכול להיות בעבר'}
                     required
                     InputLabelProps={{ shrink: true }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgb(179, 209, 53)'
+                        }
+                      }
+                    }}
                   />
-                  <FormControl fullWidth required>
+                  <FormControl fullWidth error={shouldShowTaskError('course')} required>
                     <InputLabel>קורס</InputLabel>
                     <Select
                       value={taskFormData.course}
                       onChange={(e) => handleTaskInputChange('course', e.target.value)}
+                      onBlur={() => handleTaskBlur('course')}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgb(179, 209, 53)'
+                          }
+                        }
+                      }}
                     >
                       <MenuItem value="">בחר קורס</MenuItem>
                       {courses.map(course => (
@@ -1070,6 +1235,9 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
                         </MenuItem>
                       ))}
                     </Select>
+                    {shouldShowTaskError('course') && (
+                      <FormHelperText>{taskErrors.course}</FormHelperText>
+                    )}
                   </FormControl>
                 </Box>
                 
