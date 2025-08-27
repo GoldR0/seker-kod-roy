@@ -236,24 +236,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
     }
   };
 
-  // Save students data to localStorage (legacy function)
-  const saveStudentsToLocalStorage = () => {
-    try {
-      const studentsJson = JSON.stringify(students);
-      localStorage.setItem('campus-students-data', studentsJson);
-      setNotification({
-        message: `נשמרו ${students.length} סטודנטים ב-localStorage בהצלחה`,
-        type: 'success'
-      });
-      console.log('Students saved to localStorage:', students);
-    } catch (error) {
-      console.error('Error saving students to localStorage:', error);
-      setNotification({
-        message: 'שגיאה בשמירת הנתונים ב-localStorage',
-        type: 'error'
-      });
-    }
-  };
+
 
   // Load students from localStorage on component mount
   useEffect(() => {
@@ -633,98 +616,8 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         >
           הוספת סטודנט חדש
         </Button>
-        <Button
-          variant="contained"
-          onClick={saveStudentsToLocalStorage}
-          sx={{ 
-            backgroundColor: 'rgb(179, 209, 53)',
-            '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
-          }}
-        >
-          שמירה
-        </Button>
-        <Button
-          variant="outlined"
-          sx={{ 
-            borderColor: 'rgb(179, 209, 53)',
-            color: 'rgb(179, 209, 53)',
-            '&:hover': { 
-              borderColor: 'rgb(159, 189, 33)',
-              backgroundColor: 'rgba(179, 209, 53, 0.1)'
-            }
-          }}
-        >
-          ייצוא לאקסל
-        </Button>
-        <Button
-          variant="outlined"
-          sx={{ 
-            borderColor: 'rgb(179, 209, 53)',
-            color: 'rgb(179, 209, 53)',
-            '&:hover': { 
-              borderColor: 'rgb(159, 189, 33)',
-              backgroundColor: 'rgba(179, 209, 53, 0.1)'
-            }
-          }}
-        >
-          סינון מתקדם
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={() => {
-            // Clear localStorage and reload students
-            localStorage.removeItem('campus-students-data');
-            const allStudents = getAllStudents();
-            
-            // Ensure Israel Israeli is in the students list
-            const israelExists = allStudents.some(student => student.id === '123456789');
-            if (!israelExists) {
-              const israelStudent: Student = {
-                id: '123456789',
-                studentNumber: '2024001',
-                firstName: 'ישראל',
-                lastName: 'ישראלי',
-                fullName: 'ישראל ישראלי',
-                email: 'student@campus.ac.il',
-                phone: '050-1234567',
-                address: 'רחוב הרצל 15, תל אביב',
-                department: 'מדעי המחשב',
-                year: 2,
-                semester: 'א',
-                creditsCompleted: 45,
-                gpa: 3.8,
-                birthDate: '2002-05-15',
-                age: 22,
-                gender: 'male',
-                city: 'תל אביב',
-                status: 'active',
-                enrollmentDate: '2022-10-01',
-                lastActive: '2024-12-01',
-                emergencyContact: 'שרה ישראלי',
-                emergencyPhone: '050-9876543',
-                notes: 'סטודנט מצטיין'
-              };
-              allStudents.unshift(israelStudent);
-            }
-            
-            setStudents(allStudents);
-            setStatistics(getStudentsStatistics());
-            setNotification({
-              message: 'נתוני הסטודנטים אופסו והוטענו מחדש',
-              type: 'success'
-            });
-          }}
-          sx={{ 
-            borderColor: '#FF5722',
-            color: '#FF5722',
-            '&:hover': { 
-              borderColor: '#D84315',
-              backgroundColor: 'rgba(255, 87, 34, 0.1)'
-            }
-          }}
-        >
-          אופס נתונים
-        </Button>
+
+
       </Box>
 
       {/* Students Table */}
