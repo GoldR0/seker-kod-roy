@@ -63,8 +63,8 @@ const Header: React.FC<HeaderProps> = ({
 
   const navigationItems = [
     { id: 'home', label: 'עמוד בית', icon: <HomeIcon />, path: '/' },
-    { id: 'students', label: 'ניהול סטודנטים', icon: <SchoolIcon />, path: '/students' },
-    { id: 'forms', label: 'טפסים', icon: <DescriptionIcon />, path: '/forms' },
+    { id: 'students', label: 'ניהול לימודים', icon: <SchoolIcon />, path: '/students' },
+    { id: 'forms', label: 'ניהול', icon: <DescriptionIcon />, path: '/forms' },
     { id: 'profile', label: 'פרופיל אישי', icon: <PersonIcon />, path: '/profile' },
     { id: 'learning', label: 'מרכז הלימודים', icon: <SchoolIcon />, path: '/learning' },
     { id: 'cafeteria', label: 'קפיטריה', icon: <RestaurantIcon />, path: '/cafeteria' },
@@ -100,7 +100,18 @@ const Header: React.FC<HeaderProps> = ({
         <Toolbar>
           {/* Logo, Title and Hamburger Menu */}
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-            <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+            <Typography 
+              variant="h6" 
+              component="div" 
+              sx={{ 
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.8
+                }
+              }}
+              onClick={() => navigate('/')}
+            >
               🏫 מערכת ניהול קמפוס
             </Typography>
             <IconButton

@@ -384,7 +384,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary }}>
           <DescriptionIcon sx={{ mr: 2, verticalAlign: 'middle' }} />
-          טפסים
+          ניהול
         </Typography>
         <Typography variant="body1" color="text.secondary">
           טפסים בסיסיים לניהול פעילויות בקמפוס

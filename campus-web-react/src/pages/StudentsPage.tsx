@@ -543,7 +543,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)' }}>
           <SchoolIcon sx={{ mr: 2, verticalAlign: 'middle' }} />
-          ניהול סטודנטים
+          ניהול לימודים
         </Typography>
         <Typography variant="body1" color="text.secondary">
           מערכת ניהול מקיפה לסטודנטים במכללה
