@@ -262,76 +262,12 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         const savedStudents = localStorage.getItem('campus-students-data');
         if (savedStudents) {
           const parsedStudents = JSON.parse(savedStudents);
-          
-          // Ensure Israel Israeli is in the students list
-          const israelExists = parsedStudents.some((student: Student) => student.id === '123456789');
-          if (!israelExists) {
-            const israelStudent: Student = {
-              id: '123456789',
-              studentNumber: '2024001',
-              firstName: 'ישראל',
-              lastName: 'ישראלי',
-              fullName: 'ישראל ישראלי',
-              email: 'student@campus.ac.il',
-              phone: '050-1234567',
-              address: 'רחוב הרצל 15, תל אביב',
-              department: 'מדעי המחשב',
-              year: 2,
-              semester: 'א',
-              creditsCompleted: 45,
-              gpa: 3.8,
-              birthDate: '2002-05-15',
-              age: 22,
-              gender: 'male',
-              city: 'תל אביב',
-              status: 'active',
-              enrollmentDate: '2022-10-01',
-              lastActive: '2024-12-01',
-              emergencyContact: 'שרה ישראלי',
-              emergencyPhone: '050-9876543',
-              notes: 'סטודנט מצטיין'
-            };
-            parsedStudents.unshift(israelStudent);
-          }
-          
           setStudents(parsedStudents);
           setStatistics(getStudentsStatistics());
           console.log('Students loaded from localStorage:', parsedStudents);
         } else {
           // If no data in localStorage, load from demo data
           const allStudents = getAllStudents();
-          
-          // Ensure Israel Israeli is in the students list
-          const israelExists = allStudents.some(student => student.id === '123456789');
-          if (!israelExists) {
-            const israelStudent: Student = {
-              id: '123456789',
-              studentNumber: '2024001',
-              firstName: 'ישראל',
-              lastName: 'ישראלי',
-              fullName: 'ישראל ישראלי',
-              email: 'student@campus.ac.il',
-              phone: '050-1234567',
-              address: 'רחוב הרצל 15, תל אביב',
-              department: 'מדעי המחשב',
-              year: 2,
-              semester: 'א',
-              creditsCompleted: 45,
-              gpa: 3.8,
-              birthDate: '2002-05-15',
-              age: 22,
-              gender: 'male',
-              city: 'תל אביב',
-              status: 'active',
-              enrollmentDate: '2022-10-01',
-              lastActive: '2024-12-01',
-              emergencyContact: 'שרה ישראלי',
-              emergencyPhone: '050-9876543',
-              notes: 'סטודנט מצטיין'
-            };
-            allStudents.unshift(israelStudent); // Add to beginning of array
-          }
-          
           setStudents(allStudents);
           setStatistics(getStudentsStatistics());
           console.log('Students loaded from demo data:', allStudents);
@@ -739,6 +675,38 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
             // Clear localStorage and reload students
             localStorage.removeItem('campus-students-data');
             const allStudents = getAllStudents();
+            
+            // Ensure Israel Israeli is in the students list
+            const israelExists = allStudents.some(student => student.id === '123456789');
+            if (!israelExists) {
+              const israelStudent: Student = {
+                id: '123456789',
+                studentNumber: '2024001',
+                firstName: 'ישראל',
+                lastName: 'ישראלי',
+                fullName: 'ישראל ישראלי',
+                email: 'student@campus.ac.il',
+                phone: '050-1234567',
+                address: 'רחוב הרצל 15, תל אביב',
+                department: 'מדעי המחשב',
+                year: 2,
+                semester: 'א',
+                creditsCompleted: 45,
+                gpa: 3.8,
+                birthDate: '2002-05-15',
+                age: 22,
+                gender: 'male',
+                city: 'תל אביב',
+                status: 'active',
+                enrollmentDate: '2022-10-01',
+                lastActive: '2024-12-01',
+                emergencyContact: 'שרה ישראלי',
+                emergencyPhone: '050-9876543',
+                notes: 'סטודנט מצטיין'
+              };
+              allStudents.unshift(israelStudent);
+            }
+            
             setStudents(allStudents);
             setStatistics(getStudentsStatistics());
             setNotification({
