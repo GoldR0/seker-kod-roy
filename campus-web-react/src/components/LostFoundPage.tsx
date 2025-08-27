@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -44,7 +44,7 @@ interface LostFoundFormData {
 }
 
 interface SubmittedForm {
-  id: number;
+  id: string;
   type: 'lost' | 'found';
   itemName: string;
   description: string;
@@ -65,41 +65,9 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
     contactPhone: ''
   });
   const [formDialogOpen, setFormDialogOpen] = useState(false);
-  const [submittedForms, setSubmittedForms] = useState<SubmittedForm[]>([
-    {
-      id: 1,
-      type: 'lost',
-      itemName: 'מפתחות',
-      description: 'מפתחות עם תליון כחול',
-      location: 'ספרייה',
-      date: '2024-01-15',
-      contactPhone: '050-1234567',
-      timestamp: new Date('2024-01-15T10:30:00'),
-      user: 'דוד כהן'
-    },
-    {
-      id: 2,
-      type: 'found',
-      itemName: 'ארנק שחור',
-      description: 'ארנק עם תעודות',
-      location: 'קפיטריה',
-      date: '2024-01-14',
-      contactPhone: '052-9876543',
-      timestamp: new Date('2024-01-14T14:20:00'),
-      user: 'שרה לוי'
-    },
-    {
-      id: 3,
-      type: 'lost',
-      itemName: 'טלפון נייד',
-      description: 'iPhone 13 עם כיסוי שקוף',
-      location: 'אודיטוריום',
-      date: '2024-01-13',
-      contactPhone: '054-5555555',
-      timestamp: new Date('2024-01-13T09:15:00'),
-      user: 'משה ישראלי'
-    }
-  ]);
+  const [submittedForms, setSubmittedForms] = useState<SubmittedForm[]>([]);
+  const [reportCounter, setReportCounter] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const customColors = {
@@ -108,6 +76,94 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
     primaryLight: 'rgb(199, 229, 73)',
     textOnPrimary: 'white'
   };
+
+  // Load reports from localStorage on component mount
+  useEffect(() => {
+    const loadReportsFromLocalStorage = () => {
+      try {
+        const savedReports = localStorage.getItem('campus-lost-found-data');
+        if (savedReports) {
+          const parsedReports = JSON.parse(savedReports);
+          // Convert timestamp strings back to Date objects
+          const reportsWithDates = parsedReports.map((report: any) => ({
+            ...report,
+            timestamp: new Date(report.timestamp)
+          }));
+          setSubmittedForms(reportsWithDates);
+          
+          // Set counter to next available number
+          if (parsedReports.length > 0) {
+            const maxId = Math.max(...parsedReports.map((report: SubmittedForm) => 
+              parseInt(report.id.split('-')[1])
+            ));
+            setReportCounter(maxId + 1);
+          }
+        } else {
+          // Initialize with demo data
+          const demoReports: SubmittedForm[] = [
+            {
+              id: 'LF-001',
+              type: 'lost',
+              itemName: 'מפתחות',
+              description: 'מפתחות עם תליון כחול',
+              location: 'ספרייה',
+              date: '2024-01-15',
+              contactPhone: '050-1234567',
+              timestamp: new Date('2024-01-15T10:30:00'),
+              user: 'דוד כהן'
+            },
+            {
+              id: 'LF-002',
+              type: 'found',
+              itemName: 'ארנק שחור',
+              description: 'ארנק עם תעודות',
+              location: 'קפיטריה',
+              date: '2024-01-14',
+              contactPhone: '052-9876543',
+              timestamp: new Date('2024-01-14T14:20:00'),
+              user: 'שרה לוי'
+            },
+            {
+              id: 'LF-003',
+              type: 'lost',
+              itemName: 'טלפון נייד',
+              description: 'iPhone 13 עם כיסוי שקוף',
+              location: 'אודיטוריום',
+              date: '2024-01-13',
+              contactPhone: '054-5555555',
+              timestamp: new Date('2024-01-13T09:15:00'),
+              user: 'משה ישראלי'
+            }
+          ];
+          setSubmittedForms(demoReports);
+          setReportCounter(4);
+          localStorage.setItem('campus-lost-found-data', JSON.stringify(demoReports));
+        }
+      } catch (error) {
+        console.error('Error loading reports from localStorage:', error);
+        // If there's an error, clear localStorage and initialize with demo data
+        localStorage.removeItem('campus-lost-found-data');
+        const demoReports: SubmittedForm[] = [
+          {
+            id: 'LF-001',
+            type: 'lost',
+            itemName: 'מפתחות',
+            description: 'מפתחות עם תליון כחול',
+            location: 'ספרייה',
+            date: '2024-01-15',
+            contactPhone: '050-1234567',
+            timestamp: new Date('2024-01-15T10:30:00'),
+            user: 'דוד כהן'
+          }
+        ];
+        setSubmittedForms(demoReports);
+        setReportCounter(2);
+        localStorage.setItem('campus-lost-found-data', JSON.stringify(demoReports));
+      }
+    };
+
+    loadReportsFromLocalStorage();
+  }, []);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -118,16 +174,25 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
 
   const handleFormSubmit = () => {
     const newForm: SubmittedForm = {
-      id: submittedForms.length + 1,
+      id: `LF-${String(reportCounter).padStart(3, '0')}`,
       ...formData,
       timestamp: new Date(),
       user: currentUser?.name || 'משתמש אנונימי'
     };
     
-    setSubmittedForms(prev => [newForm, ...prev]);
+    const updatedForms = [newForm, ...submittedForms];
+    setSubmittedForms(updatedForms);
+    setReportCounter(prev => prev + 1);
+    
+    // Save to localStorage
+    try {
+      localStorage.setItem('campus-lost-found-data', JSON.stringify(updatedForms));
+    } catch (error) {
+      console.error('Error saving reports to localStorage:', error);
+    }
     
     setNotification({
-      message: `הדיווח על ${formData.type === 'lost' ? 'אבידה' : 'מציאה'} נשלח בהצלחה!`,
+      message: `הדיווח על ${formData.type === 'lost' ? 'אבידה' : 'מציאה'} נשלח בהצלחה! מזהה: ${newForm.id}`,
       type: 'success'
     });
     
@@ -155,6 +220,11 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
   };
 
   const formatDate = (date: Date) => {
+    // Check if date is valid
+    if (!date || isNaN(date.getTime())) {
+      return 'תאריך לא תקין';
+    }
+    
     return new Intl.DateTimeFormat('he-IL', {
       year: 'numeric',
       month: 'short',
@@ -163,6 +233,15 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
       minute: '2-digit'
     }).format(date);
   };
+
+  // Filter reports based on search term
+  const filteredForms = submittedForms.filter(form => 
+    form.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    form.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    form.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    form.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    form.user.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -196,6 +275,26 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
         </Button>
       </Box>
 
+      {/* Search Bar */}
+      <Box sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
+        <TextField
+          fullWidth
+          placeholder="חיפוש לפי מזהה, שם פריט, תיאור, מיקום או משתמש..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: customColors.primary
+              }
+            }
+          }}
+        />
+      </Box>
+
       {/* Chat Section - Submitted Forms */}
       <Card sx={{ height: 800, overflow: 'hidden' }}>
         <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -210,7 +309,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
           }}>
             <SearchIcon />
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              דיווחים אחרונים
+              דיווחים אחרונים ({filteredForms.length})
             </Typography>
           </Box>
           
@@ -220,12 +319,12 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
             overflow: 'auto',
             backgroundColor: '#f5f5f5'
           }}>
-            {submittedForms.length === 0 ? (
+            {filteredForms.length === 0 ? (
               <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-                אין דיווחים עדיין
+                {searchTerm ? 'לא נמצאו דיווחים התואמים לחיפוש' : 'אין דיווחים עדיין'}
               </Typography>
             ) : (
-              submittedForms.map((form, index) => (
+              filteredForms.map((form, index) => (
                 <Box key={form.id}>
                   <Paper 
                     sx={{ 
@@ -247,9 +346,24 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
                         <PersonIcon fontSize="small" />
                       </Avatar>
                       <Box sx={{ flexGrow: 1 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                          {form.user}
-                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                            {form.user}
+                          </Typography>
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              backgroundColor: customColors.primary,
+                              color: 'white',
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1,
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            {form.id}
+                          </Typography>
+                        </Box>
                         <Typography variant="caption" color="text.secondary">
                           {formatDate(form.timestamp)}
                         </Typography>
@@ -292,7 +406,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
                       </Typography>
                     </Box>
                   </Paper>
-                  {index < submittedForms.length - 1 && <Divider sx={{ my: 1 }} />}
+                  {index < filteredForms.length - 1 && <Divider sx={{ my: 1 }} />}
                 </Box>
               ))
             )}
@@ -319,6 +433,24 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
         </DialogTitle>
         <DialogContent sx={{ p: 4 }}>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
+            <TextField
+              fullWidth
+              label="מזהה דיווח"
+              value={`LF-${String(reportCounter).padStart(3, '0')}`}
+              InputProps={{ 
+                readOnly: true,
+                sx: { 
+                  backgroundColor: '#f5f5f5',
+                  '& .MuiInputBase-input': {
+                    color: '#666',
+                    fontWeight: 'bold'
+                  }
+                }
+              }}
+              helperText="נוצר אוטומטית"
+              sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
+            />
+            
             <FormControl fullWidth required sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
               <InputLabel>סוג הדיווח</InputLabel>
               <Select
