@@ -12,11 +12,13 @@ import {
   MenuItem, 
   Button,
   Alert,
-  Snackbar
+  Snackbar,
+  FormHelperText
 } from '@mui/material';
 import { 
   Group as GroupIcon,
-  Send as SendIcon
+  Send as SendIcon,
+  Clear as ClearIcon
 } from '@mui/icons-material';
 import FacilitiesCard from './dashboard/FacilitiesCard';
 
@@ -30,6 +32,13 @@ interface InquiryFormData {
   description: string;
   date: string;
   location: string;
+}
+
+interface ValidationErrors {
+  category?: string;
+  description?: string;
+  date?: string;
+  location?: string;
 }
 
 const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
@@ -50,9 +59,75 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
     date: '',
     location: ''
   });
+  
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  // Validation functions
+  const validateRequired = (value: string, fieldName: string): string | undefined => {
+    if (!value || value.trim() === '') return `${fieldName} הוא שדה חובה`;
+    return undefined;
+  };
 
+  const validateDescription = (description: string): string | undefined => {
+    if (!description) return 'תיאור הפנייה הוא שדה חובה';
+    if (description.length < 10) return 'תיאור הפנייה חייב להכיל לפחות 10 תווים';
+    if (description.length > 500) return 'תיאור הפנייה לא יכול לעלות על 500 תווים';
+    return undefined;
+  };
+
+  const validateLocation = (location: string): string | undefined => {
+    if (!location) return 'מיקום הוא שדה חובה';
+    if (location.length < 3) return 'מיקום חייב להכיל לפחות 3 תווים';
+    if (location.length > 100) return 'מיקום לא יכול לעלות על 100 תווים';
+    return undefined;
+  };
+
+  const validateDate = (date: string): string | undefined => {
+    if (!date) return 'תאריך הוא שדה חובה';
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      return 'תאריך לא יכול להיות בעבר';
+    }
+    return undefined;
+  };
+
+  const validateField = (field: string, value: string): string | undefined => {
+    switch (field) {
+      case 'category':
+        return validateRequired(value, 'קטגוריה');
+      case 'description':
+        return validateDescription(value);
+      case 'date':
+        return validateDate(value);
+      case 'location':
+        return validateLocation(value);
+      default:
+        return undefined;
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: ValidationErrors = {};
+    let isValid = true;
+
+    Object.keys(inquiryFormData).forEach(field => {
+      if (field !== 'inquiryId') { // Skip inquiryId validation
+        const error = validateField(field, inquiryFormData[field as keyof InquiryFormData]);
+        if (error) {
+          newErrors[field as keyof ValidationErrors] = error;
+          isValid = false;
+        }
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   // Inquiry form handlers
   const handleInquiryInputChange = (field: string, value: any) => {
@@ -60,22 +135,77 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
       ...prev,
       [field]: value
     }));
+
+    // Clear error when user starts typing
+    if (errors[field as keyof ValidationErrors]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: undefined
+      }));
+    }
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({
+      ...prev,
+      [field]: true
+    }));
+
+    const error = validateField(field, inquiryFormData[field as keyof InquiryFormData]);
+    setErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
   };
 
   const handleInquirySubmit = () => {
-    setNotification({
-      message: `פנייה חדשה נוצרה בהצלחה! מזהה: ${inquiryFormData.inquiryId}`,
-      type: 'success'
-    });
-    
-    setInquiryCounter(prev => prev + 1);
+    // Mark all fields as touched
+    const allTouched = Object.keys(inquiryFormData).reduce((acc, field) => {
+      if (field !== 'inquiryId') {
+        acc[field] = true;
+      }
+      return acc;
+    }, {} as Record<string, boolean>);
+    setTouched(allTouched);
+
+    if (validateForm()) {
+      setNotification({
+        message: `פנייה חדשה נוצרה בהצלחה! מזהה: ${inquiryFormData.inquiryId}`,
+        type: 'success'
+      });
+      
+      setInquiryCounter(prev => prev + 1);
+      setInquiryFormData({
+        inquiryId: `INQUIRY-${String(inquiryCounter + 1).padStart(3, '0')}`,
+        category: '',
+        description: '',
+        date: '',
+        location: ''
+      });
+      setErrors({});
+      setTouched({});
+    } else {
+      setNotification({
+        message: 'יש שגיאות בטופס. אנא בדוק את השדות המסומנים.',
+        type: 'error'
+      });
+    }
+  };
+
+  const handleClearForm = () => {
     setInquiryFormData({
-      inquiryId: `INQUIRY-${String(inquiryCounter + 1).padStart(3, '0')}`,
+      inquiryId: `INQUIRY-${String(inquiryCounter).padStart(3, '0')}`,
       category: '',
       description: '',
       date: '',
       location: ''
     });
+    setErrors({});
+    setTouched({});
+  };
+
+  const shouldShowError = (field: string): boolean => {
+    return touched[field] && !!errors[field as keyof ValidationErrors];
   };
 
   return (
@@ -138,16 +268,29 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
                 }}
                 sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
               />
-              <FormControl fullWidth required>
+              
+              <FormControl fullWidth error={shouldShowError('category')} required>
                 <InputLabel>קטגוריה</InputLabel>
                 <Select
                   value={inquiryFormData.category}
                   onChange={(e) => handleInquiryInputChange('category', e.target.value)}
+                  onBlur={() => handleBlur('category')}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: customColors.primary
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="complaint">תלונה</MenuItem>
                   <MenuItem value="improvement">עצת שיפור</MenuItem>
                 </Select>
+                {shouldShowError('category') && (
+                  <FormHelperText>{errors.category}</FormHelperText>
+                )}
               </FormControl>
+              
               <TextField
                 fullWidth
                 multiline
@@ -155,31 +298,79 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
                 label="תיאור הפנייה"
                 value={inquiryFormData.description}
                 onChange={(e) => handleInquiryInputChange('description', e.target.value)}
+                onBlur={() => handleBlur('description')}
+                error={shouldShowError('description')}
+                helperText={shouldShowError('description') ? errors.description : 'תיאור מפורט של הפנייה (10-500 תווים)'}
                 required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
+                sx={{ 
+                  gridColumn: { xs: '1', md: '1 / -1' },
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: customColors.primary
+                    }
+                  }
+                }}
               />
+              
               <TextField
                 fullWidth
                 type="date"
                 label="תאריך"
                 value={inquiryFormData.date}
                 onChange={(e) => handleInquiryInputChange('date', e.target.value)}
+                onBlur={() => handleBlur('date')}
+                error={shouldShowError('date')}
+                helperText={shouldShowError('date') ? errors.date : ''}
                 required
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: customColors.primary
+                    }
+                  }
+                }}
               />
+              
               <TextField
                 fullWidth
                 label="מיקום"
                 value={inquiryFormData.location}
                 onChange={(e) => handleInquiryInputChange('location', e.target.value)}
+                onBlur={() => handleBlur('location')}
+                error={shouldShowError('location')}
+                helperText={shouldShowError('location') ? errors.location : 'למשל: בניין A, קומה 2, חדר 205'}
                 required
                 placeholder="למשל: בניין A, קומה 2, חדר 205"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: customColors.primary
+                    }
+                  }
+                }}
               />
             </Box>
             
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
+              <Button
+                variant="outlined"
+                startIcon={<ClearIcon />}
+                onClick={handleClearForm}
+                sx={{
+                  borderColor: customColors.primary,
+                  color: customColors.primary,
+                  '&:hover': {
+                    borderColor: customColors.primaryDark,
+                    backgroundColor: customColors.primaryLight + '20'
+                  }
+                }}
+              >
+                נקה טופס
+              </Button>
               <Button
                 variant="contained"
+                startIcon={<SendIcon />}
                 onClick={handleInquirySubmit}
                 sx={{
                   backgroundColor: 'rgb(179, 209, 53)',

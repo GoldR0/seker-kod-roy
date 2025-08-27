@@ -19,14 +19,12 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  FormHelperText
+  DialogActions
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Send as SendIcon,
   Clear as ClearIcon,
-  CheckCircle as CheckCircleIcon,
   Person as PersonIcon,
   Add as AddIcon
 } from '@mui/icons-material';
