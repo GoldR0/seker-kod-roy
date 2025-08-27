@@ -21,7 +21,7 @@ interface FacilitiesCardProps {
 interface ManagedFacility {
   id: string;
   name: string;
-  type: 'community' | 'library' | 'cafeteria' | 'gym' | 'parking';
+  type: 'library' | 'cafeteria' | 'gym' | 'parking';
   status: 'open' | 'closed';
   lastUpdated: string;
 }
@@ -61,7 +61,7 @@ const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
     };
 
     window.addEventListener('facilityUpdated', handleFacilityUpdate);
-
+    
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('facilityUpdated', handleFacilityUpdate);
@@ -81,7 +81,6 @@ const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
     // First check if we have a managed facility with type
     if (facilityType) {
       switch (facilityType) {
-        case 'community': return <BusinessIcon sx={{ fontSize: 24, color: customColors.primary }} />;
         case 'library': return <LibraryIcon sx={{ fontSize: 24, color: customColors.primary }} />;
         case 'cafeteria': return <CafeteriaIcon sx={{ fontSize: 24, color: customColors.primary }} />;
         case 'gym': return <GymIcon sx={{ fontSize: 24, color: customColors.primary }} />;
@@ -100,8 +99,6 @@ const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
         return <GymIcon sx={{ fontSize: 24, color: customColors.primary }} />;
       case 'חניה':
         return <ParkingIcon sx={{ fontSize: 24, color: customColors.primary }} />;
-      case 'מרכז קהילתי':
-        return <BusinessIcon sx={{ fontSize: 24, color: customColors.primary }} />;
       default:
         return <LocationIcon sx={{ fontSize: 24, color: customColors.primary }} />;
     }

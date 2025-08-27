@@ -52,6 +52,8 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
   });
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+
+
   // Inquiry form handlers
   const handleInquiryInputChange = (field: string, value: any) => {
     setInquiryFormData(prev => ({

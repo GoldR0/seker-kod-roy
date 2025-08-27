@@ -64,7 +64,7 @@ interface Event {
 interface Facility {
   id: string;
   name: string;
-  type: 'community' | 'library' | 'cafeteria' | 'gym' | 'parking';
+  type: 'library' | 'cafeteria' | 'gym' | 'parking';
   status: 'open' | 'closed';
   lastUpdated: string;
 }
@@ -115,6 +115,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
   // Load events and facilities from localStorage on component mount
   useEffect(() => {
+
     const loadEventsFromLocalStorage = () => {
       try {
         const savedEvents = localStorage.getItem('campus-events-data');
@@ -140,11 +141,19 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         const savedFacilities = localStorage.getItem('campus-facilities-data');
         if (savedFacilities) {
           const parsedFacilities = JSON.parse(savedFacilities);
-          setFacilities(parsedFacilities);
+          // Remove community center if it exists
+          const filteredFacilities = parsedFacilities.filter((facility: any) => 
+            facility.id !== 'community-1' && facility.name !== 'מרכז קהילתי' && facility.type !== 'community'
+          );
+          setFacilities(filteredFacilities);
+          
+          // Save the filtered data back to localStorage
+          if (filteredFacilities.length !== parsedFacilities.length) {
+            localStorage.setItem('campus-facilities-data', JSON.stringify(filteredFacilities));
+          }
         } else {
           // Initialize with default facilities - always create fresh data
           const defaultFacilities: Facility[] = [
-            { id: 'community-1', name: 'מרכז קהילתי', type: 'community', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
             { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
             { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
             { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
@@ -159,10 +168,10 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         if (currentFacilities) {
           try {
             const parsed = JSON.parse(currentFacilities);
+            
             if (!Array.isArray(parsed) || parsed.length === 0) {
               // Reset if data is corrupted
               const defaultFacilities: Facility[] = [
-                { id: 'community-1', name: 'מרכז קהילתי', type: 'community', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
                 { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
                 { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
                 { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
@@ -174,7 +183,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           } catch (error) {
             console.error('Corrupted facilities data, resetting...', error);
             const defaultFacilities: Facility[] = [
-              { id: 'community-1', name: 'מרכז קהילתי', type: 'community', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
               { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
               { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
               { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
@@ -326,7 +334,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
   const getFacilityIcon = (type: string) => {
     switch (type) {
-      case 'community': return <BusinessIcon />;
       case 'library': return <LibraryIcon />;
       case 'cafeteria': return <RestaurantIcon />;
       case 'gym': return <GymIcon />;
@@ -390,6 +397,8 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     localStorage.removeItem('campus-facilities-data');
     localStorage.removeItem('campus-lost-found-data');
     
+
+    
     // Reset state
     setEvents([]);
     setEventCounter(1);
@@ -397,7 +406,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     
     // Reinitialize with default data
     const defaultFacilities: Facility[] = [
-      { id: 'community-1', name: 'מרכז קהילתי', type: 'community', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
       { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
       { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
       { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
