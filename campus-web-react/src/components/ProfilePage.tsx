@@ -13,7 +13,8 @@ import {
   MenuItem,
   Alert,
   Snackbar,
-  Avatar
+  Avatar,
+  FormHelperText
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -36,6 +37,16 @@ interface ProfileFormData {
   year: string;
 }
 
+interface ValidationErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  department?: string;
+  year?: string;
+}
+
 const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
   const [formData, setFormData] = useState<ProfileFormData>({
     firstName: currentUser?.name?.split(' ')[0] || '',
@@ -46,6 +57,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
     department: '',
     year: ''
   });
+  
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const customColors = {
@@ -55,21 +69,120 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
     textOnPrimary: 'white'
   };
 
+  // פונקציות בדיקת תקינות
+  const validateEmail = (email: string): string | undefined => {
+    if (!email) return 'אימייל הוא שדה חובה';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return 'פורמט אימייל לא תקין';
+    return undefined;
+  };
+
+  const validatePhone = (phone: string): string | undefined => {
+    if (!phone) return 'מספר טלפון הוא שדה חובה';
+    const phoneRegex = /^[\d\s\-\+\(\)]{9,15}$/;
+    if (!phoneRegex.test(phone)) return 'מספר טלפון לא תקין';
+    return undefined;
+  };
+
+  const validateName = (name: string, fieldName: string): string | undefined => {
+    if (!name) return `${fieldName} הוא שדה חובה`;
+    const nameRegex = /^[א-ת\s]+$/;
+    if (!nameRegex.test(name)) return `${fieldName} יכול להכיל אותיות בלבד`;
+    return undefined;
+  };
+
+  const validateRequired = (value: string, fieldName: string): string | undefined => {
+    if (!value || value.trim() === '') return `${fieldName} הוא שדה חובה`;
+    return undefined;
+  };
+
+  const validateField = (field: string, value: string): string | undefined => {
+    switch (field) {
+      case 'firstName':
+        return validateName(value, 'שם פרטי');
+      case 'lastName':
+        return validateName(value, 'שם משפחה');
+      case 'email':
+        return validateEmail(value);
+      case 'phone':
+        return validatePhone(value);
+      case 'address':
+        return validateRequired(value, 'כתובת');
+      case 'department':
+        return validateRequired(value, 'חוג');
+      case 'year':
+        return validateRequired(value, 'שנה');
+      default:
+        return undefined;
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: ValidationErrors = {};
+    let isValid = true;
+
+    Object.keys(formData).forEach(field => {
+      const error = validateField(field, formData[field as keyof ProfileFormData]);
+      if (error) {
+        newErrors[field as keyof ValidationErrors] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+
+    // נקה שגיאה כשהמשתמש מתחיל להקליד
+    if (errors[field as keyof ValidationErrors]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: undefined
+      }));
+    }
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({
+      ...prev,
+      [field]: true
+    }));
+
+    const error = validateField(field, formData[field as keyof ProfileFormData]);
+    setErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
   };
 
   const handleFormSubmit = () => {
-    setNotification({
-      message: 'הפרופיל עודכן בהצלחה!',
-      type: 'success'
-    });
-    
-    // כאן אפשר להוסיף לוגיקה לשמירת הנתונים
-    console.log('Profile data saved:', formData);
+    // סמן את כל השדות כנגעו
+    const allTouched = Object.keys(formData).reduce((acc, field) => {
+      acc[field] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
+    setTouched(allTouched);
+
+    if (validateForm()) {
+      setNotification({
+        message: 'הפרופיל עודכן בהצלחה!',
+        type: 'success'
+      });
+      
+      // כאן אפשר להוסיף לוגיקה לשמירת הנתונים
+      console.log('Profile data saved:', formData);
+    } else {
+      setNotification({
+        message: 'יש שגיאות בטופס. אנא בדוק את השדות המסומנים.',
+        type: 'error'
+      });
+    }
   };
 
   const handleClearForm = () => {
@@ -82,6 +195,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
       department: '',
       year: ''
     });
+    setErrors({});
+    setTouched({});
+  };
+
+  const shouldShowError = (field: string): boolean => {
+    return touched[field] && !!errors[field as keyof ValidationErrors];
   };
 
   return (
@@ -139,6 +258,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
               label="שם פרטי"
               value={formData.firstName}
               onChange={(e) => handleInputChange('firstName', e.target.value)}
+              onBlur={() => handleBlur('firstName')}
+              error={shouldShowError('firstName')}
+              helperText={shouldShowError('firstName') ? errors.firstName : ''}
               required
               sx={{
                 '& .MuiOutlinedInput-root': {
@@ -154,6 +276,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
               label="שם משפחה"
               value={formData.lastName}
               onChange={(e) => handleInputChange('lastName', e.target.value)}
+              onBlur={() => handleBlur('lastName')}
+              error={shouldShowError('lastName')}
+              helperText={shouldShowError('lastName') ? errors.lastName : ''}
               required
               sx={{
                 '& .MuiOutlinedInput-root': {
@@ -170,6 +295,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
               label="אימייל"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
+              onBlur={() => handleBlur('email')}
+              error={shouldShowError('email')}
+              helperText={shouldShowError('email') ? errors.email : ''}
               required
               sx={{ 
                 gridColumn: { xs: '1', md: '1 / -1' },
@@ -186,6 +314,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
               label="טלפון"
               value={formData.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
+              onBlur={() => handleBlur('phone')}
+              error={shouldShowError('phone')}
+              helperText={shouldShowError('phone') ? errors.phone : ''}
+              required
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -200,6 +332,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
               label="כתובת"
               value={formData.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
+              onBlur={() => handleBlur('address')}
+              error={shouldShowError('address')}
+              helperText={shouldShowError('address') ? errors.address : ''}
+              required
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -209,11 +345,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
               }}
             />
             
-            <FormControl fullWidth>
+            <FormControl fullWidth error={shouldShowError('department')} required>
               <InputLabel>חוג</InputLabel>
               <Select
                 value={formData.department}
                 onChange={(e) => handleInputChange('department', e.target.value)}
+                onBlur={() => handleBlur('department')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -229,13 +366,17 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
                 <MenuItem value="medicine">רפואה</MenuItem>
                 <MenuItem value="law">משפטים</MenuItem>
               </Select>
+              {shouldShowError('department') && (
+                <FormHelperText>{errors.department}</FormHelperText>
+              )}
             </FormControl>
             
-            <FormControl fullWidth>
+            <FormControl fullWidth error={shouldShowError('year')} required>
               <InputLabel>שנה</InputLabel>
               <Select
                 value={formData.year}
                 onChange={(e) => handleInputChange('year', e.target.value)}
+                onBlur={() => handleBlur('year')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -249,6 +390,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
                 <MenuItem value="3">שנה ג</MenuItem>
                 <MenuItem value="4">שנה ד</MenuItem>
               </Select>
+              {shouldShowError('year') && (
+                <FormHelperText>{errors.year}</FormHelperText>
+              )}
             </FormControl>
           </Box>
 
