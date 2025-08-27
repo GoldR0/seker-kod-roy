@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -17,19 +17,17 @@ import {
   Select,
   MenuItem,
   Alert,
-  Snackbar
+  Snackbar,
+  IconButton
 } from '@mui/material';
 import {
   Description as DescriptionIcon,
-  Person as PersonIcon,
-  Login as LoginIcon,
   Event as EventIcon,
-  Search as SearchIcon,
-  Assignment as AssignmentIcon,
   Send as SendIcon,
   Clear as ClearIcon,
   CheckCircle as CheckCircleIcon,
-  School as SchoolIcon
+  Edit as EditIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material';
 
 interface FormsPageProps {
@@ -37,20 +35,8 @@ interface FormsPageProps {
 }
 
 interface FormData {
-  registration: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    userType: string;
-  };
-  login: {
-    email: string;
-    password: string;
-    rememberMe: boolean;
-  };
   event: {
+    eventId: string;
     title: string;
     description: string;
     date: string;
@@ -58,45 +44,35 @@ interface FormData {
     location: string;
     maxParticipants: number;
   };
-  task: {
-    title: string;
-    description: string;
-    dueDate: string;
-    priority: string;
-    course: string;
-  };
+}
+
+interface Event {
+  eventId: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  maxParticipants: number;
+  createdAt: string;
 }
 
 const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [activeForm, setActiveForm] = useState<string | null>(null);
+  const [eventCounter, setEventCounter] = useState(1);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [deleteEventDialogOpen, setDeleteEventDialogOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [formData, setFormData] = useState<FormData>({
-    registration: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      userType: ''
-    },
-    login: {
-      email: '',
-      password: '',
-      rememberMe: false
-    },
     event: {
+      eventId: `EVENT-${String(eventCounter).padStart(3, '0')}`,
       title: '',
       description: '',
       date: '',
       time: '',
       location: '',
       maxParticipants: 10
-    },
-    task: {
-      title: '',
-      description: '',
-      dueDate: '',
-      priority: '',
-      course: ''
     }
   });
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -108,52 +84,79 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     textOnPrimary: 'white'
   };
 
+  // Load events from localStorage on component mount
+  useEffect(() => {
+    const loadEventsFromLocalStorage = () => {
+      try {
+        const savedEvents = localStorage.getItem('campus-events-data');
+        if (savedEvents) {
+          const parsedEvents = JSON.parse(savedEvents);
+          setEvents(parsedEvents);
+          
+          // Set counter to next available number
+          if (parsedEvents.length > 0) {
+            const maxId = Math.max(...parsedEvents.map((event: Event) => 
+              parseInt(event.eventId.split('-')[1])
+            ));
+            setEventCounter(maxId + 1);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading events from localStorage:', error);
+      }
+    };
+
+    loadEventsFromLocalStorage();
+  }, []);
+
   const forms = [
-    {
-      id: 'registration',
-      title: 'הרשמה',
-      description: 'הרשמה למערכת הקמפוס',
-      icon: <PersonIcon sx={{ fontSize: 40 }} />,
-      color: '#2196F3'
-    },
-    {
-      id: 'login',
-      title: 'התחברות',
-      description: 'התחברות למערכת',
-      icon: <LoginIcon sx={{ fontSize: 40 }} />,
-      color: '#4CAF50'
-    },
     {
       id: 'event',
       title: 'יצירת אירוע',
       description: 'יצירת אירוע חדש',
       icon: <EventIcon sx={{ fontSize: 40 }} />,
       color: '#FF9800'
-    },
-    {
-      id: 'task',
-      title: 'מטלות ומבחנים',
-      description: 'הוספת מטלה או מבחן',
-      icon: <AssignmentIcon sx={{ fontSize: 40 }} />,
-      color: '#607D8B'
     }
   ];
 
   const handleFormSubmit = (formType: string) => {
-    setNotification({
-      message: `הטופס "${forms.find(f => f.id === formType)?.title}" נשלח בהצלחה!`,
-      type: 'success'
-    });
-    setActiveForm(null);
+    if (formType === 'event') {
+      const newEvent: Event = {
+        ...formData.event,
+        createdAt: new Date().toLocaleString('he-IL')
+      };
+
+      const updatedEvents = [...events, newEvent];
+      setEvents(updatedEvents);
+
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-events-data', JSON.stringify(updatedEvents));
+      } catch (error) {
+        console.error('Error saving events to localStorage:', error);
+      }
+
+      setNotification({
+        message: `אירוע "${formData.event.title}" נוצר בהצלחה! מזהה: ${formData.event.eventId}`,
+        type: 'success'
+      });
+
+      // Reset form and increment counter
+      setEventCounter(prev => prev + 1);
+      setFormData({
+        event: {
+          eventId: `EVENT-${String(eventCounter + 1).padStart(3, '0')}`,
+          title: '',
+          description: '',
+          date: '',
+          time: '',
+          location: '',
+          maxParticipants: 10
+        }
+      });
+    }
     
-    // איפוס טופס רגיל
-    setFormData(prev => ({
-      ...prev,
-      [formType]: Object.keys(prev[formType as keyof FormData]).reduce((acc, key) => ({
-        ...acc,
-        [key]: typeof (prev[formType as keyof FormData] as any)[key] === 'boolean' ? false : ''
-      }), {}) as any
-    }));
+    setActiveForm(null);
   };
 
   const handleInputChange = (formType: string, field: string, value: any) => {
@@ -171,97 +174,115 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     setActiveForm(formId);
   };
 
+  // Event management functions
+  const handleEditEvent = (event: Event) => {
+    setEditingEvent(event);
+    setFormData({
+      event: {
+        eventId: event.eventId,
+        title: event.title,
+        description: event.description,
+        date: event.date,
+        time: event.time,
+        location: event.location,
+        maxParticipants: event.maxParticipants
+      }
+    });
+    setActiveForm('event');
+  };
+
+  const handleDeleteEvent = (event: Event) => {
+    setEventToDelete(event);
+    setDeleteEventDialogOpen(true);
+  };
+
+  const confirmDeleteEvent = () => {
+    if (eventToDelete) {
+      const updatedEvents = events.filter(event => event.eventId !== eventToDelete.eventId);
+      setEvents(updatedEvents);
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-events-data', JSON.stringify(updatedEvents));
+      } catch (error) {
+        console.error('Error saving events to localStorage:', error);
+      }
+      
+      setNotification({
+        message: `האירוע "${eventToDelete.title}" נמחק בהצלחה`,
+        type: 'success'
+      });
+      setDeleteEventDialogOpen(false);
+      setEventToDelete(null);
+    }
+  };
+
+  const handleUpdateEvent = () => {
+    if (editingEvent) {
+      const updatedEvents = events.map(event => 
+        event.eventId === editingEvent.eventId 
+          ? { ...formData.event, createdAt: editingEvent.createdAt }
+          : event
+      );
+      setEvents(updatedEvents);
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-events-data', JSON.stringify(updatedEvents));
+      } catch (error) {
+        console.error('Error saving events to localStorage:', error);
+      }
+      
+      setNotification({
+        message: `האירוע "${formData.event.title}" עודכן בהצלחה`,
+        type: 'success'
+      });
+      
+      setEditingEvent(null);
+      setActiveForm(null);
+      
+      // Reset form
+      setEventCounter(prev => prev + 1);
+      setFormData({
+        event: {
+          eventId: `EVENT-${String(eventCounter + 1).padStart(3, '0')}`,
+          title: '',
+          description: '',
+          date: '',
+          time: '',
+          location: '',
+          maxParticipants: 10
+        }
+      });
+    }
+  };
+
   const renderForm = (formType: string) => {
     switch (formType) {
-      case 'registration':
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>הרשמה למערכת</Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
-              <TextField
-                fullWidth
-                label="שם פרטי"
-                value={formData.registration.firstName}
-                onChange={(e) => handleInputChange('registration', 'firstName', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                label="שם משפחה"
-                value={formData.registration.lastName}
-                onChange={(e) => handleInputChange('registration', 'lastName', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                type="email"
-                label="אימייל"
-                value={formData.registration.email}
-                onChange={(e) => handleInputChange('registration', 'email', e.target.value)}
-                required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
-              />
-              <TextField
-                fullWidth
-                type="password"
-                label="סיסמה"
-                value={formData.registration.password}
-                onChange={(e) => handleInputChange('registration', 'password', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                type="password"
-                label="אימות סיסמה"
-                value={formData.registration.confirmPassword}
-                onChange={(e) => handleInputChange('registration', 'confirmPassword', e.target.value)}
-                required
-              />
-              <FormControl fullWidth required sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
-                <InputLabel>סוג משתמש</InputLabel>
-                <Select
-                  value={formData.registration.userType}
-                  onChange={(e) => handleInputChange('registration', 'userType', e.target.value)}
-                >
-                  <MenuItem value="student">סטודנט</MenuItem>
-                  <MenuItem value="lecturer">מרצה</MenuItem>
-                  <MenuItem value="staff">צוות</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-          </Box>
-        );
-
-      case 'login':
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>התחברות למערכת</Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <TextField
-                fullWidth
-                type="email"
-                label="אימייל"
-                value={formData.login.email}
-                onChange={(e) => handleInputChange('login', 'email', e.target.value)}
-                required
-              />
-              <TextField
-                fullWidth
-                type="password"
-                label="סיסמה"
-                value={formData.login.password}
-                onChange={(e) => handleInputChange('login', 'password', e.target.value)}
-                required
-              />
-            </Box>
-          </Box>
-        );
-
       case 'event':
         return (
           <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>יצירת אירוע</Typography>
+            <Typography variant="h6" gutterBottom>
+              {editingEvent ? 'עריכת אירוע' : 'יצירת אירוע'}
+            </Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
+              <TextField
+                fullWidth
+                label="מזהה אירוע"
+                value={formData.event.eventId}
+                InputProps={{ 
+                  readOnly: true,
+                  sx: { 
+                    backgroundColor: '#f5f5f5',
+                    '& .MuiInputBase-input': {
+                      color: '#666',
+                      fontWeight: 'bold'
+                    }
+                  }
+                }}
+                helperText="נוצר אוטומטית"
+                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
+              />
               <TextField
                 fullWidth
                 label="כותרת האירוע"
@@ -312,62 +333,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
                 value={formData.event.maxParticipants}
                 onChange={(e) => handleInputChange('event', 'maxParticipants', parseInt(e.target.value))}
                 required
-              />
-            </Box>
-          </Box>
-        );
-
-      case 'task':
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>מטלות ומבחנים</Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
-              <TextField
-                fullWidth
-                label="כותרת המטלה"
-                value={formData.task.title}
-                onChange={(e) => handleInputChange('task', 'title', e.target.value)}
-                required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
-              />
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                label="תיאור המטלה"
-                value={formData.task.description}
-                onChange={(e) => handleInputChange('task', 'description', e.target.value)}
-                required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
-              />
-              <TextField
-                fullWidth
-                type="date"
-                label="תאריך יעד"
-                value={formData.task.dueDate}
-                onChange={(e) => handleInputChange('task', 'dueDate', e.target.value)}
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-              <FormControl fullWidth required>
-                <InputLabel>עדיפות</InputLabel>
-                <Select
-                  value={formData.task.priority}
-                  onChange={(e) => handleInputChange('task', 'priority', e.target.value)}
-                >
-                  <MenuItem value="low">נמוכה</MenuItem>
-                  <MenuItem value="medium">בינונית</MenuItem>
-                  <MenuItem value="high">גבוהה</MenuItem>
-                  <MenuItem value="urgent">דחופה</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                fullWidth
-                label="קורס"
-                value={formData.task.course}
-                onChange={(e) => handleInputChange('task', 'course', e.target.value)}
-                required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
               />
             </Box>
           </Box>
@@ -464,13 +429,117 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           <Button 
             variant="contained"
             startIcon={<SendIcon />}
-            onClick={() => activeForm && handleFormSubmit(activeForm)}
+            onClick={() => {
+              if (editingEvent) {
+                handleUpdateEvent();
+              } else if (activeForm) {
+                handleFormSubmit(activeForm);
+              }
+            }}
             sx={{
               backgroundColor: customColors.primary,
               '&:hover': { backgroundColor: customColors.primaryDark }
             }}
           >
-            שלח טופס
+            {editingEvent ? 'עדכן אירוע' : 'שלח טופס'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Events Management Table */}
+      <Box sx={{ mt: 6 }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary, mb: 3 }}>
+          <EventIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+          ניהול אירועים ({events.length})
+        </Typography>
+        
+        {events.length === 0 ? (
+          <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+            אין אירועים עדיין. צור אירוע חדש באמצעות הטופס למעלה.
+          </Typography>
+        ) : (
+          <Box sx={{ overflowX: 'auto' }}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr auto auto',
+              gap: 2,
+              p: 2,
+              backgroundColor: '#f5f5f5',
+              borderRadius: 1,
+              mb: 2,
+              fontWeight: 'bold',
+              fontSize: '0.875rem'
+            }}>
+              <Box>מזהה</Box>
+              <Box>כותרת</Box>
+              <Box>תאריך</Box>
+              <Box>שעה</Box>
+              <Box>מיקום</Box>
+              <Box>משתתפים</Box>
+              <Box>פעולות</Box>
+            </Box>
+            
+            {events.map((event) => (
+              <Box key={event.eventId} sx={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr auto auto',
+                gap: 2,
+                p: 2,
+                borderBottom: '1px solid #e0e0e0',
+                '&:hover': { backgroundColor: '#f9f9f9' },
+                '&:last-child': { borderBottom: 'none' }
+              }}>
+                <Box sx={{ fontWeight: 'bold', color: customColors.primary }}>{event.eventId}</Box>
+                <Box>{event.title}</Box>
+                <Box>{event.date}</Box>
+                <Box>{event.time}</Box>
+                <Box>{event.location}</Box>
+                <Box>{event.maxParticipants}</Box>
+                <Box>
+                  <IconButton
+                    size="small"
+                    color="primary"
+                    onClick={() => handleEditEvent(event)}
+                    sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.1)' } }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+                <Box>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => handleDeleteEvent(event)}
+                    sx={{ '&:hover': { backgroundColor: 'rgba(244, 67, 54, 0.1)' } }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
+
+      {/* Delete Event Confirmation Dialog */}
+      <Dialog open={deleteEventDialogOpen} onClose={() => setDeleteEventDialogOpen(false)}>
+        <DialogTitle>אישור מחיקת אירוע</DialogTitle>
+        <DialogContent>
+          <Typography>
+            האם אתה בטוח שברצונך למחוק את האירוע "{eventToDelete?.title}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            פעולה זו אינה הפיכה.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteEventDialogOpen(false)}>ביטול</Button>
+          <Button 
+            onClick={confirmDeleteEvent} 
+            color="error" 
+            variant="contained"
+          >
+            מחיקה
           </Button>
         </DialogActions>
       </Dialog>
