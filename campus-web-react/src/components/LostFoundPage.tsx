@@ -99,7 +99,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
             setReportCounter(maxId + 1);
           }
         } else {
-          // Initialize with demo data
+          // Initialize with demo data - always create fresh data
           const demoReports: SubmittedForm[] = [
             {
               id: 'LF-001',
@@ -138,6 +138,56 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
           setSubmittedForms(demoReports);
           setReportCounter(4);
           localStorage.setItem('campus-lost-found-data', JSON.stringify(demoReports));
+        }
+        
+        // Always ensure reports have proper IDs (in case of corrupted data)
+        const currentReports = localStorage.getItem('campus-lost-found-data');
+        if (currentReports) {
+          try {
+            const parsed = JSON.parse(currentReports);
+            if (Array.isArray(parsed)) {
+              // Check if any reports have old numeric IDs and fix them
+              let needsUpdate = false;
+              const fixedReports = parsed.map((report: any, index: number) => {
+                if (typeof report.id === 'number' || !report.id.startsWith('LF-')) {
+                  needsUpdate = true;
+                  return {
+                    ...report,
+                    id: `LF-${String(index + 1).padStart(3, '0')}`,
+                    timestamp: new Date(report.timestamp)
+                  };
+                }
+                return {
+                  ...report,
+                  timestamp: new Date(report.timestamp)
+                };
+              });
+              
+              if (needsUpdate) {
+                setSubmittedForms(fixedReports);
+                localStorage.setItem('campus-lost-found-data', JSON.stringify(fixedReports));
+                setReportCounter(fixedReports.length + 1);
+              }
+            }
+          } catch (error) {
+            console.error('Corrupted reports data, resetting...', error);
+            const demoReports: SubmittedForm[] = [
+              {
+                id: 'LF-001',
+                type: 'lost',
+                itemName: 'מפתחות',
+                description: 'מפתחות עם תליון כחול',
+                location: 'ספרייה',
+                date: '2024-01-15',
+                contactPhone: '050-1234567',
+                timestamp: new Date('2024-01-15T10:30:00'),
+                user: 'דוד כהן'
+              }
+            ];
+            setSubmittedForms(demoReports);
+            setReportCounter(2);
+            localStorage.setItem('campus-lost-found-data', JSON.stringify(demoReports));
+          }
         }
       } catch (error) {
         console.error('Error loading reports from localStorage:', error);

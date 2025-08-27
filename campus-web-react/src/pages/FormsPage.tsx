@@ -12,10 +12,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Alert,
   Snackbar,
   IconButton
@@ -96,6 +92,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [lostFoundReports, setLostFoundReports] = useState<LostFoundReport[]>([]);
   const [deleteReportDialogOpen, setDeleteReportDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<LostFoundReport | null>(null);
+  const [resetDataDialogOpen, setResetDataDialogOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     event: {
       eventId: `EVENT-${String(eventCounter).padStart(3, '0')}`,
@@ -145,7 +142,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           const parsedFacilities = JSON.parse(savedFacilities);
           setFacilities(parsedFacilities);
         } else {
-          // Initialize with default facilities
+          // Initialize with default facilities - always create fresh data
           const defaultFacilities: Facility[] = [
             { id: 'community-1', name: 'מרכז קהילתי', type: 'community', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
             { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
@@ -155,6 +152,37 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           ];
           setFacilities(defaultFacilities);
           localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
+        }
+        
+        // Always ensure facilities exist (in case of corrupted data)
+        const currentFacilities = localStorage.getItem('campus-facilities-data');
+        if (currentFacilities) {
+          try {
+            const parsed = JSON.parse(currentFacilities);
+            if (!Array.isArray(parsed) || parsed.length === 0) {
+              // Reset if data is corrupted
+              const defaultFacilities: Facility[] = [
+                { id: 'community-1', name: 'מרכז קהילתי', type: 'community', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+                { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+                { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+                { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+                { id: 'parking-1', name: 'חניה', type: 'parking', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') }
+              ];
+              setFacilities(defaultFacilities);
+              localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
+            }
+          } catch (error) {
+            console.error('Corrupted facilities data, resetting...', error);
+            const defaultFacilities: Facility[] = [
+              { id: 'community-1', name: 'מרכז קהילתי', type: 'community', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+              { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+              { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+              { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+              { id: 'parking-1', name: 'חניה', type: 'parking', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') }
+            ];
+            setFacilities(defaultFacilities);
+            localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
+          }
         }
       } catch (error) {
         console.error('Error loading facilities from localStorage:', error);
@@ -353,6 +381,78 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  };
+
+  // Reset all data function
+  const handleResetAllData = () => {
+    // Clear all localStorage data
+    localStorage.removeItem('campus-events-data');
+    localStorage.removeItem('campus-facilities-data');
+    localStorage.removeItem('campus-lost-found-data');
+    
+    // Reset state
+    setEvents([]);
+    setEventCounter(1);
+    setLostFoundReports([]);
+    
+    // Reinitialize with default data
+    const defaultFacilities: Facility[] = [
+      { id: 'community-1', name: 'מרכז קהילתי', type: 'community', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+      { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+      { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+      { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+      { id: 'parking-1', name: 'חניה', type: 'parking', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') }
+    ];
+    setFacilities(defaultFacilities);
+    localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
+    
+    const defaultReports: LostFoundReport[] = [
+      {
+        id: 'LF-001',
+        type: 'lost',
+        itemName: 'מפתחות',
+        description: 'מפתחות עם תליון כחול',
+        location: 'ספרייה',
+        date: '2024-01-15',
+        contactPhone: '050-1234567',
+        timestamp: new Date('2024-01-15T10:30:00'),
+        user: 'דוד כהן'
+      },
+      {
+        id: 'LF-002',
+        type: 'found',
+        itemName: 'ארנק שחור',
+        description: 'ארנק עם תעודות',
+        location: 'קפיטריה',
+        date: '2024-01-14',
+        contactPhone: '052-9876543',
+        timestamp: new Date('2024-01-14T14:20:00'),
+        user: 'שרה לוי'
+      },
+      {
+        id: 'LF-003',
+        type: 'lost',
+        itemName: 'טלפון נייד',
+        description: 'iPhone 13 עם כיסוי שקוף',
+        location: 'אודיטוריום',
+        date: '2024-01-13',
+        contactPhone: '054-5555555',
+        timestamp: new Date('2024-01-13T09:15:00'),
+        user: 'משה ישראלי'
+      }
+    ];
+    setLostFoundReports(defaultReports);
+    localStorage.setItem('campus-lost-found-data', JSON.stringify(defaultReports));
+    
+    setNotification({
+      message: 'כל הנתונים אופסו בהצלחה!',
+      type: 'success'
+    });
+    setResetDataDialogOpen(false);
+    
+    // Notify other components
+    window.dispatchEvent(new CustomEvent('facilityUpdated'));
+    window.dispatchEvent(new CustomEvent('lostFoundUpdated'));
   };
 
   const handleInputChange = (formType: string, field: string, value: any) => {
@@ -683,13 +783,32 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Page Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary }}>
-          <DescriptionIcon sx={{ mr: 2, verticalAlign: 'middle' }} />
-          ניהול
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          טפסים בסיסיים לניהול פעילויות בקמפוס
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Box>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary }}>
+              <DescriptionIcon sx={{ mr: 2, verticalAlign: 'middle' }} />
+              ניהול
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              טפסים בסיסיים לניהול פעילויות בקמפוס
+            </Typography>
+          </Box>
+          <Button
+            variant="outlined"
+            color="warning"
+            onClick={() => setResetDataDialogOpen(true)}
+            sx={{
+              borderColor: '#ff9800',
+              color: '#ff9800',
+              '&:hover': {
+                borderColor: '#f57c00',
+                backgroundColor: '#fff3e0'
+              }
+            }}
+          >
+            איפוס נתונים
+          </Button>
+        </Box>
       </Box>
 
       {/* Forms Grid */}
@@ -942,6 +1061,32 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
             variant="contained"
           >
             מחיקה
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reset Data Confirmation Dialog */}
+      <Dialog open={resetDataDialogOpen} onClose={() => setResetDataDialogOpen(false)}>
+        <DialogTitle>אישור איפוס נתונים</DialogTitle>
+        <DialogContent>
+          <Typography>
+            האם אתה בטוח שברצונך לאפס את כל הנתונים?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            פעולה זו תמחק את כל האירועים, דיווחי האבידות והמציאות, ותאתחל את מצבי המתקנים.
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            פעולה זו אינה הפיכה.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setResetDataDialogOpen(false)}>ביטול</Button>
+          <Button 
+            onClick={handleResetAllData} 
+            color="warning" 
+            variant="contained"
+          >
+            איפוס נתונים
           </Button>
         </DialogActions>
       </Dialog>

@@ -79,7 +79,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
 
   const validatePhone = (phone: string): string | undefined => {
     if (!phone) return 'מספר טלפון הוא שדה חובה';
-    const phoneRegex = /^[\d\s\-\+\(\)]{9,15}$/;
+    const phoneRegex = /^[\d\s\-+()]{9,15}$/;
     if (!phoneRegex.test(phone)) return 'מספר טלפון לא תקין';
     return undefined;
   };
