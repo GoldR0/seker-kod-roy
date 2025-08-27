@@ -163,6 +163,17 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
     };
 
     loadReportsFromLocalStorage();
+    
+    // Listen for updates from FormsPage
+    const handleLostFoundUpdate = () => {
+      loadReportsFromLocalStorage();
+    };
+
+    window.addEventListener('lostFoundUpdated', handleLostFoundUpdate);
+
+    return () => {
+      window.removeEventListener('lostFoundUpdated', handleLostFoundUpdate);
+    };
   }, []);
 
   const handleInputChange = (field: string, value: any) => {

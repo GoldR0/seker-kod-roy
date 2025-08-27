@@ -34,7 +34,8 @@ import {
   FitnessCenter as GymIcon,
   LocalParking as ParkingIcon,
   ToggleOn as ToggleOnIcon,
-  ToggleOff as ToggleOffIcon
+  ToggleOff as ToggleOffIcon,
+  Search as SearchIcon
 } from '@mui/icons-material';
 
 interface FormsPageProps {
@@ -72,6 +73,18 @@ interface Facility {
   lastUpdated: string;
 }
 
+interface LostFoundReport {
+  id: string;
+  type: 'lost' | 'found';
+  itemName: string;
+  description: string;
+  location: string;
+  date: string;
+  contactPhone: string;
+  timestamp: Date;
+  user: string;
+}
+
 const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [activeForm, setActiveForm] = useState<string | null>(null);
   const [eventCounter, setEventCounter] = useState(1);
@@ -80,6 +93,9 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [deleteEventDialogOpen, setDeleteEventDialogOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [lostFoundReports, setLostFoundReports] = useState<LostFoundReport[]>([]);
+  const [deleteReportDialogOpen, setDeleteReportDialogOpen] = useState(false);
+  const [reportToDelete, setReportToDelete] = useState<LostFoundReport | null>(null);
   const [formData, setFormData] = useState<FormData>({
     event: {
       eventId: `EVENT-${String(eventCounter).padStart(3, '0')}`,
@@ -145,13 +161,33 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       }
     };
 
+    const loadLostFoundReportsFromLocalStorage = () => {
+      try {
+        const savedReports = localStorage.getItem('campus-lost-found-data');
+        if (savedReports) {
+          const parsedReports = JSON.parse(savedReports);
+          // Convert timestamp strings back to Date objects
+          const reportsWithDates = parsedReports.map((report: any) => ({
+            ...report,
+            timestamp: new Date(report.timestamp)
+          }));
+          setLostFoundReports(reportsWithDates);
+        }
+      } catch (error) {
+        console.error('Error loading lost-found reports from localStorage:', error);
+      }
+    };
+
     loadEventsFromLocalStorage();
     loadFacilitiesFromLocalStorage();
+    loadLostFoundReportsFromLocalStorage();
 
-    // Listen for facility updates from other tabs
+    // Listen for updates from other tabs
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'campus-facilities-data') {
         loadFacilitiesFromLocalStorage();
+      } else if (e.key === 'campus-lost-found-data') {
+        loadLostFoundReportsFromLocalStorage();
       }
     };
 
@@ -176,6 +212,13 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       description: 'ניהול מצבי המתקנים בקמפוס',
       icon: <BusinessIcon sx={{ fontSize: 40 }} />,
       color: '#4CAF50'
+    },
+    {
+      id: 'lostfound',
+      title: 'ניהול דיווחי אבידות',
+      description: 'ניהול דיווחי אבידות ומציאות',
+      icon: <SearchIcon sx={{ fontSize: 40 }} />,
+      color: '#9C27B0'
     }
   ];
 
@@ -266,6 +309,50 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
   const getFacilityColor = (status: string) => {
     return status === 'open' ? '#4CAF50' : '#F44336';
+  };
+
+  // Lost & Found management functions
+  const handleDeleteReport = (report: LostFoundReport) => {
+    setReportToDelete(report);
+    setDeleteReportDialogOpen(true);
+  };
+
+  const confirmDeleteReport = () => {
+    if (reportToDelete) {
+      const updatedReports = lostFoundReports.filter(report => report.id !== reportToDelete.id);
+      setLostFoundReports(updatedReports);
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-lost-found-data', JSON.stringify(updatedReports));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('lostFoundUpdated'));
+      } catch (error) {
+        console.error('Error saving reports to localStorage:', error);
+      }
+      
+      setNotification({
+        message: `הדיווח "${reportToDelete.id}" נמחק בהצלחה`,
+        type: 'success'
+      });
+      setDeleteReportDialogOpen(false);
+      setReportToDelete(null);
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    if (!date || isNaN(date.getTime())) {
+      return 'תאריך לא תקין';
+    }
+    
+    return new Intl.DateTimeFormat('he-IL', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
   };
 
   const handleInputChange = (formType: string, field: string, value: any) => {
@@ -502,6 +589,88 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
                 </Card>
               ))}
             </Box>
+          </Box>
+        );
+
+      case 'lostfound':
+        return (
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              ניהול דיווחי אבידות ומציאות
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              לחץ על כפתור המחיקה כדי למחוק דיווח מהרשימה
+            </Typography>
+            
+            {lostFoundReports.length === 0 ? (
+              <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                אין דיווחים עדיין
+              </Typography>
+            ) : (
+              <Box sx={{ overflowX: 'auto' }}>
+                <Box sx={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr auto',
+                  gap: 2,
+                  p: 2,
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: 1,
+                  mb: 2,
+                  fontWeight: 'bold',
+                  fontSize: '0.875rem'
+                }}>
+                  <Box>מזהה</Box>
+                  <Box>סוג</Box>
+                  <Box>פריט</Box>
+                  <Box>מיקום</Box>
+                  <Box>משתמש</Box>
+                  <Box>תאריך</Box>
+                  <Box>פעולות</Box>
+                </Box>
+                
+                {lostFoundReports.map((report) => (
+                  <Box key={report.id} sx={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr auto',
+                    gap: 2,
+                    p: 2,
+                    borderBottom: '1px solid #e0e0e0',
+                    '&:hover': { backgroundColor: '#f9f9f9' },
+                    '&:last-child': { borderBottom: 'none' }
+                  }}>
+                    <Box sx={{ fontWeight: 'bold', color: customColors.primary }}>{report.id}</Box>
+                    <Box>
+                      <Box sx={{ 
+                        display: 'inline-block',
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 1,
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold',
+                        backgroundColor: report.type === 'lost' ? '#fff3e0' : '#e8f5e8',
+                        color: report.type === 'lost' ? '#e65100' : '#2e7d32'
+                      }}>
+                        {report.type === 'lost' ? 'אבידה' : 'מציאה'}
+                      </Box>
+                    </Box>
+                    <Box>{report.itemName}</Box>
+                    <Box>{report.location}</Box>
+                    <Box>{report.user}</Box>
+                    <Box>{formatDate(report.timestamp)}</Box>
+                    <Box>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteReport(report)}
+                        sx={{ '&:hover': { backgroundColor: 'rgba(244, 67, 54, 0.1)' } }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            )}
           </Box>
         );
 
@@ -743,6 +912,32 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           <Button onClick={() => setDeleteEventDialogOpen(false)}>ביטול</Button>
           <Button 
             onClick={confirmDeleteEvent} 
+            color="error" 
+            variant="contained"
+          >
+            מחיקה
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Report Confirmation Dialog */}
+      <Dialog open={deleteReportDialogOpen} onClose={() => setDeleteReportDialogOpen(false)}>
+        <DialogTitle>אישור מחיקת דיווח</DialogTitle>
+        <DialogContent>
+          <Typography>
+            האם אתה בטוח שברצונך למחוק את הדיווח "{reportToDelete?.id}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            פריט: {reportToDelete?.itemName} ({reportToDelete?.type === 'lost' ? 'אבידה' : 'מציאה'})
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            פעולה זו אינה הפיכה.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteReportDialogOpen(false)}>ביטול</Button>
+          <Button 
+            onClick={confirmDeleteReport} 
             color="error" 
             variant="contained"
           >
