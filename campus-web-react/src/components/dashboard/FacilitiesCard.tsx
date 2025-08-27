@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Box, Typography, Chip, Divider } from '@mui/material';
 import { 
   LocationOn as LocationIcon,
   LocalLibrary as LibraryIcon,
   Restaurant as CafeteriaIcon,
   FitnessCenter as GymIcon,
-  LocalParking as ParkingIcon
+  LocalParking as ParkingIcon,
+  Business as BusinessIcon
 } from '@mui/icons-material';
 import RatingStars from '../RatingStars';
 
@@ -17,8 +18,55 @@ interface FacilitiesCardProps {
   };
 }
 
+interface ManagedFacility {
+  id: string;
+  name: string;
+  type: 'community' | 'library' | 'cafeteria' | 'gym' | 'parking';
+  status: 'open' | 'closed';
+  lastUpdated: string;
+}
+
 const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
   const [facilities, setFacilities] = useState(demoFacilities);
+  const [managedFacilities, setManagedFacilities] = useState<ManagedFacility[]>([]);
+
+  // Load facilities from localStorage
+  useEffect(() => {
+    const loadFacilitiesFromLocalStorage = () => {
+      try {
+        const savedFacilities = localStorage.getItem('campus-facilities-data');
+        if (savedFacilities) {
+          const parsedFacilities = JSON.parse(savedFacilities);
+          setManagedFacilities(parsedFacilities);
+        }
+      } catch (error) {
+        console.error('Error loading facilities from localStorage:', error);
+      }
+    };
+
+    loadFacilitiesFromLocalStorage();
+    
+    // Listen for storage changes to update when facilities are modified in FormsPage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'campus-facilities-data') {
+        loadFacilitiesFromLocalStorage();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for custom events (for same-tab updates)
+    const handleFacilityUpdate = () => {
+      loadFacilitiesFromLocalStorage();
+    };
+
+    window.addEventListener('facilityUpdated', handleFacilityUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('facilityUpdated', handleFacilityUpdate);
+    };
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -29,7 +77,20 @@ const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
     }
   };
 
-  const getFacilityIcon = (facilityName: string) => {
+  const getFacilityIcon = (facilityName: string, facilityType?: string) => {
+    // First check if we have a managed facility with type
+    if (facilityType) {
+      switch (facilityType) {
+        case 'community': return <BusinessIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+        case 'library': return <LibraryIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+        case 'cafeteria': return <CafeteriaIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+        case 'gym': return <GymIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+        case 'parking': return <ParkingIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+        default: return <LocationIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+      }
+    }
+    
+    // Fallback to name-based matching for demo facilities
     switch (facilityName) {
       case 'ספרייה':
         return <LibraryIcon sx={{ fontSize: 24, color: customColors.primary }} />;
@@ -39,6 +100,8 @@ const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
         return <GymIcon sx={{ fontSize: 24, color: customColors.primary }} />;
       case 'חניה':
         return <ParkingIcon sx={{ fontSize: 24, color: customColors.primary }} />;
+      case 'מרכז קהילתי':
+        return <BusinessIcon sx={{ fontSize: 24, color: customColors.primary }} />;
       default:
         return <LocationIcon sx={{ fontSize: 24, color: customColors.primary }} />;
     }
@@ -73,59 +136,66 @@ const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
           <Typography variant="h6">מצב מתקנים</Typography>
         </Box>
         
-        {facilities.map((facility, index) => (
-          <Box key={facility.id}>
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
-              mb: 2,
-              p: 2,
-              backgroundColor: 'rgba(0,0,0,0.02)',
-              borderRadius: 1,
-              border: '1px solid rgba(0,0,0,0.05)'
-            }}>
-              <Box sx={{ flex: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  {getFacilityIcon(facility.name)}
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', ml: 1 }}>
-                    {facility.name}
-                  </Typography>
-                </Box>
-                
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <Chip 
-                    label={facility.status === 'open' ? 'פתוח' : facility.status === 'busy' ? 'עמוס' : 'סגור'}
-                    color={getStatusColor(facility.status) as any}
-                    size="small"
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    {facility.hours}
-                  </Typography>
-                </Box>
-                
-                {/* Rating Section */}
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    דרג את המתקן:
-                  </Typography>
-                  <RatingStars
-                    value={facility.rating || 0}
-                    onChange={(rating) => handleRatingChange(facility.id, rating)}
-                    size="small"
-                    showLabel={true}
-                    totalRatings={facility.totalRatings || 0}
-                    averageRating={facility.averageRating || 0}
-                  />
+        {/* Display managed facilities if available, otherwise show demo facilities */}
+        {(managedFacilities.length > 0 ? managedFacilities : facilities).map((facility, index) => {
+          const isManagedFacility = managedFacilities.length > 0;
+          
+          return (
+            <Box key={facility.id}>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                mb: 2,
+                p: 2,
+                backgroundColor: 'rgba(0,0,0,0.02)',
+                borderRadius: 1,
+                border: '1px solid rgba(0,0,0,0.05)'
+              }}>
+                <Box sx={{ flex: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    {getFacilityIcon(facility.name, isManagedFacility ? (facility as ManagedFacility).type : undefined)}
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', ml: 1 }}>
+                      {facility.name}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Chip 
+                      label={facility.status === 'open' ? 'פתוח' : facility.status === 'busy' ? 'עמוס' : 'סגור'}
+                      color={getStatusColor(facility.status) as any}
+                      size="small"
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      {isManagedFacility ? `עודכן: ${(facility as ManagedFacility).lastUpdated}` : (facility as any).hours}
+                    </Typography>
+                  </Box>
+                  
+                  {/* Rating Section - only for demo facilities */}
+                  {!isManagedFacility && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        דרג את המתקן:
+                      </Typography>
+                      <RatingStars
+                        value={(facility as any).rating || 0}
+                        onChange={(rating) => handleRatingChange(facility.id, rating)}
+                        size="small"
+                        showLabel={true}
+                        totalRatings={(facility as any).totalRatings || 0}
+                        averageRating={(facility as any).averageRating || 0}
+                      />
+                    </Box>
+                  )}
                 </Box>
               </Box>
+              
+              {index < (managedFacilities.length > 0 ? managedFacilities : facilities).length - 1 && (
+                <Divider sx={{ my: 1 }} />
+              )}
             </Box>
-            
-            {index < facilities.length - 1 && (
-              <Divider sx={{ my: 1 }} />
-            )}
-          </Box>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );

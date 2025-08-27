@@ -27,7 +27,14 @@ import {
   Clear as ClearIcon,
   CheckCircle as CheckCircleIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  Business as BusinessIcon,
+  LibraryBooks as LibraryIcon,
+  Restaurant as RestaurantIcon,
+  FitnessCenter as GymIcon,
+  LocalParking as ParkingIcon,
+  ToggleOn as ToggleOnIcon,
+  ToggleOff as ToggleOffIcon
 } from '@mui/icons-material';
 
 interface FormsPageProps {
@@ -57,6 +64,14 @@ interface Event {
   createdAt: string;
 }
 
+interface Facility {
+  id: string;
+  name: string;
+  type: 'community' | 'library' | 'cafeteria' | 'gym' | 'parking';
+  status: 'open' | 'closed';
+  lastUpdated: string;
+}
+
 const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [activeForm, setActiveForm] = useState<string | null>(null);
   const [eventCounter, setEventCounter] = useState(1);
@@ -64,6 +79,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deleteEventDialogOpen, setDeleteEventDialogOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
   const [formData, setFormData] = useState<FormData>({
     event: {
       eventId: `EVENT-${String(eventCounter).padStart(3, '0')}`,
@@ -84,7 +100,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     textOnPrimary: 'white'
   };
 
-  // Load events from localStorage on component mount
+  // Load events and facilities from localStorage on component mount
   useEffect(() => {
     const loadEventsFromLocalStorage = () => {
       try {
@@ -106,7 +122,44 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       }
     };
 
+    const loadFacilitiesFromLocalStorage = () => {
+      try {
+        const savedFacilities = localStorage.getItem('campus-facilities-data');
+        if (savedFacilities) {
+          const parsedFacilities = JSON.parse(savedFacilities);
+          setFacilities(parsedFacilities);
+        } else {
+          // Initialize with default facilities
+          const defaultFacilities: Facility[] = [
+            { id: 'community-1', name: 'מרכז קהילתי', type: 'community', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+            { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+            { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+            { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
+            { id: 'parking-1', name: 'חניה', type: 'parking', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') }
+          ];
+          setFacilities(defaultFacilities);
+          localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
+        }
+      } catch (error) {
+        console.error('Error loading facilities from localStorage:', error);
+      }
+    };
+
     loadEventsFromLocalStorage();
+    loadFacilitiesFromLocalStorage();
+
+    // Listen for facility updates from other tabs
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'campus-facilities-data') {
+        loadFacilitiesFromLocalStorage();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const forms = [
@@ -116,6 +169,13 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       description: 'יצירת אירוע חדש',
       icon: <EventIcon sx={{ fontSize: 40 }} />,
       color: '#FF9800'
+    },
+    {
+      id: 'facilities',
+      title: 'ניהול מתקנים',
+      description: 'ניהול מצבי המתקנים בקמפוס',
+      icon: <BusinessIcon sx={{ fontSize: 40 }} />,
+      color: '#4CAF50'
     }
   ];
 
@@ -157,6 +217,55 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     }
     
     setActiveForm(null);
+  };
+
+  // Facility management functions
+  const handleFacilityStatusToggle = (facilityId: string) => {
+    const updatedFacilities = facilities.map(facility => {
+      if (facility.id === facilityId) {
+        const newStatus: 'open' | 'closed' = facility.status === 'open' ? 'closed' : 'open';
+        return {
+          ...facility,
+          status: newStatus,
+          lastUpdated: new Date().toLocaleString('he-IL')
+        };
+      }
+      return facility;
+    });
+    
+    setFacilities(updatedFacilities);
+    
+    // Save to localStorage
+    try {
+      localStorage.setItem('campus-facilities-data', JSON.stringify(updatedFacilities));
+      
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new CustomEvent('facilityUpdated'));
+    } catch (error) {
+      console.error('Error saving facilities to localStorage:', error);
+    }
+    
+    const facility = facilities.find(f => f.id === facilityId);
+    const newStatus = facility?.status === 'open' ? 'סגור' : 'פתוח';
+    setNotification({
+      message: `המתקן "${facility?.name}" שונה למצב ${newStatus}`,
+      type: 'success'
+    });
+  };
+
+  const getFacilityIcon = (type: string) => {
+    switch (type) {
+      case 'community': return <BusinessIcon />;
+      case 'library': return <LibraryIcon />;
+      case 'cafeteria': return <RestaurantIcon />;
+      case 'gym': return <GymIcon />;
+      case 'parking': return <ParkingIcon />;
+      default: return <BusinessIcon />;
+    }
+  };
+
+  const getFacilityColor = (status: string) => {
+    return status === 'open' ? '#4CAF50' : '#F44336';
   };
 
   const handleInputChange = (formType: string, field: string, value: any) => {
@@ -338,6 +447,64 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           </Box>
         );
 
+      case 'facilities':
+        return (
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              ניהול מצבי המתקנים
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              לחץ על המתקן כדי לשנות את מצבו בין פתוח לסגור
+            </Typography>
+            
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+              {facilities.map((facility) => (
+                <Card 
+                  key={facility.id}
+                  sx={{ 
+                    cursor: 'pointer',
+                    border: `2px solid ${getFacilityColor(facility.status)}`,
+                    transition: 'all 0.3s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: `0 4px 15px ${getFacilityColor(facility.status)}40`
+                    }
+                  }}
+                  onClick={() => handleFacilityStatusToggle(facility.id)}
+                >
+                  <CardContent sx={{ textAlign: 'center', p: 2 }}>
+                    <Box sx={{ color: getFacilityColor(facility.status), mb: 1 }}>
+                      {getFacilityIcon(facility.type)}
+                    </Box>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
+                      {facility.name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                      {facility.status === 'open' ? (
+                        <ToggleOnIcon sx={{ color: '#4CAF50', fontSize: 30 }} />
+                      ) : (
+                        <ToggleOffIcon sx={{ color: '#F44336', fontSize: 30 }} />
+                      )}
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          fontWeight: 'bold',
+                          color: getFacilityColor(facility.status)
+                        }}
+                      >
+                        {facility.status === 'open' ? 'פתוח' : 'סגור'}
+                      </Typography>
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                      עודכן: {facility.lastUpdated}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </Box>
+        );
+
       default:
         return null;
     }
@@ -426,25 +593,65 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           >
             ביטול
           </Button>
-          <Button 
-            variant="contained"
-            startIcon={<SendIcon />}
-            onClick={() => {
-              if (editingEvent) {
-                handleUpdateEvent();
-              } else if (activeForm) {
-                handleFormSubmit(activeForm);
-              }
-            }}
-            sx={{
-              backgroundColor: customColors.primary,
-              '&:hover': { backgroundColor: customColors.primaryDark }
-            }}
-          >
-            {editingEvent ? 'עדכן אירוע' : 'שלח טופס'}
-          </Button>
+          {activeForm !== 'facilities' && (
+            <Button 
+              variant="contained"
+              startIcon={<SendIcon />}
+              onClick={() => {
+                if (editingEvent) {
+                  handleUpdateEvent();
+                } else if (activeForm) {
+                  handleFormSubmit(activeForm);
+                }
+              }}
+              sx={{
+                backgroundColor: customColors.primary,
+                '&:hover': { backgroundColor: customColors.primaryDark }
+              }}
+            >
+              {editingEvent ? 'עדכן אירוע' : 'שלח טופס'}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
+
+      {/* Facilities Status Overview */}
+      <Box sx={{ mt: 6 }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary, mb: 3 }}>
+          <BusinessIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+          סטטוס מתקנים ({facilities.length})
+        </Typography>
+        
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(5, 1fr)' }, gap: 2, mb: 4 }}>
+          {facilities.map((facility) => (
+            <Card 
+              key={facility.id}
+              sx={{ 
+                border: `2px solid ${getFacilityColor(facility.status)}`,
+                backgroundColor: facility.status === 'open' ? '#f1f8e9' : '#ffebee'
+              }}
+            >
+              <CardContent sx={{ textAlign: 'center', p: 2 }}>
+                <Box sx={{ color: getFacilityColor(facility.status), mb: 1 }}>
+                  {getFacilityIcon(facility.type)}
+                </Box>
+                <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 'bold' }}>
+                  {facility.name}
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    fontWeight: 'bold',
+                    color: getFacilityColor(facility.status)
+                  }}
+                >
+                  {facility.status === 'open' ? 'פתוח' : 'סגור'}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      </Box>
 
       {/* Events Management Table */}
       <Box sx={{ mt: 6 }}>
