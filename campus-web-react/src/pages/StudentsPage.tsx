@@ -108,6 +108,14 @@ interface StudentValidationErrors {
   emergencyPhone?: string;
 }
 
+interface CourseValidationErrors {
+  courseName?: string;
+  lecturer?: string;
+  semester?: string;
+  year?: string;
+  credits?: string;
+}
+
 const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
@@ -170,6 +178,10 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   });
   const [studentErrors, setStudentErrors] = useState<StudentValidationErrors>({});
   const [studentTouched, setStudentTouched] = useState<Record<string, boolean>>({});
+
+  // Course validation state
+  const [courseErrors, setCourseErrors] = useState<CourseValidationErrors>({});
+  const [courseTouched, setCourseTouched] = useState<Record<string, boolean>>({});
 
   // Load statistics on component mount
   useEffect(() => {
@@ -441,7 +453,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       address: '',
       department: 'מדעי המחשב',
       year: 1,
-      semester: 'א',
+      semester: 'א' as 'א' | 'ב' | 'ג',
       city: 'תל אביב',
       emergencyContact: '',
       emergencyPhone: '',
@@ -449,6 +461,85 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
     });
     setStudentErrors({});
     setStudentTouched({});
+  };
+
+  // Course validation functions
+  const validateCourseName = (courseName: string): string | undefined => {
+    if (!courseName) return 'שם הקורס הוא שדה חובה';
+    if (courseName.length < 3) return 'שם הקורס חייב להכיל לפחות 3 תווים';
+    if (courseName.length > 100) return 'שם הקורס לא יכול לעלות על 100 תווים';
+    return undefined;
+  };
+
+  const validateLecturer = (lecturer: string): string | undefined => {
+    if (!lecturer) return 'מרצה אחראי הוא שדה חובה';
+    if (lecturer.length < 2) return 'שם המרצה חייב להכיל לפחות 2 תווים';
+    if (lecturer.length > 50) return 'שם המרצה לא יכול לעלות על 50 תווים';
+    const nameRegex = /^[א-ת\s]+$/;
+    if (!nameRegex.test(lecturer)) return 'שם המרצה יכול להכיל אותיות עבריות בלבד';
+    return undefined;
+  };
+
+  const validateCourseRequired = (value: string, fieldName: string): string | undefined => {
+    if (!value || value.trim() === '') return `${fieldName} הוא שדה חובה`;
+    return undefined;
+  };
+
+  const validateCourseYear = (year: string): string | undefined => {
+    if (!year) return 'שנה היא שדה חובה';
+    const yearNum = parseInt(year);
+    if (isNaN(yearNum) || yearNum < 2024 || yearNum > 2030) {
+      return 'שנה חייבת להיות בין 2024 ל-2030';
+    }
+    return undefined;
+  };
+
+  const validateCourseCredits = (credits: string): string | undefined => {
+    if (!credits) return 'נקודות זכות הוא שדה חובה';
+    const creditsNum = parseInt(credits);
+    if (isNaN(creditsNum) || creditsNum < 1 || creditsNum > 10) {
+      return 'נקודות זכות חייבות להיות בין 1 ל-10';
+    }
+    return undefined;
+  };
+
+  const validateCourseField = (field: string, value: string): string | undefined => {
+    switch (field) {
+      case 'courseName':
+        return validateCourseName(value);
+      case 'lecturer':
+        return validateLecturer(value);
+      case 'semester':
+        return validateCourseRequired(value, 'סמסטר');
+      case 'year':
+        return validateCourseYear(value);
+      case 'credits':
+        return validateCourseCredits(value);
+      default:
+        return undefined;
+    }
+  };
+
+  const validateCourseForm = (): boolean => {
+    const newErrors: CourseValidationErrors = {};
+    let isValid = true;
+
+    Object.keys(courseFormData).forEach(field => {
+      if (field !== 'courseId' && field !== 'students' && field !== 'selectedStudents') {
+        const error = validateCourseField(field, courseFormData[field as keyof CourseFormData] as string);
+        if (error) {
+          newErrors[field as keyof CourseValidationErrors] = error;
+          isValid = false;
+        }
+      }
+    });
+
+    setCourseErrors(newErrors);
+    return isValid;
+  };
+
+  const shouldShowCourseError = (field: string): boolean => {
+    return courseTouched[field] && !!courseErrors[field as keyof CourseValidationErrors];
   };
 
 
@@ -540,43 +631,82 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       ...prev,
       [field]: value
     }));
+
+    // Clear error when user starts typing
+    if (courseErrors[field as keyof CourseValidationErrors]) {
+      setCourseErrors(prev => ({
+        ...prev,
+        [field]: undefined
+      }));
+    }
+  };
+
+  const handleCourseBlur = (field: string) => {
+    setCourseTouched(prev => ({
+      ...prev,
+      [field]: true
+    }));
+
+    const error = validateCourseField(field, courseFormData[field as keyof CourseFormData] as string);
+    setCourseErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
   };
 
   const handleCourseSubmit = () => {
-    // Create new course with creation date
-    const newCourse: Course = {
-      ...courseFormData,
-      createdAt: new Date().toLocaleString('he-IL'),
-      selectedStudents: courseFormData.selectedStudents
-    };
+    // Mark all fields as touched
+    const allTouched = Object.keys(courseFormData).reduce((acc, field) => {
+      if (field !== 'courseId' && field !== 'students' && field !== 'selectedStudents') {
+        acc[field] = true;
+      }
+      return acc;
+    }, {} as Record<string, boolean>);
+    setCourseTouched(allTouched);
 
-    // Add to courses array
-    const updatedCourses = [...courses, newCourse];
-    setCourses(updatedCourses);
+    if (validateCourseForm()) {
+      // Create new course with creation date
+      const newCourse: Course = {
+        ...courseFormData,
+        createdAt: new Date().toLocaleString('he-IL'),
+        selectedStudents: courseFormData.selectedStudents
+      };
 
-    // Save to localStorage
-    try {
-      localStorage.setItem('campus-courses-data', JSON.stringify(updatedCourses));
-    } catch (error) {
-      console.error('Error saving courses to localStorage:', error);
+      // Add to courses array
+      const updatedCourses = [...courses, newCourse];
+      setCourses(updatedCourses);
+
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-courses-data', JSON.stringify(updatedCourses));
+      } catch (error) {
+        console.error('Error saving courses to localStorage:', error);
+      }
+
+      setNotification({
+        message: `קורס חדש נוצר בהצלחה! מזהה: ${courseFormData.courseId}`,
+        type: 'success'
+      });
+      
+      setCourseCounter(prev => prev + 1);
+      setCourseFormData({
+        courseId: `COURSE-${String(courseCounter + 1).padStart(3, '0')}`,
+        courseName: '',
+        lecturer: '',
+        semester: '',
+        year: '2025',
+        students: '',
+        credits: '',
+        selectedStudents: []
+      });
+      setCourseErrors({});
+      setCourseTouched({});
+    } else {
+      setNotification({
+        message: 'יש שגיאות בטופס. אנא בדוק את השדות המסומנים.',
+        type: 'error'
+      });
     }
-
-    setNotification({
-      message: `קורס חדש נוצר בהצלחה! מזהה: ${courseFormData.courseId}`,
-      type: 'success'
-    });
-    
-    setCourseCounter(prev => prev + 1);
-    setCourseFormData({
-      courseId: `COURSE-${String(courseCounter + 1).padStart(3, '0')}`,
-      courseName: '',
-      lecturer: '',
-      semester: '',
-      year: '2025',
-      students: '',
-      credits: '',
-      selectedStudents: []
-    });
   };
 
   // Student selection functions
@@ -993,33 +1123,74 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
                 label="שם קורס"
                 value={courseFormData.courseName}
                 onChange={(e) => handleCourseInputChange('courseName', e.target.value)}
+                onBlur={() => handleCourseBlur('courseName')}
+                error={shouldShowCourseError('courseName')}
+                helperText={shouldShowCourseError('courseName') ? courseErrors.courseName : ''}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgb(179, 209, 53)'
+                    }
+                  }
+                }}
               />
               <TextField
                 fullWidth
                 label="מרצה אחראי"
                 value={courseFormData.lecturer}
                 onChange={(e) => handleCourseInputChange('lecturer', e.target.value)}
+                onBlur={() => handleCourseBlur('lecturer')}
+                error={shouldShowCourseError('lecturer')}
+                helperText={shouldShowCourseError('lecturer') ? courseErrors.lecturer : ''}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgb(179, 209, 53)'
+                    }
+                  }
+                }}
               />
-              <FormControl fullWidth required>
+              <FormControl fullWidth error={shouldShowCourseError('semester')} required>
                 <InputLabel>סמסטר</InputLabel>
                 <Select
                   value={courseFormData.semester}
                   onChange={(e) => handleCourseInputChange('semester', e.target.value)}
+                  onBlur={() => handleCourseBlur('semester')}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgb(179, 209, 53)'
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="a">סמסטר א</MenuItem>
                   <MenuItem value="b">סמסטר ב</MenuItem>
                   <MenuItem value="summer">סמסטר קיץ</MenuItem>
                 </Select>
+                {shouldShowCourseError('semester') && (
+                  <FormHelperText>{courseErrors.semester}</FormHelperText>
+                )}
               </FormControl>
               <TextField
                 fullWidth
                 label="שנה"
                 value={courseFormData.year}
                 onChange={(e) => handleCourseInputChange('year', e.target.value)}
+                onBlur={() => handleCourseBlur('year')}
+                error={shouldShowCourseError('year')}
+                helperText={shouldShowCourseError('year') ? courseErrors.year : 'שנה בין 2024 ל-2030'}
                 required
-                inputProps={{ min: '2025' }}
+                inputProps={{ min: '2024', max: '2030' }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgb(179, 209, 53)'
+                    }
+                  }
+                }}
               />
               <TextField
                 fullWidth
@@ -1053,8 +1224,19 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
                 label="נקודות זכות"
                 value={courseFormData.credits}
                 onChange={(e) => handleCourseInputChange('credits', e.target.value)}
+                onBlur={() => handleCourseBlur('credits')}
+                error={shouldShowCourseError('credits')}
+                helperText={shouldShowCourseError('credits') ? courseErrors.credits : 'נקודות זכות בין 1 ל-10'}
                 type="number"
-                inputProps={{ min: 0, max: 10 }}
+                inputProps={{ min: 1, max: 10 }}
+                required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgb(179, 209, 53)'
+                    }
+                  }
+                }}
               />
             </Box>
             
