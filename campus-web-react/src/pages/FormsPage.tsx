@@ -50,6 +50,13 @@ interface FormData {
   };
 }
 
+interface ValidationErrors {
+  title?: string;
+  date?: string;
+  time?: string;
+  location?: string;
+}
+
 interface Event {
   eventId: string;
   title: string;
@@ -104,6 +111,9 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       maxParticipants: 10
     }
   });
+  
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const customColors = {
@@ -111,6 +121,72 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     primaryDark: 'rgb(159, 189, 33)',
     primaryLight: 'rgb(199, 229, 73)',
     textOnPrimary: 'white'
+  };
+
+  // Validation functions
+  const validateTitle = (title: string): string | undefined => {
+    if (!title) return 'כותרת האירוע היא שדה חובה';
+    if (title.length < 3) return 'כותרת האירוע חייבת להכיל לפחות 3 תווים';
+    if (title.length > 100) return 'כותרת האירוע לא יכולה לעלות על 100 תווים';
+    return undefined;
+  };
+
+  const validateDate = (date: string): string | undefined => {
+    if (!date) return 'תאריך הוא שדה חובה';
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      return 'תאריך לא יכול להיות בעבר';
+    }
+    return undefined;
+  };
+
+  const validateTime = (time: string): string | undefined => {
+    if (!time) return 'שעה היא שדה חובה';
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    if (!timeRegex.test(time)) return 'פורמט שעה לא תקין (HH:MM)';
+    return undefined;
+  };
+
+  const validateLocation = (location: string): string | undefined => {
+    if (!location) return 'מיקום הוא שדה חובה';
+    if (location.length < 3) return 'מיקום חייב להכיל לפחות 3 תווים';
+    if (location.length > 100) return 'מיקום לא יכול לעלות על 100 תווים';
+    return undefined;
+  };
+
+  const validateField = (field: string, value: string): string | undefined => {
+    switch (field) {
+      case 'title':
+        return validateTitle(value);
+      case 'date':
+        return validateDate(value);
+      case 'time':
+        return validateTime(value);
+      case 'location':
+        return validateLocation(value);
+      default:
+        return undefined;
+    }
+  };
+
+  const validateEventForm = (): boolean => {
+    const newErrors: ValidationErrors = {};
+    let isValid = true;
+
+    const fieldsToValidate = ['title', 'date', 'time', 'location'];
+    fieldsToValidate.forEach(field => {
+      const error = validateField(field, formData.event[field as keyof typeof formData.event] as string);
+      if (error) {
+        newErrors[field as keyof ValidationErrors] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   // Load events and facilities from localStorage on component mount
@@ -260,39 +336,56 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
   const handleFormSubmit = (formType: string) => {
     if (formType === 'event') {
-      const newEvent: Event = {
-        ...formData.event,
-        createdAt: new Date().toLocaleString('he-IL')
-      };
+      // Mark all fields as touched
+      const allTouched = ['title', 'date', 'time', 'location'].reduce((acc, field) => {
+        acc[field] = true;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setTouched(allTouched);
 
-      const updatedEvents = [...events, newEvent];
-      setEvents(updatedEvents);
+      if (validateEventForm()) {
+        const newEvent: Event = {
+          ...formData.event,
+          createdAt: new Date().toLocaleString('he-IL')
+        };
 
-      // Save to localStorage
-      try {
-        localStorage.setItem('campus-events-data', JSON.stringify(updatedEvents));
-      } catch (error) {
-        console.error('Error saving events to localStorage:', error);
-      }
+        const updatedEvents = [...events, newEvent];
+        setEvents(updatedEvents);
 
-      setNotification({
-        message: `אירוע "${formData.event.title}" נוצר בהצלחה! מזהה: ${formData.event.eventId}`,
-        type: 'success'
-      });
-
-      // Reset form and increment counter
-      setEventCounter(prev => prev + 1);
-      setFormData({
-        event: {
-          eventId: `EVENT-${String(eventCounter + 1).padStart(3, '0')}`,
-          title: '',
-          description: '',
-          date: '',
-          time: '',
-          location: '',
-          maxParticipants: 10
+        // Save to localStorage
+        try {
+          localStorage.setItem('campus-events-data', JSON.stringify(updatedEvents));
+        } catch (error) {
+          console.error('Error saving events to localStorage:', error);
         }
-      });
+
+        setNotification({
+          message: `אירוע "${formData.event.title}" נוצר בהצלחה! מזהה: ${formData.event.eventId}`,
+          type: 'success'
+        });
+
+        // Reset form and increment counter
+        setEventCounter(prev => prev + 1);
+        setFormData({
+          event: {
+            eventId: `EVENT-${String(eventCounter + 1).padStart(3, '0')}`,
+            title: '',
+            description: '',
+            date: '',
+            time: '',
+            location: '',
+            maxParticipants: 10
+          }
+        });
+        setErrors({});
+        setTouched({});
+      } else {
+        setNotification({
+          message: 'יש שגיאות בטופס. אנא בדוק את השדות המסומנים.',
+          type: 'error'
+        });
+        return; // Don't close the form if there are errors
+      }
     }
     
     setActiveForm(null);
@@ -471,6 +564,31 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         [field]: value
       } as any
     }));
+
+    // Clear error when user starts typing
+    if (errors[field as keyof ValidationErrors]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: undefined
+      }));
+    }
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({
+      ...prev,
+      [field]: true
+    }));
+
+    const error = validateField(field, formData.event[field as keyof typeof formData.event] as string);
+    setErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+  };
+
+  const shouldShowError = (field: string): boolean => {
+    return touched[field] && !!errors[field as keyof ValidationErrors];
   };
 
   // פונקציה ליצירת מזהה חדש בעת פתיחת טופס
@@ -592,8 +710,18 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
                 label="כותרת האירוע"
                 value={formData.event.title}
                 onChange={(e) => handleInputChange('event', 'title', e.target.value)}
+                onBlur={() => handleBlur('title')}
+                error={shouldShowError('title')}
+                helperText={shouldShowError('title') ? errors.title : ''}
                 required
-                sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}
+                sx={{ 
+                  gridColumn: { xs: '1', md: '1 / -1' },
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: customColors.primary
+                    }
+                  }
+                }}
               />
               <TextField
                 fullWidth
@@ -611,8 +739,18 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
                 label="תאריך"
                 value={formData.event.date}
                 onChange={(e) => handleInputChange('event', 'date', e.target.value)}
+                onBlur={() => handleBlur('date')}
+                error={shouldShowError('date')}
+                helperText={shouldShowError('date') ? errors.date : ''}
                 required
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: customColors.primary
+                    }
+                  }
+                }}
               />
               <TextField
                 fullWidth
@@ -620,15 +758,35 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
                 label="שעה"
                 value={formData.event.time}
                 onChange={(e) => handleInputChange('event', 'time', e.target.value)}
+                onBlur={() => handleBlur('time')}
+                error={shouldShowError('time')}
+                helperText={shouldShowError('time') ? errors.time : ''}
                 required
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: customColors.primary
+                    }
+                  }
+                }}
               />
               <TextField
                 fullWidth
                 label="מיקום"
                 value={formData.event.location}
                 onChange={(e) => handleInputChange('event', 'location', e.target.value)}
+                onBlur={() => handleBlur('location')}
+                error={shouldShowError('location')}
+                helperText={shouldShowError('location') ? errors.location : ''}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: customColors.primary
+                    }
+                  }
+                }}
               />
               <TextField
                 fullWidth
