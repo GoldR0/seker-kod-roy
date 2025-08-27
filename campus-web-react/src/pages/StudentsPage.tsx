@@ -29,7 +29,8 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemButton
+  ListItemButton,
+  FormHelperText
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -78,6 +79,35 @@ interface Course extends CourseFormData {
   selectedStudents: string[];
 }
 
+interface StudentFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  department: string;
+  year: number;
+  semester: 'א' | 'ב' | 'ג';
+  city: string;
+  emergencyContact: string;
+  emergencyPhone: string;
+  notes: string;
+}
+
+interface StudentValidationErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  department?: string;
+  year?: string;
+  semester?: string;
+  city?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+}
+
 const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
@@ -121,6 +151,25 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   const [studentSelectionDialogOpen, setStudentSelectionDialogOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [editMode, setEditMode] = useState(false);
+
+  // Student form dialog state
+  const [studentFormDialogOpen, setStudentFormDialogOpen] = useState(false);
+  const [studentFormData, setStudentFormData] = useState<StudentFormData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    department: 'מדעי המחשב',
+    year: 1,
+    semester: 'א' as 'א' | 'ב' | 'ג',
+    city: 'תל אביב',
+    emergencyContact: '',
+    emergencyPhone: '',
+    notes: ''
+  });
+  const [studentErrors, setStudentErrors] = useState<StudentValidationErrors>({});
+  const [studentTouched, setStudentTouched] = useState<Record<string, boolean>>({});
 
   // Load statistics on component mount
   useEffect(() => {
@@ -178,62 +227,228 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   const getActiveStudents = () => getStudentsByStatus('active');
   const getHighGPAStudentsList = () => getHighGPAStudents();
 
-  // Add new student and save to localStorage
+  // Validation functions for student form
+  const validateStudentName = (name: string, fieldName: string): string | undefined => {
+    if (!name) return `${fieldName} הוא שדה חובה`;
+    if (name.length < 2) return `${fieldName} חייב להכיל לפחות 2 תווים`;
+    if (name.length > 50) return `${fieldName} לא יכול לעלות על 50 תווים`;
+    const nameRegex = /^[א-ת\s]+$/;
+    if (!nameRegex.test(name)) return `${fieldName} יכול להכיל אותיות עבריות בלבד`;
+    return undefined;
+  };
+
+  const validateStudentEmail = (email: string): string | undefined => {
+    if (!email) return 'אימייל הוא שדה חובה';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return 'פורמט אימייל לא תקין';
+    return undefined;
+  };
+
+  const validateStudentPhone = (phone: string): string | undefined => {
+    if (!phone) return 'מספר טלפון הוא שדה חובה';
+    const phoneRegex = /^[\d\s\-+()]{9,15}$/;
+    if (!phoneRegex.test(phone)) return 'מספר טלפון לא תקין';
+    return undefined;
+  };
+
+  const validateStudentRequired = (value: string, fieldName: string): string | undefined => {
+    if (!value || value.trim() === '') return `${fieldName} הוא שדה חובה`;
+    return undefined;
+  };
+
+  const validateStudentField = (field: string, value: string): string | undefined => {
+    switch (field) {
+      case 'firstName':
+        return validateStudentName(value, 'שם פרטי');
+      case 'lastName':
+        return validateStudentName(value, 'שם משפחה');
+      case 'email':
+        return validateStudentEmail(value);
+      case 'phone':
+        return validateStudentPhone(value);
+      case 'address':
+        return validateStudentRequired(value, 'כתובת');
+      case 'department':
+        return validateStudentRequired(value, 'חוג');
+      case 'semester':
+        return validateStudentRequired(value, 'סמסטר');
+      case 'city':
+        return validateStudentRequired(value, 'עיר');
+      case 'emergencyContact':
+        return validateStudentRequired(value, 'איש קשר לשעת חירום');
+      case 'emergencyPhone':
+        return validateStudentPhone(value);
+      default:
+        return undefined;
+    }
+  };
+
+  const validateStudentForm = (): boolean => {
+    const newErrors: StudentValidationErrors = {};
+    let isValid = true;
+
+    Object.keys(studentFormData).forEach(field => {
+      if (field !== 'notes' && field !== 'year') { // Skip notes and year validation
+        const error = validateStudentField(field, studentFormData[field as keyof StudentFormData] as string);
+        if (error) {
+          newErrors[field as keyof StudentValidationErrors] = error;
+          isValid = false;
+        }
+      }
+    });
+
+    setStudentErrors(newErrors);
+    return isValid;
+  };
+
+  // Student form handlers
+  const handleStudentInputChange = (field: string, value: any) => {
+    setStudentFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+
+    // Clear error when user starts typing
+    if (studentErrors[field as keyof StudentValidationErrors]) {
+      setStudentErrors(prev => ({
+        ...prev,
+        [field]: undefined
+      }));
+    }
+  };
+
+  const handleStudentBlur = (field: string) => {
+    setStudentTouched(prev => ({
+      ...prev,
+      [field]: true
+    }));
+
+    const error = validateStudentField(field, studentFormData[field as keyof StudentFormData] as string);
+    setStudentErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+  };
+
+  const shouldShowStudentError = (field: string): boolean => {
+    return studentTouched[field] && !!studentErrors[field as keyof StudentValidationErrors];
+  };
+
+  // Open student form dialog
+  const openStudentFormDialog = () => {
+    setStudentFormDialogOpen(true);
+  };
+
+  // Add new student with form data
   const addNewStudent = () => {
-    try {
-      // Generate unique ID and student number
-      const newId = Date.now().toString();
-      const newStudentNumber = `2024${String(students.length + 1).padStart(3, '0')}`;
-      
-      // Create new student object
-      const newStudent: Student = {
-        id: newId,
-        studentNumber: newStudentNumber,
-        firstName: 'סטודנט',
-        lastName: 'חדש',
-        fullName: 'סטודנט חדש',
-        email: `student${students.length + 1}@campus.ac.il`,
-        phone: `050-${String(Math.floor(Math.random() * 9000000) + 1000000)}`,
-        address: 'כתובת לדוגמה',
-        department: 'מדעי המחשב',
-        year: 1,
-        semester: 'א',
-        creditsCompleted: 0,
-        gpa: 0.0,
-        birthDate: new Date().toISOString().split('T')[0],
-        age: 18,
-        gender: 'male',
-        city: 'תל אביב',
-        status: 'active',
-        enrollmentDate: new Date().toISOString().split('T')[0],
-        lastActive: new Date().toISOString().split('T')[0],
-        emergencyContact: 'הורה',
-        emergencyPhone: '050-1234567',
-        notes: 'סטודנט חדש שנוסף למערכת'
-      };
+    // Mark all fields as touched
+    const allTouched = Object.keys(studentFormData).reduce((acc, field) => {
+      if (field !== 'notes') {
+        acc[field] = true;
+      }
+      return acc;
+    }, {} as Record<string, boolean>);
+    setStudentTouched(allTouched);
 
-      // Add to students array
-      const updatedStudents = [...students, newStudent];
-      setStudents(updatedStudents);
+    if (validateStudentForm()) {
+      try {
+        // Generate unique ID and student number
+        const newId = Date.now().toString();
+        const newStudentNumber = `2024${String(students.length + 1).padStart(3, '0')}`;
+        
+        // Create new student object
+        const newStudent: Student = {
+          id: newId,
+          studentNumber: newStudentNumber,
+          firstName: studentFormData.firstName,
+          lastName: studentFormData.lastName,
+          fullName: `${studentFormData.firstName} ${studentFormData.lastName}`,
+          email: studentFormData.email,
+          phone: studentFormData.phone,
+          address: studentFormData.address,
+          department: studentFormData.department,
+          year: studentFormData.year,
+          semester: studentFormData.semester,
+          creditsCompleted: 0,
+          gpa: 0.0,
+          birthDate: new Date().toISOString().split('T')[0],
+          age: 18,
+          gender: 'male',
+          city: studentFormData.city,
+          status: 'active',
+          enrollmentDate: new Date().toISOString().split('T')[0],
+          lastActive: new Date().toISOString().split('T')[0],
+          emergencyContact: studentFormData.emergencyContact,
+          emergencyPhone: studentFormData.emergencyPhone,
+          notes: studentFormData.notes || 'סטודנט חדש שנוסף למערכת'
+        };
 
-      // Save to localStorage
-      const studentsJson = JSON.stringify(updatedStudents);
-      localStorage.setItem('campus-students-data', studentsJson);
+        // Add to students array
+        const updatedStudents = [...students, newStudent];
+        setStudents(updatedStudents);
 
+        // Save to localStorage
+        const studentsJson = JSON.stringify(updatedStudents);
+        localStorage.setItem('campus-students-data', studentsJson);
+
+        setNotification({
+          message: `סטודנט חדש נוסף בהצלחה! מספר סטודנט: ${newStudentNumber}`,
+          type: 'success'
+        });
+        
+        // Reset form and close dialog
+        setStudentFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          address: '',
+          department: 'מדעי המחשב',
+          year: 1,
+          semester: 'א',
+          city: 'תל אביב',
+          emergencyContact: '',
+          emergencyPhone: '',
+          notes: ''
+        });
+        setStudentErrors({});
+        setStudentTouched({});
+        setStudentFormDialogOpen(false);
+        
+        console.log('New student added:', newStudent);
+        console.log('Updated students list:', updatedStudents);
+      } catch (error) {
+        console.error('Error adding new student:', error);
+        setNotification({
+          message: 'שגיאה בהוספת סטודנט חדש',
+          type: 'error'
+        });
+      }
+    } else {
       setNotification({
-        message: `סטודנט חדש נוסף בהצלחה! מספר סטודנט: ${newStudentNumber}`,
-        type: 'success'
-      });
-      
-      console.log('New student added:', newStudent);
-      console.log('Updated students list:', updatedStudents);
-    } catch (error) {
-      console.error('Error adding new student:', error);
-      setNotification({
-        message: 'שגיאה בהוספת סטודנט חדש',
+        message: 'יש שגיאות בטופס. אנא בדוק את השדות המסומנים.',
         type: 'error'
       });
     }
+  };
+
+  const handleClearStudentForm = () => {
+    setStudentFormData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      address: '',
+      department: 'מדעי המחשב',
+      year: 1,
+      semester: 'א',
+      city: 'תל אביב',
+      emergencyContact: '',
+      emergencyPhone: '',
+      notes: ''
+    });
+    setStudentErrors({});
+    setStudentTouched({});
   };
 
 
@@ -608,7 +823,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={addNewStudent}
+          onClick={openStudentFormDialog}
           sx={{ 
             backgroundColor: 'rgb(179, 209, 53)',
             '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
@@ -1294,6 +1509,293 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
             }}
           >
             {editMode ? 'עדכן בחירה' : 'אישור בחירה'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Student Form Dialog */}
+      <Dialog 
+        open={studentFormDialogOpen} 
+        onClose={() => setStudentFormDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle sx={{ backgroundColor: 'rgb(179, 209, 53)', color: 'white' }}>
+          <AddIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+          הוספת סטודנט חדש
+        </DialogTitle>
+        <DialogContent sx={{ p: 4 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
+            <TextField
+              fullWidth
+              label="שם פרטי"
+              value={studentFormData.firstName}
+              onChange={(e) => handleStudentInputChange('firstName', e.target.value)}
+              onBlur={() => handleStudentBlur('firstName')}
+              error={shouldShowStudentError('firstName')}
+              helperText={shouldShowStudentError('firstName') ? studentErrors.firstName : ''}
+              required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              label="שם משפחה"
+              value={studentFormData.lastName}
+              onChange={(e) => handleStudentInputChange('lastName', e.target.value)}
+              onBlur={() => handleStudentBlur('lastName')}
+              error={shouldShowStudentError('lastName')}
+              helperText={shouldShowStudentError('lastName') ? studentErrors.lastName : ''}
+              required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              type="email"
+              label="אימייל"
+              value={studentFormData.email}
+              onChange={(e) => handleStudentInputChange('email', e.target.value)}
+              onBlur={() => handleStudentBlur('email')}
+              error={shouldShowStudentError('email')}
+              helperText={shouldShowStudentError('email') ? studentErrors.email : ''}
+              required
+              sx={{ 
+                gridColumn: { xs: '1', md: '1 / -1' },
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              label="טלפון"
+              value={studentFormData.phone}
+              onChange={(e) => handleStudentInputChange('phone', e.target.value)}
+              onBlur={() => handleStudentBlur('phone')}
+              error={shouldShowStudentError('phone')}
+              helperText={shouldShowStudentError('phone') ? studentErrors.phone : 'פורמט: 050-1234567'}
+              required
+              placeholder="050-1234567"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              label="כתובת"
+              value={studentFormData.address}
+              onChange={(e) => handleStudentInputChange('address', e.target.value)}
+              onBlur={() => handleStudentBlur('address')}
+              error={shouldShowStudentError('address')}
+              helperText={shouldShowStudentError('address') ? studentErrors.address : ''}
+              required
+              sx={{ 
+                gridColumn: { xs: '1', md: '1 / -1' },
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+            
+            <FormControl fullWidth error={shouldShowStudentError('department')} required>
+              <InputLabel>חוג</InputLabel>
+              <Select
+                value={studentFormData.department}
+                onChange={(e) => handleStudentInputChange('department', e.target.value)}
+                onBlur={() => handleStudentBlur('department')}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgb(179, 209, 53)'
+                    }
+                  }
+                }}
+              >
+                <MenuItem value="מדעי המחשב">מדעי המחשב</MenuItem>
+                <MenuItem value="הנדסה">הנדסה</MenuItem>
+                <MenuItem value="ניהול">ניהול</MenuItem>
+                <MenuItem value="אמנויות">אמנויות</MenuItem>
+                <MenuItem value="רפואה">רפואה</MenuItem>
+                <MenuItem value="משפטים">משפטים</MenuItem>
+              </Select>
+              {shouldShowStudentError('department') && (
+                <FormHelperText>{studentErrors.department}</FormHelperText>
+              )}
+            </FormControl>
+            
+            <TextField
+              fullWidth
+              type="number"
+              label="שנה"
+              value={studentFormData.year}
+              onChange={(e) => handleStudentInputChange('year', parseInt(e.target.value))}
+              inputProps={{ min: 1, max: 4 }}
+              required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+            
+            <FormControl fullWidth error={shouldShowStudentError('semester')} required>
+              <InputLabel>סמסטר</InputLabel>
+              <Select
+                value={studentFormData.semester}
+                onChange={(e) => handleStudentInputChange('semester', e.target.value)}
+                onBlur={() => handleStudentBlur('semester')}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgb(179, 209, 53)'
+                    }
+                  }
+                }}
+              >
+                <MenuItem value="א">סמסטר א</MenuItem>
+                <MenuItem value="ב">סמסטר ב</MenuItem>
+                <MenuItem value="ג">סמסטר קיץ</MenuItem>
+              </Select>
+              {shouldShowStudentError('semester') && (
+                <FormHelperText>{studentErrors.semester}</FormHelperText>
+              )}
+            </FormControl>
+            
+            <TextField
+              fullWidth
+              label="עיר"
+              value={studentFormData.city}
+              onChange={(e) => handleStudentInputChange('city', e.target.value)}
+              onBlur={() => handleStudentBlur('city')}
+              error={shouldShowStudentError('city')}
+              helperText={shouldShowStudentError('city') ? studentErrors.city : ''}
+              required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              label="איש קשר לשעת חירום"
+              value={studentFormData.emergencyContact}
+              onChange={(e) => handleStudentInputChange('emergencyContact', e.target.value)}
+              onBlur={() => handleStudentBlur('emergencyContact')}
+              error={shouldShowStudentError('emergencyContact')}
+              helperText={shouldShowStudentError('emergencyContact') ? studentErrors.emergencyContact : ''}
+              required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              label="טלפון לשעת חירום"
+              value={studentFormData.emergencyPhone}
+              onChange={(e) => handleStudentInputChange('emergencyPhone', e.target.value)}
+              onBlur={() => handleStudentBlur('emergencyPhone')}
+              error={shouldShowStudentError('emergencyPhone')}
+              helperText={shouldShowStudentError('emergencyPhone') ? studentErrors.emergencyPhone : 'פורמט: 050-1234567'}
+              required
+              placeholder="050-1234567"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              label="הערות (אופציונלי)"
+              value={studentFormData.notes}
+              onChange={(e) => handleStudentInputChange('notes', e.target.value)}
+              sx={{ 
+                gridColumn: { xs: '1', md: '1 / -1' },
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgb(179, 209, 53)'
+                  }
+                }
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button
+            variant="outlined"
+            onClick={handleClearStudentForm}
+            sx={{
+              borderColor: 'rgb(179, 209, 53)',
+              color: 'rgb(179, 209, 53)',
+              '&:hover': {
+                borderColor: 'rgb(159, 189, 33)',
+                backgroundColor: 'rgba(179, 209, 53, 0.1)'
+              }
+            }}
+          >
+            נקה טופס
+          </Button>
+          <Button
+            onClick={() => setStudentFormDialogOpen(false)}
+            sx={{
+              borderColor: 'rgb(179, 209, 53)',
+              color: 'rgb(179, 209, 53)',
+              '&:hover': {
+                borderColor: 'rgb(159, 189, 33)',
+                backgroundColor: 'rgba(179, 209, 53, 0.1)'
+              }
+            }}
+          >
+            ביטול
+          </Button>
+          <Button
+            variant="contained"
+            onClick={addNewStudent}
+            sx={{
+              backgroundColor: 'rgb(179, 209, 53)',
+              '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
+            }}
+          >
+            הוספת סטודנט
           </Button>
         </DialogActions>
       </Dialog>
