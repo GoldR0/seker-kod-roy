@@ -19,7 +19,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  FormHelperText
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -43,6 +44,14 @@ interface LostFoundFormData {
   contactPhone: string;
 }
 
+interface ValidationErrors {
+  itemName?: string;
+  description?: string;
+  location?: string;
+  date?: string;
+  contactPhone?: string;
+}
+
 interface SubmittedForm {
   id: string;
   type: 'lost' | 'found';
@@ -64,6 +73,9 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
     date: '',
     contactPhone: ''
   });
+  
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [submittedForms, setSubmittedForms] = useState<SubmittedForm[]>([]);
   const [reportCounter, setReportCounter] = useState(1);
@@ -75,6 +87,59 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
     primaryDark: 'rgb(159, 189, 33)',
     primaryLight: 'rgb(199, 229, 73)',
     textOnPrimary: 'white'
+  };
+
+  // Validation functions
+  const validatePhone = (phone: string): string | undefined => {
+    if (!phone) return 'מספר טלפון הוא שדה חובה';
+    const phoneRegex = /^[\d\s\-+()]{9,15}$/;
+    if (!phoneRegex.test(phone)) return 'מספר טלפון לא תקין';
+    return undefined;
+  };
+
+  const validateItemName = (itemName: string): string | undefined => {
+    if (!itemName) return 'שם הפריט הוא שדה חובה';
+    if (itemName.length < 2) return 'שם הפריט חייב להכיל לפחות 2 תווים';
+    if (itemName.length > 50) return 'שם הפריט לא יכול לעלות על 50 תווים';
+    return undefined;
+  };
+
+  const validateRequired = (value: string, fieldName: string): string | undefined => {
+    if (!value || value.trim() === '') return `${fieldName} הוא שדה חובה`;
+    return undefined;
+  };
+
+  const validateField = (field: string, value: string): string | undefined => {
+    switch (field) {
+      case 'itemName':
+        return validateItemName(value);
+      case 'description':
+        return validateRequired(value, 'תיאור הפריט');
+      case 'location':
+        return validateRequired(value, 'מיקום');
+      case 'date':
+        return validateRequired(value, 'תאריך');
+      case 'contactPhone':
+        return validatePhone(value);
+      default:
+        return undefined;
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: ValidationErrors = {};
+    let isValid = true;
+
+    Object.keys(formData).forEach(field => {
+      const error = validateField(field, formData[field as keyof LostFoundFormData]);
+      if (error) {
+        newErrors[field as keyof ValidationErrors] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   // Load reports from localStorage on component mount
@@ -231,42 +296,79 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
       ...prev,
       [field]: value
     }));
+
+    // Clear error when user starts typing
+    if (errors[field as keyof ValidationErrors]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: undefined
+      }));
+    }
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({
+      ...prev,
+      [field]: true
+    }));
+
+    const error = validateField(field, formData[field as keyof LostFoundFormData]);
+    setErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
   };
 
   const handleFormSubmit = () => {
-    const newForm: SubmittedForm = {
-      id: `LF-${String(reportCounter).padStart(3, '0')}`,
-      ...formData,
-      timestamp: new Date(),
-      user: currentUser?.name || 'משתמש אנונימי'
-    };
-    
-    const updatedForms = [newForm, ...submittedForms];
-    setSubmittedForms(updatedForms);
-    setReportCounter(prev => prev + 1);
-    
-    // Save to localStorage
-    try {
-      localStorage.setItem('campus-lost-found-data', JSON.stringify(updatedForms));
-    } catch (error) {
-      console.error('Error saving reports to localStorage:', error);
+    // Mark all fields as touched
+    const allTouched = Object.keys(formData).reduce((acc, field) => {
+      acc[field] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
+    setTouched(allTouched);
+
+    if (validateForm()) {
+      const newForm: SubmittedForm = {
+        id: `LF-${String(reportCounter).padStart(3, '0')}`,
+        ...formData,
+        timestamp: new Date(),
+        user: currentUser?.name || 'משתמש אנונימי'
+      };
+      
+      const updatedForms = [newForm, ...submittedForms];
+      setSubmittedForms(updatedForms);
+      setReportCounter(prev => prev + 1);
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-lost-found-data', JSON.stringify(updatedForms));
+      } catch (error) {
+        console.error('Error saving reports to localStorage:', error);
+      }
+      
+      setNotification({
+        message: `הדיווח על ${formData.type === 'lost' ? 'אבידה' : 'מציאה'} נשלח בהצלחה! מזהה: ${newForm.id}`,
+        type: 'success'
+      });
+      
+      // איפוס הטופס וסגירת הדיאלוג
+      setFormData({
+        type: 'lost',
+        itemName: '',
+        description: '',
+        location: '',
+        date: '',
+        contactPhone: ''
+      });
+      setErrors({});
+      setTouched({});
+      setFormDialogOpen(false);
+    } else {
+      setNotification({
+        message: 'יש שגיאות בטופס. אנא בדוק את השדות המסומנים.',
+        type: 'error'
+      });
     }
-    
-    setNotification({
-      message: `הדיווח על ${formData.type === 'lost' ? 'אבידה' : 'מציאה'} נשלח בהצלחה! מזהה: ${newForm.id}`,
-      type: 'success'
-    });
-    
-    // איפוס הטופס וסגירת הדיאלוג
-    setFormData({
-      type: 'lost',
-      itemName: '',
-      description: '',
-      location: '',
-      date: '',
-      contactPhone: ''
-    });
-    setFormDialogOpen(false);
   };
 
   const handleClearForm = () => {
@@ -278,6 +380,12 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
       date: '',
       contactPhone: ''
     });
+    setErrors({});
+    setTouched({});
+  };
+
+  const shouldShowError = (field: string): boolean => {
+    return touched[field] && !!errors[field as keyof ValidationErrors];
   };
 
   const formatDate = (date: Date) => {
@@ -535,6 +643,9 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
               label="שם הפריט"
               value={formData.itemName}
               onChange={(e) => handleInputChange('itemName', e.target.value)}
+              onBlur={() => handleBlur('itemName')}
+              error={shouldShowError('itemName')}
+              helperText={shouldShowError('itemName') ? errors.itemName : ''}
               required
               sx={{ 
                 gridColumn: { xs: '1', md: '1 / -1' },
@@ -553,6 +664,9 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
               label="תיאור הפריט"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
+              onBlur={() => handleBlur('description')}
+              error={shouldShowError('description')}
+              helperText={shouldShowError('description') ? errors.description : ''}
               required
               sx={{ 
                 gridColumn: { xs: '1', md: '1 / -1' },
@@ -569,6 +683,9 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
               label="מיקום"
               value={formData.location}
               onChange={(e) => handleInputChange('location', e.target.value)}
+              onBlur={() => handleBlur('location')}
+              error={shouldShowError('location')}
+              helperText={shouldShowError('location') ? errors.location : ''}
               required
               sx={{
                 '& .MuiOutlinedInput-root': {
@@ -585,6 +702,9 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
               label="תאריך"
               value={formData.date}
               onChange={(e) => handleInputChange('date', e.target.value)}
+              onBlur={() => handleBlur('date')}
+              error={shouldShowError('date')}
+              helperText={shouldShowError('date') ? errors.date : ''}
               required
               InputLabelProps={{ shrink: true }}
               sx={{
@@ -601,6 +721,9 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
               label="טלפון ליצירת קשר"
               value={formData.contactPhone}
               onChange={(e) => handleInputChange('contactPhone', e.target.value)}
+              onBlur={() => handleBlur('contactPhone')}
+              error={shouldShowError('contactPhone')}
+              helperText={shouldShowError('contactPhone') ? errors.contactPhone : ''}
               required
               sx={{ 
                 gridColumn: { xs: '1', md: '1 / -1' },
@@ -653,7 +776,6 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
           onClose={() => setNotification(null)} 
           severity={notification?.type} 
           sx={{ width: '100%' }}
-          icon={notification?.type === 'success' ? <CheckCircleIcon /> : undefined}
         >
           {notification?.message}
         </Alert>
