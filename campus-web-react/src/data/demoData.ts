@@ -21,6 +21,17 @@ export const demoUsers: Record<string, User> = {
     age: 45,
     city: 'ירושלים',
     gender: 'male'
+  },
+  // סטודנט קיים מהטבלה - שירה גולדברג
+  'shira.goldberg@student.ono.ac.il': {
+    id: '4',
+    name: 'שירה גולדברג',
+    email: 'shira.goldberg@student.ono.ac.il',
+    role: 'student',
+    phone: '053-4567890',
+    age: 24,
+    city: 'באר שבע',
+    gender: 'female'
   }
 };
 

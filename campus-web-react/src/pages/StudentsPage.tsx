@@ -638,31 +638,23 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
 
 
 
+  // Force reload students data from demo data
+  const forceReloadStudents = () => {
+    // Clear existing data
+    localStorage.removeItem('campus-students-data');
+    // Load fresh data
+    const allStudents = getAllStudents();
+    setStudents(allStudents);
+    setStatistics(getStudentsStatistics());
+    localStorage.setItem('campus-students-data', JSON.stringify(allStudents));
+    console.log('Force reload: Students loaded from demo data:', allStudents);
+    console.log('Force reload: Looking for Shira Goldberg:', allStudents.find(s => s.id === '4'));
+  };
+
   // Load students from localStorage on component mount
   useEffect(() => {
-    const loadStudentsFromLocalStorage = () => {
-      try {
-        const savedStudents = localStorage.getItem('campus-students-data');
-        if (savedStudents) {
-          const parsedStudents = JSON.parse(savedStudents);
-          setStudents(parsedStudents);
-          setStatistics(getStudentsStatistics());
-          console.log('Students loaded from localStorage:', parsedStudents);
-        } else {
-          // If no data in localStorage, load from demo data
-          const allStudents = getAllStudents();
-          setStudents(allStudents);
-          setStatistics(getStudentsStatistics());
-          console.log('Students loaded from demo data:', allStudents);
-        }
-      } catch (error) {
-        console.error('Error loading students from localStorage:', error);
-        // Fallback to demo data
-        const allStudents = getAllStudents();
-        setStudents(allStudents);
-        setStatistics(getStudentsStatistics());
-      }
-    };
+    // Force reload on first load to ensure we have the correct data
+    forceReloadStudents();
 
     const loadCoursesFromLocalStorage = () => {
       try {
@@ -802,7 +794,6 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       }
     };
 
-    loadStudentsFromLocalStorage();
     loadCoursesFromLocalStorage();
     loadTasksFromLocalStorage();
   }, []);

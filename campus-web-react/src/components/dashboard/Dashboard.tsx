@@ -6,6 +6,7 @@ import WelcomeBanner from './WelcomeBanner';
 import TasksCard from './TasksCard';
 import EventsCard from './EventsCard';
 import { demoEvents } from '../../data/demoData';
+import { getAllStudents } from '../../data/studentsData';
 
 interface DashboardProps {
   currentUser: User | null;
@@ -126,51 +127,11 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser }) => {
           localStorage.setItem('campus-inquiries-data', JSON.stringify(initialInquiries));
         }
 
-        // Check if students data exists
-        const existingStudents = localStorage.getItem('campus-students-data');
-        if (!existingStudents) {
-          // Create initial students data (at least 10 objects)
-          const studentNames = [
-            { firstName: 'דוד', lastName: 'כהן' },
-            { firstName: 'שרה', lastName: 'לוי' },
-            { firstName: 'משה', lastName: 'ישראלי' },
-            { firstName: 'רחל', lastName: 'אברהם' },
-            { firstName: 'יוסף', lastName: 'גולד' },
-            { firstName: 'מרים', lastName: 'שלום' },
-            { firstName: 'אברהם', lastName: 'כהן' },
-            { firstName: 'רחל', lastName: 'לוי' },
-            { firstName: 'יצחק', lastName: 'ישראלי' },
-            { firstName: 'לאה', lastName: 'אברהם' }
-          ];
-          
-          const initialStudents = Array.from({ length: 10 }, (_, index) => ({
-            id: `student-${index + 1}`,
-            studentNumber: `2024${String(index + 1).padStart(3, '0')}`,
-            firstName: studentNames[index].firstName,
-            lastName: studentNames[index].lastName,
-            fullName: `${studentNames[index].firstName} ${studentNames[index].lastName}`,
-            email: `student${index + 1}@campus.ac.il`,
-            phone: `050-${String(1234567 + index).padStart(7, '0')}`,
-            address: `רחוב ${index + 1}, תל אביב`,
-            department: ['מדעי המחשב', 'הנדסה', 'ניהול', 'אמנויות'][index % 4],
-            year: (index % 4) + 1,
-            semester: ['א', 'ב', 'ג'][index % 3] as 'א' | 'ב' | 'ג',
-            creditsCompleted: index * 5,
-            gpa: 3.0 + (index * 0.1),
-            birthDate: new Date(2000 + index, index % 12, (index % 28) + 1).toISOString().split('T')[0],
-            age: 18 + index,
-            gender: index % 2 === 0 ? 'male' : 'female',
-            city: 'תל אביב',
-            status: 'active',
-            enrollmentDate: new Date(2024, 0, 1).toISOString().split('T')[0],
-            lastActive: new Date().toISOString().split('T')[0],
-            emergencyContact: `איש קשר ${index + 1}`,
-            emergencyPhone: `052-${String(1234567 + index).padStart(7, '0')}`,
-            notes: `סטודנט ${index + 1}`
-          }));
-          
-          localStorage.setItem('campus-students-data', JSON.stringify(initialStudents));
-        }
+        // Always refresh students data to ensure we have the latest data
+        const initialStudents = getAllStudents();
+        localStorage.setItem('campus-students-data', JSON.stringify(initialStudents));
+        console.log('Students data refreshed in localStorage:', initialStudents);
+        console.log('Looking for Shira Goldberg in Dashboard:', initialStudents.find(s => s.id === '4'));
 
         // Check if courses data exists
         const existingCourses = localStorage.getItem('campus-courses-data');

@@ -245,6 +245,9 @@ const Header: React.FC<HeaderProps> = ({
                 <strong>סטודנט:</strong> student@campus.ac.il / 123456
               </Typography>
               <Typography variant="body2">
+                <strong>סטודנטית:</strong> shira.goldberg@student.ono.ac.il / 123456
+              </Typography>
+              <Typography variant="body2">
                 <strong>מרצה:</strong> lecturer@campus.ac.il / 123456
               </Typography>
             </Box>
