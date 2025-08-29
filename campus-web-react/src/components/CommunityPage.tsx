@@ -114,9 +114,10 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    if (selectedDate < today) {
-      return 'תאריך לא יכול להיות בעבר';
-    }
+    // Allow dates from the past (remove the restriction)
+    // if (selectedDate < today) {
+    //   return 'תאריך לא יכול להיות בעבר';
+    // }
     return undefined;
   };
 
