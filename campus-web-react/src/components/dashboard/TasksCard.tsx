@@ -81,7 +81,7 @@ const TasksCard: React.FC<TasksCardProps> = ({ customColors }) => {
               </Typography>
             </Box>
             <Typography variant="caption" color="text.secondary">
-              {task.course} - {task.date || task.dueDate}
+              {task.course} - {(task as any).date || task.dueDate}
             </Typography>
           </Box>
         ))}

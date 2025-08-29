@@ -240,19 +240,19 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
             if (Array.isArray(parsed)) {
               // Check if any reports have old numeric IDs and fix them
               let needsUpdate = false;
-              const fixedReports = parsed.map((report: { [key: string]: any }, index: number) => {
+              const fixedReports: SubmittedForm[] = parsed.map((report: { [key: string]: any }, index: number) => {
                 if (typeof report.id === 'number' || !report.id.startsWith('LF-')) {
                   needsUpdate = true;
                   return {
                     ...report,
                     id: `LF-${String(index + 1).padStart(3, '0')}`,
                     timestamp: new Date(report.timestamp)
-                  };
+                  } as SubmittedForm;
                 }
                 return {
                   ...report,
                   timestamp: new Date(report.timestamp)
-                };
+                } as SubmittedForm;
               });
               
               if (needsUpdate) {
