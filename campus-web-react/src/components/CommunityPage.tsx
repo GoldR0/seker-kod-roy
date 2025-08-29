@@ -16,6 +16,7 @@ import {
   FormHelperText
 } from '@mui/material';
 import { CUSTOM_COLORS, TYPOGRAPHY, BUTTON_STYLES } from '../constants/theme';
+import { User } from '../types';
 import { 
   Group as GroupIcon,
   Send as SendIcon,
@@ -24,7 +25,7 @@ import {
 import FacilitiesCard from './dashboard/FacilitiesCard';
 
 interface CommunityPageProps {
-  currentUser: any;
+  currentUser: User | null;
 }
 
 interface InquiryFormData {
@@ -73,7 +74,7 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
         const inquiries = JSON.parse(savedInquiries);
         if (inquiries.length > 0) {
           // Find the highest inquiry counter
-          const maxId = Math.max(...inquiries.map((inquiry: any) => 
+          const maxId = Math.max(...inquiries.map((inquiry: { inquiryId: string }) => 
             parseInt(inquiry.inquiryId.split('-')[1])
           ));
           setInquiryCounter(maxId + 1);
@@ -156,7 +157,7 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
   };
 
   // Inquiry form handlers
-  const handleInquiryInputChange = (field: string, value: any) => {
+  const handleInquiryInputChange = (field: string, value: string) => {
     setInquiryFormData(prev => ({
       ...prev,
       [field]: value

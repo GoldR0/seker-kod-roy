@@ -33,6 +33,7 @@ import {
   FormHelperText
 } from '@mui/material';
 import { CUSTOM_COLORS, TYPOGRAPHY } from '../constants/theme';
+import { User } from '../types';
 import {
   Add as AddIcon,
   School as SchoolIcon,
@@ -124,7 +125,7 @@ interface TaskValidationErrors {
   course?: string;
 }
 
-const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
+const StudentsPage: React.FC<{ currentUser: User | null }> = ({ currentUser }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -329,7 +330,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   };
 
   // Student form handlers
-  const handleStudentInputChange = (field: string, value: any) => {
+  const handleStudentInputChange = (field: string, value: string | number) => {
     setStudentFormData(prev => ({
       ...prev,
       [field]: value
@@ -796,7 +797,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   }, []);
 
   // Task form handlers
-  const handleTaskInputChange = (field: string, value: any) => {
+  const handleTaskInputChange = (field: string, value: string) => {
     setTaskFormData(prev => ({
       ...prev,
       [field]: value
@@ -890,7 +891,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   };
 
   // Course form handlers
-  const handleCourseInputChange = (field: string, value: any) => {
+  const handleCourseInputChange = (field: string, value: string | string[]) => {
     setCourseFormData(prev => ({
       ...prev,
       [field]: value

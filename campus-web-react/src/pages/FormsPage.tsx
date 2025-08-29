@@ -17,6 +17,7 @@ import {
   IconButton
 } from '@mui/material';
 import { CUSTOM_COLORS, TYPOGRAPHY, CARD_STYLES } from '../constants/theme';
+import { User } from '../types';
 import {
   Description as DescriptionIcon,
   Event as EventIcon,
@@ -37,7 +38,7 @@ import {
 } from '@mui/icons-material';
 
 interface FormsPageProps {
-  currentUser: any;
+  currentUser: User | null;
 }
 
 interface FormData {
@@ -290,7 +291,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         if (savedFacilities) {
           const parsedFacilities = JSON.parse(savedFacilities);
           // Remove community center if it exists
-          const filteredFacilities = parsedFacilities.filter((facility: any) => 
+          const filteredFacilities = parsedFacilities.filter((facility: { id: string; name: string; type: string }) => 
             facility.id !== 'community-1' && facility.name !== 'מרכז קהילתי' && facility.type !== 'community'
           );
           
@@ -415,7 +416,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
             localStorage.setItem('campus-lost-found-data', JSON.stringify(initialReports));
           } else {
             // Convert timestamp strings back to Date objects
-            const reportsWithDates = parsedReports.map((report: any) => ({
+            const reportsWithDates = parsedReports.map((report: { timestamp: string | Date; [key: string]: any }) => ({
               ...report,
               timestamp: new Date(report.timestamp)
             }));
@@ -720,7 +721,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
 
 
-  const handleInputChange = (formType: string, field: string, value: any) => {
+  const handleInputChange = (formType: string, field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [formType]: {

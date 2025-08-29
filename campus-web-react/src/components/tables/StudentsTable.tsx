@@ -39,7 +39,7 @@ interface Column {
   label: string;
   minWidth?: number;
   align?: 'right' | 'left' | 'center';
-  format?: (value: any, student: Student) => React.ReactNode;
+  format?: (value: string | number, student: Student) => React.ReactNode;
 }
 
 const StudentsTable: React.FC<StudentsTableProps> = ({

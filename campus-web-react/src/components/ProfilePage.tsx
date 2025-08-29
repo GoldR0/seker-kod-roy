@@ -17,6 +17,7 @@ import {
   FormHelperText
 } from '@mui/material';
 import { CUSTOM_COLORS, TYPOGRAPHY, BUTTON_STYLES } from '../constants/theme';
+import { User } from '../types';
 import {
   Person as PersonIcon,
   Save as SaveIcon,
@@ -25,7 +26,7 @@ import {
 } from '@mui/icons-material';
 
 interface ProfilePageProps {
-  currentUser: any;
+  currentUser: User | null;
 }
 
 interface ProfileFormData {
@@ -134,7 +135,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
     return isValid;
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value

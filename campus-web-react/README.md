@@ -50,6 +50,10 @@ npm test
 - **אימייל:** student@campus.ac.il
 - **סיסמה:** 123456
 
+### סטודנטית
+- **אימייל:** shira.goldberg@student.ono.ac.il
+- **סיסמה:** 123456
+
 ### מרצה
 - **אימייל:** lecturer@campus.ac.il
 - **סיסמה:** 123456

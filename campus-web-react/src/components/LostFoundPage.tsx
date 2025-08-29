@@ -22,6 +22,7 @@ import {
   DialogActions
 } from '@mui/material';
 import { CUSTOM_COLORS, TYPOGRAPHY } from '../constants/theme';
+import { User } from '../types';
 import {
   Search as SearchIcon,
   Send as SendIcon,
@@ -31,7 +32,7 @@ import {
 } from '@mui/icons-material';
 
 interface LostFoundPageProps {
-  currentUser: any;
+  currentUser: User | null;
 }
 
 interface LostFoundFormData {
@@ -171,7 +172,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
             localStorage.setItem('campus-lost-found-data', JSON.stringify(demoReports));
           } else {
             // Convert timestamp strings back to Date objects
-            const reportsWithDates = parsedReports.map((report: any) => ({
+            const reportsWithDates = parsedReports.map((report: { timestamp: string | Date; [key: string]: any }) => ({
               ...report,
               timestamp: new Date(report.timestamp)
             }));
@@ -239,7 +240,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
             if (Array.isArray(parsed)) {
               // Check if any reports have old numeric IDs and fix them
               let needsUpdate = false;
-              const fixedReports = parsed.map((report: any, index: number) => {
+              const fixedReports = parsed.map((report: { [key: string]: any }, index: number) => {
                 if (typeof report.id === 'number' || !report.id.startsWith('LF-')) {
                   needsUpdate = true;
                   return {
@@ -323,7 +324,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
     };
   }, []);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value

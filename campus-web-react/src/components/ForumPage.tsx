@@ -25,6 +25,7 @@ import {
   Grid
 } from '@mui/material';
 import { CUSTOM_COLORS, TYPOGRAPHY, BUTTON_STYLES } from '../constants/theme';
+import { User } from '../types';
 import {
   Send as SendIcon,
   Forum as ForumIcon,
@@ -54,7 +55,7 @@ interface Course {
 }
 
 interface ForumPageProps {
-  currentUser: any;
+  currentUser: User | null;
 }
 
 const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {

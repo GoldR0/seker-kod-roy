@@ -5,6 +5,16 @@ import { useAuth } from '../../hooks/useAuth';
 
 import { demoTasks } from '../../data/demoData';
 
+interface Task {
+  id: string;
+  title: string;
+  type: string;
+  course: string;
+  date?: string;
+  dueDate?: string;
+  priority: 'urgent' | 'medium' | 'low';
+}
+
 interface TasksCardProps {
   customColors: {
     primary: string;
@@ -13,7 +23,7 @@ interface TasksCardProps {
 
 const TasksCard: React.FC<TasksCardProps> = ({ customColors }) => {
   const { currentUser } = useAuth();
-  const [studentTasks, setStudentTasks] = useState<any[]>([]);
+  const [studentTasks, setStudentTasks] = useState<Task[]>([]);
 
   // Load student-specific tasks from localStorage
   useEffect(() => {
@@ -27,13 +37,13 @@ const TasksCard: React.FC<TasksCardProps> = ({ customColors }) => {
           const allTasks = JSON.parse(savedTasks);
           
           // Find courses where this student is enrolled
-          const studentCourses = allCourses.filter((course: any) => 
+          const studentCourses = allCourses.filter((course: { selectedStudents?: string[]; courseId: string }) => 
             course.selectedStudents && course.selectedStudents.includes(currentUser.id)
           );
           
           // Find tasks for courses this student is enrolled in
-          const userTasks = allTasks.filter((task: any) => {
-            return studentCourses.some((course: any) => course.courseId === task.course);
+          const userTasks = allTasks.filter((task: { course: string }) => {
+            return studentCourses.some((course: { courseId: string }) => course.courseId === task.course);
           });
           
           setStudentTasks(userTasks);

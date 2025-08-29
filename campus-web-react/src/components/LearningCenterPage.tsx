@@ -11,6 +11,7 @@ import {
   Snackbar
 } from '@mui/material';
 import { CUSTOM_COLORS, TYPOGRAPHY } from '../constants/theme';
+import { User } from '../types';
 import {
   School as SchoolIcon,
   Assignment as AssignmentIcon,
@@ -18,7 +19,7 @@ import {
 } from '@mui/icons-material';
 
 interface LearningCenterPageProps {
-  currentUser: any;
+  currentUser: User | null;
 }
 
 interface StudentCourse {
@@ -61,7 +62,7 @@ const LearningCenterPage: React.FC<LearningCenterPageProps> = ({ currentUser }) 
       if (savedCourses) {
         try {
           const allCourses = JSON.parse(savedCourses);
-          const userCourses = allCourses.filter((course: any) => 
+          const userCourses = allCourses.filter((course: { selectedStudents?: string[] }) => 
             course.selectedStudents && course.selectedStudents.includes(currentUser.id)
           );
           setStudentCourses(userCourses);
@@ -71,9 +72,9 @@ const LearningCenterPage: React.FC<LearningCenterPageProps> = ({ currentUser }) 
           if (savedTasks) {
             try {
               const allTasks = JSON.parse(savedTasks);
-              const userTasks = allTasks.filter((task: any) => {
+              const userTasks = allTasks.filter((task: { course: string }) => {
                 // Find if the task's course is in student's courses
-                return userCourses.some((course: any) => course.courseId === task.course);
+                return userCourses.some((course: { courseId: string }) => course.courseId === task.course);
               });
               setStudentTasks(userTasks);
             } catch (error) {
