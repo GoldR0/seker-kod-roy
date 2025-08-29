@@ -16,6 +16,7 @@ import {
   Avatar,
   FormHelperText
 } from '@mui/material';
+import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES } from '../constants/theme';
 import {
   Person as PersonIcon,
   Save as SaveIcon,
@@ -207,7 +208,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
     <Container maxWidth="md" sx={{ py: 4 }}>
       {/* Page Header */}
       <Box sx={{ mb: 4, textAlign: 'center' }}>
-        <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary }}>
+        <Typography variant="h3" gutterBottom sx={{ ...TYPOGRAPHY.h3, color: CUSTOM_COLORS.primary }}>
           <PersonIcon sx={{ mr: 2, verticalAlign: 'middle', fontSize: 40 }} />
           פרופיל אישי
         </Typography>
@@ -238,7 +239,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
               {currentUser?.name?.charAt(0) || 'U'}
             </Avatar>
             <Box>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', color: customColors.primary }}>
+              <Typography variant="h5" sx={{ ...TYPOGRAPHY.h5, color: CUSTOM_COLORS.primary }}>
                 {currentUser?.name || 'משתמש'}
               </Typography>
               <Typography variant="body1" color="text.secondary">
@@ -248,7 +249,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
             </Box>
           </Box>
 
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', mb: 3, textAlign: 'center' }}>
+          <Typography variant="h5" gutterBottom sx={{ ...TYPOGRAPHY.h5, mb: 3, textAlign: 'center' }}>
             עדכון פרטי הפרופיל
           </Typography>
           
@@ -402,14 +403,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
               variant="outlined"
               startIcon={<ClearIcon />}
               onClick={handleClearForm}
-              sx={{
-                borderColor: customColors.primary,
-                color: customColors.primary,
-                '&:hover': {
-                  borderColor: customColors.primaryDark,
-                  backgroundColor: customColors.primaryLight + '20'
-                }
-              }}
+              sx={BUTTON_STYLES.secondary}
             >
               נקה טופס
             </Button>
@@ -417,10 +411,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
               variant="contained"
               startIcon={<SaveIcon />}
               onClick={handleFormSubmit}
-              sx={{
-                backgroundColor: customColors.primary,
-                '&:hover': { backgroundColor: customColors.primaryDark }
-              }}
+              sx={BUTTON_STYLES.primary}
             >
               שמור שינויים
             </Button>

@@ -10,6 +10,7 @@ import {
   Alert,
   Snackbar
 } from '@mui/material';
+import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES } from '../constants/theme';
 import {
   School as SchoolIcon,
   Assignment as AssignmentIcon,
@@ -131,7 +132,7 @@ const LearningCenterPage: React.FC<LearningCenterPageProps> = ({ currentUser }) 
       }}>
         <SchoolIcon sx={{ fontSize: 40, mr: 2, color: customColors.primary }} />
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: customColors.primary }}>
+          <Typography variant="h4" sx={{ ...TYPOGRAPHY.h4, color: CUSTOM_COLORS.primary }}>
             מרכז הלימודים
           </Typography>
           <Typography variant="body1" color="text.secondary">
@@ -145,7 +146,7 @@ const LearningCenterPage: React.FC<LearningCenterPageProps> = ({ currentUser }) 
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <PersonIcon sx={{ mr: 1, color: customColors.primary }} />
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: customColors.primary }}>
+            <Typography variant="h6" sx={{ ...TYPOGRAPHY.h6, color: CUSTOM_COLORS.primary }}>
               מידע אישי
             </Typography>
           </Box>
@@ -172,7 +173,7 @@ const LearningCenterPage: React.FC<LearningCenterPageProps> = ({ currentUser }) 
 
       {/* Courses Section */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary, mb: 3 }}>
+        <Typography variant="h5" gutterBottom sx={{ ...TYPOGRAPHY.h5, color: CUSTOM_COLORS.primary, mb: 3 }}>
           <SchoolIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
           הקורסים שלי ({studentCourses.length})
         </Typography>
@@ -196,7 +197,7 @@ const LearningCenterPage: React.FC<LearningCenterPageProps> = ({ currentUser }) 
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <SchoolIcon sx={{ mr: 1, color: customColors.primary }} />
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                    <Typography variant="h6" sx={TYPOGRAPHY.h6}>
                       {course.courseName}
                     </Typography>
                   </Box>
@@ -236,7 +237,7 @@ const LearningCenterPage: React.FC<LearningCenterPageProps> = ({ currentUser }) 
 
       {/* Tasks Section */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary, mb: 3 }}>
+        <Typography variant="h5" gutterBottom sx={{ ...TYPOGRAPHY.h5, color: CUSTOM_COLORS.primary, mb: 3 }}>
           <AssignmentIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
           המטלות שלי ({studentTasks.length})
         </Typography>

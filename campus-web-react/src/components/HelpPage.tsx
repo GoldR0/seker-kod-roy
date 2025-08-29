@@ -9,6 +9,7 @@ import {
   AccordionDetails,
   Divider
 } from '@mui/material';
+import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES } from '../constants/theme';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const HelpPage: React.FC = () => {
@@ -87,8 +88,8 @@ const HelpPage: React.FC = () => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h3" component="h1" gutterBottom sx={{ 
-          color: 'rgb(179, 209, 53)', 
-          fontWeight: 'bold',
+          ...TYPOGRAPHY.h3,
+          color: CUSTOM_COLORS.primary,
           textAlign: 'center',
           mb: 3
         }}>
@@ -129,7 +130,7 @@ const HelpPage: React.FC = () => {
                   }
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6" sx={TYPOGRAPHY.h6}>
                   {section.title}
                 </Typography>
               </AccordionSummary>

@@ -15,6 +15,7 @@ import {
   Snackbar,
   FormHelperText
 } from '@mui/material';
+import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES } from '../constants/theme';
 import { 
   Group as GroupIcon,
   Send as SendIcon,
@@ -272,7 +273,7 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
       }}>
         <GroupIcon sx={{ fontSize: 40, mr: 2, color: customColors.primary }} />
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: customColors.primary }}>
+          <Typography variant="h4" sx={{ ...TYPOGRAPHY.h4, color: CUSTOM_COLORS.primary }}>
             קהילת הקמפוס
           </Typography>
           <Typography variant="body1" color="text.secondary">
@@ -294,7 +295,7 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
 
       {/* Inquiry Form Section */}
       <Box sx={{ mt: 6 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary, mb: 3 }}>
+        <Typography variant="h5" gutterBottom sx={{ ...TYPOGRAPHY.h5, color: CUSTOM_COLORS.primary, mb: 3 }}>
           <SendIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
           פנייה חדשה
         </Typography>
@@ -407,14 +408,7 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
                 variant="outlined"
                 startIcon={<ClearIcon />}
                 onClick={handleClearForm}
-                sx={{
-                  borderColor: customColors.primary,
-                  color: customColors.primary,
-                  '&:hover': {
-                    borderColor: customColors.primaryDark,
-                    backgroundColor: customColors.primaryLight + '20'
-                  }
-                }}
+                sx={BUTTON_STYLES.secondary}
               >
                 נקה טופס
               </Button>
@@ -422,10 +416,7 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
                 variant="contained"
                 startIcon={<SendIcon />}
                 onClick={handleInquirySubmit}
-                sx={{
-                  backgroundColor: 'rgb(179, 209, 53)',
-                  '&:hover': { backgroundColor: 'rgb(159, 189, 33)' }
-                }}
+                sx={BUTTON_STYLES.primary}
               >
                 שליחת פנייה
               </Button>

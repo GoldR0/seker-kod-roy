@@ -105,7 +105,7 @@ const Header: React.FC<HeaderProps> = ({
               variant="h6" 
               component="div" 
               sx={{ 
-                fontWeight: 'bold',
+                ...TYPOGRAPHY.h6,
                 cursor: 'pointer',
                 '&:hover': {
                   opacity: 0.8

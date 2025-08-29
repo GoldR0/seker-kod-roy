@@ -24,6 +24,7 @@ import {
   CardContent,
   Grid
 } from '@mui/material';
+import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES } from '../constants/theme';
 import {
   Send as SendIcon,
   Forum as ForumIcon,
@@ -182,7 +183,7 @@ const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
       <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
         <ForumIcon sx={{ fontSize: 40, color: 'primary.main' }} />
         <Box>
-          <Typography variant="h4" component="h1" gutterBottom>
+          <Typography variant="h4" component="h1" gutterBottom sx={TYPOGRAPHY.h4}>
             פורום קורסים
           </Typography>
           <Typography variant="body1" color="text.secondary">
@@ -196,7 +197,7 @@ const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
             <SchoolIcon color="primary" />
-            <Typography variant="h6">
+            <Typography variant="h6" sx={TYPOGRAPHY.h6}>
               קורס נבחר: {getSelectedCourseName()}
             </Typography>
             <Button
@@ -238,7 +239,7 @@ const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
               color: 'text.secondary'
             }}>
               <ForumIcon sx={{ fontSize: 60, mb: 2, opacity: 0.5 }} />
-              <Typography variant="h6">אין הודעות עדיין</Typography>
+              <Typography variant="h6" sx={TYPOGRAPHY.h6}>אין הודעות עדיין</Typography>
               <Typography variant="body2">התחל את השיחה הראשונה!</Typography>
             </Box>
           ) : (
@@ -307,10 +308,9 @@ const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
               onClick={handleSendMessage}
               disabled={!newMessage.trim()}
               sx={{ 
+                ...BUTTON_STYLES.primary,
                 minWidth: 'auto',
-                px: 2,
-                backgroundColor: '#B3D135',
-                '&:hover': { backgroundColor: '#9BC02A' }
+                px: 2
               }}
             >
               <SendIcon />
