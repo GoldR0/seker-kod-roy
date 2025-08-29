@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
-import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES } from '../../constants/theme';
+
 import { User } from '../../types';
 import WelcomeBanner from './WelcomeBanner';
 import TasksCard from './TasksCard';
@@ -130,8 +130,6 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser }) => {
         // Always refresh students data to ensure we have the latest data
         const initialStudents = getAllStudents();
         localStorage.setItem('campus-students-data', JSON.stringify(initialStudents));
-        console.log('Students data refreshed in localStorage:', initialStudents);
-        console.log('Looking for Shira Goldberg in Dashboard:', initialStudents.find(s => s.id === '4'));
 
         // Check if courses data exists
         const existingCourses = localStorage.getItem('campus-courses-data');
@@ -211,7 +209,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser }) => {
         }
 
       } catch (error) {
-        console.error('Error initializing data in localStorage:', error);
+        // Error initializing data in localStorage
       }
     };
 

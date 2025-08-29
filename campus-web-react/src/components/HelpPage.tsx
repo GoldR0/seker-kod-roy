@@ -9,7 +9,7 @@ import {
   AccordionDetails,
   Divider
 } from '@mui/material';
-import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES } from '../constants/theme';
+import { CUSTOM_COLORS, TYPOGRAPHY } from '../constants/theme';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const HelpPage: React.FC = () => {

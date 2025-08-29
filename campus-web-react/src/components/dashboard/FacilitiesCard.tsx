@@ -40,7 +40,7 @@ const FacilitiesCard: React.FC<FacilitiesCardProps> = ({ customColors }) => {
           setManagedFacilities(parsedFacilities);
         }
       } catch (error) {
-        console.error('Error loading facilities from localStorage:', error);
+        // Error loading facilities from localStorage
       }
     };
 

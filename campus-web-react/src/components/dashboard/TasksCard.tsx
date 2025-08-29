@@ -39,7 +39,6 @@ const TasksCard: React.FC<TasksCardProps> = ({ customColors }) => {
           setStudentTasks(userTasks);
         }
       } catch (error) {
-        console.error('Error loading student tasks:', error);
         setStudentTasks([]);
       }
     }

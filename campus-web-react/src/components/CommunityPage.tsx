@@ -15,7 +15,7 @@ import {
   Snackbar,
   FormHelperText
 } from '@mui/material';
-import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES } from '../constants/theme';
+import { CUSTOM_COLORS, TYPOGRAPHY, BUTTON_STYLES } from '../constants/theme';
 import { 
   Group as GroupIcon,
   Send as SendIcon,
@@ -85,7 +85,7 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
         }
       }
     } catch (error) {
-      console.error('Error loading inquiries counter from localStorage:', error);
+      // Error loading inquiries counter from localStorage
     }
   }, []);
 
@@ -217,7 +217,7 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('inquiriesUpdated'));
       } catch (error) {
-        console.error('Error saving inquiry to localStorage:', error);
+        // Error saving inquiry to localStorage
       }
       
       setNotification({

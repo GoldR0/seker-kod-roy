@@ -10,7 +10,7 @@ import {
   Alert,
   Snackbar
 } from '@mui/material';
-import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES } from '../constants/theme';
+import { CUSTOM_COLORS, TYPOGRAPHY } from '../constants/theme';
 import {
   School as SchoolIcon,
   Assignment as AssignmentIcon,
@@ -77,11 +77,11 @@ const LearningCenterPage: React.FC<LearningCenterPageProps> = ({ currentUser }) 
               });
               setStudentTasks(userTasks);
             } catch (error) {
-              console.error('Error loading tasks:', error);
+              // Error loading tasks
             }
           }
         } catch (error) {
-          console.error('Error loading courses:', error);
+          // Error loading courses
         }
       }
     }

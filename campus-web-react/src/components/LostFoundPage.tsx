@@ -21,7 +21,7 @@ import {
   DialogContent,
   DialogActions
 } from '@mui/material';
-import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES, TABLE_STYLES } from '../constants/theme';
+import { CUSTOM_COLORS, TYPOGRAPHY } from '../constants/theme';
 import {
   Search as SearchIcon,
   Send as SendIcon,
@@ -261,7 +261,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
               }
             }
           } catch (error) {
-            console.error('Corrupted reports data, resetting...', error);
+            // Corrupted reports data, resetting...
             const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
             const locations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
             const users = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
@@ -284,7 +284,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
           }
         }
       } catch (error) {
-        console.error('Error loading reports from localStorage:', error);
+        // Error loading reports from localStorage
         // If there's an error, clear localStorage and initialize with demo data
         localStorage.removeItem('campus-lost-found-data');
         const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
@@ -378,7 +378,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('lostFoundUpdated'));
       } catch (error) {
-        console.error('Error saving reports to localStorage:', error);
+        // Error saving reports to localStorage
       }
       
       setNotification({

@@ -24,7 +24,7 @@ import {
   CardContent,
   Grid
 } from '@mui/material';
-import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES } from '../constants/theme';
+import { CUSTOM_COLORS, TYPOGRAPHY, BUTTON_STYLES } from '../constants/theme';
 import {
   Send as SendIcon,
   Forum as ForumIcon,
@@ -96,7 +96,7 @@ const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
           setMessages(JSON.parse(savedMessages));
         }
       } catch (error) {
-        console.error('Error loading forum data:', error);
+        // Error loading forum data
       }
     };
 
@@ -129,7 +129,7 @@ const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
       // Dispatch custom event to notify other components
       window.dispatchEvent(new CustomEvent('forumMessagesUpdated'));
     } catch (error) {
-      console.error('Error saving message to localStorage:', error);
+      // Error saving message to localStorage
     }
 
     setNotification({

@@ -45,7 +45,7 @@ const EventsCard: React.FC<EventsCardProps> = ({ customColors }) => {
           })));
         }
       } catch (error) {
-        console.error('Error loading events from localStorage:', error);
+        // Error loading events from localStorage
         // Fallback to demo events
         setEvents(demoEvents.map(demoEvent => ({
           eventId: demoEvent.id,

@@ -32,7 +32,7 @@ import {
   ListItemButton,
   FormHelperText
 } from '@mui/material';
-import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES, TABLE_STYLES } from '../constants/theme';
+import { CUSTOM_COLORS, TYPOGRAPHY } from '../constants/theme';
 import {
   Add as AddIcon,
   School as SchoolIcon,
@@ -235,7 +235,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
           // Dispatch custom event to notify other components
           window.dispatchEvent(new CustomEvent('studentsUpdated'));
         } catch (error) {
-          console.error('Error saving to localStorage:', error);
+          // Error saving to localStorage
         }
         
         return updatedStudents;
@@ -445,10 +445,8 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         setStudentTouched({});
         setStudentFormDialogOpen(false);
         
-        console.log('New student added:', newStudent);
-        console.log('Updated students list:', updatedStudents);
       } catch (error) {
-        console.error('Error adding new student:', error);
+        // Error adding new student
         setNotification({
           message: 'שגיאה בהוספת סטודנט חדש',
           type: 'error'
@@ -647,8 +645,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
     setStudents(allStudents);
     setStatistics(getStudentsStatistics());
     localStorage.setItem('campus-students-data', JSON.stringify(allStudents));
-    console.log('Force reload: Students loaded from demo data:', allStudents);
-    console.log('Force reload: Looking for Shira Goldberg:', allStudents.find(s => s.id === '4'));
+
   };
 
   // Load students from localStorage on component mount
@@ -724,7 +721,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
           localStorage.setItem('campus-courses-data', JSON.stringify(initialCourses));
         }
       } catch (error) {
-        console.error('Error loading courses from localStorage:', error);
+        // Error loading courses from localStorage
       }
     };
 
@@ -790,7 +787,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
           localStorage.setItem('campus-tasks-data', JSON.stringify(initialTasks));
         }
       } catch (error) {
-        console.error('Error loading tasks from localStorage:', error);
+        // Error loading tasks from localStorage
       }
     };
 
@@ -866,7 +863,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('tasksUpdated'));
       } catch (error) {
-        console.error('Error saving tasks to localStorage:', error);
+        // Error saving tasks to localStorage
       }
 
       setNotification({
@@ -950,7 +947,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('coursesUpdated'));
       } catch (error) {
-        console.error('Error saving courses to localStorage:', error);
+        // Error saving courses to localStorage
       }
 
       setNotification({
@@ -1049,7 +1046,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('coursesUpdated'));
       } catch (error) {
-        console.error('Error saving courses to localStorage:', error);
+        // Error saving courses to localStorage
       }
 
       setNotification({
@@ -1108,7 +1105,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('tasksUpdated'));
       } catch (error) {
-        console.error('Error saving tasks to localStorage:', error);
+        // Error saving tasks to localStorage
       }
       
       setNotification({
@@ -1132,7 +1129,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('coursesUpdated'));
       } catch (error) {
-        console.error('Error saving courses to localStorage:', error);
+        // Error saving courses to localStorage
       }
       
       setNotification({

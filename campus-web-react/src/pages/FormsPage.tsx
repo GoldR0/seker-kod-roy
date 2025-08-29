@@ -16,7 +16,7 @@ import {
   Snackbar,
   IconButton
 } from '@mui/material';
-import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES, TABLE_STYLES } from '../constants/theme';
+import { CUSTOM_COLORS, TYPOGRAPHY, CARD_STYLES } from '../constants/theme';
 import {
   Description as DescriptionIcon,
   Event as EventIcon,
@@ -280,7 +280,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           localStorage.setItem('campus-events-data', JSON.stringify(initialEvents));
         }
       } catch (error) {
-        console.error('Error loading events from localStorage:', error);
+        // Error loading events from localStorage
       }
     };
 
@@ -365,7 +365,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
               window.dispatchEvent(new CustomEvent('facilityUpdated'));
             }
           } catch (error) {
-            console.error('Corrupted facilities data, resetting...', error);
+            // Corrupted facilities data, resetting...
             const facilityTypes: ('library' | 'cafeteria' | 'gym' | 'parking')[] = ['library', 'cafeteria', 'gym', 'parking'];
             const facilityNames = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'חדר לימוד', 'חדר משחקים', 'מעבדה', 'אודיטוריום', 'גינה', 'מרכז סטודנטים'];
             
@@ -384,7 +384,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           }
         }
       } catch (error) {
-        console.error('Error loading facilities from localStorage:', error);
+        // Error loading facilities from localStorage
       }
     };
 
@@ -443,7 +443,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           localStorage.setItem('campus-lost-found-data', JSON.stringify(initialReports));
         }
       } catch (error) {
-        console.error('Error loading lost-found reports from localStorage:', error);
+        // Error loading lost-found reports from localStorage
       }
     };
 
@@ -515,7 +515,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           localStorage.setItem('campus-inquiries-data', JSON.stringify(initialInquiries));
         }
       } catch (error) {
-        console.error('Error loading inquiries from localStorage:', error);
+        // Error loading inquiries from localStorage
       }
     };
 
@@ -591,7 +591,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           // Dispatch custom event to notify other components
           window.dispatchEvent(new CustomEvent('eventsUpdated'));
         } catch (error) {
-          console.error('Error saving events to localStorage:', error);
+          // Error saving events to localStorage
         }
 
         setNotification({
@@ -649,7 +649,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       // Dispatch custom event to notify other components
       window.dispatchEvent(new CustomEvent('facilityUpdated'));
     } catch (error) {
-      console.error('Error saving facilities to localStorage:', error);
+      // Error saving facilities to localStorage
     }
     
     const facility = facilities.find(f => f.id === facilityId);
@@ -692,7 +692,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('lostFoundUpdated'));
       } catch (error) {
-        console.error('Error saving reports to localStorage:', error);
+        // Error saving reports to localStorage
       }
       
       setNotification({
@@ -773,7 +773,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('inquiriesUpdated'));
       } catch (error) {
-        console.error('Error saving inquiries to localStorage:', error);
+        // Error saving inquiries to localStorage
       }
       
       setNotification({
@@ -824,7 +824,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('eventsUpdated'));
       } catch (error) {
-        console.error('Error saving events to localStorage:', error);
+        // Error saving events to localStorage
       }
       
       setNotification({
@@ -852,7 +852,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('eventsUpdated'));
       } catch (error) {
-        console.error('Error saving events to localStorage:', error);
+        // Error saving events to localStorage
       }
       
       setNotification({

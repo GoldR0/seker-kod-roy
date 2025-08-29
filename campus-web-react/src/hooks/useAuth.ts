@@ -14,7 +14,7 @@ export const useAuth = () => {
         setCurrentUser(user);
       }
     } catch (error) {
-      console.error('Error loading user from localStorage:', error);
+      // Error loading user from localStorage
       // Clear corrupted data
       localStorage.removeItem('campus-current-user');
     }
@@ -29,7 +29,7 @@ export const useAuth = () => {
       try {
         localStorage.setItem('campus-current-user', JSON.stringify(user));
       } catch (error) {
-        console.error('Error saving user to localStorage:', error);
+        // Error saving user to localStorage
       }
       
       return { success: true, message: 'התחברת בהצלחה!' };
@@ -45,7 +45,7 @@ export const useAuth = () => {
     try {
       localStorage.removeItem('campus-current-user');
     } catch (error) {
-      console.error('Error clearing user from localStorage:', error);
+      // Error clearing user from localStorage
     }
     
     return { success: true, message: 'התנתקת בהצלחה' };

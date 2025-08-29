@@ -16,7 +16,7 @@ import {
   Avatar,
   FormHelperText
 } from '@mui/material';
-import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES } from '../constants/theme';
+import { CUSTOM_COLORS, TYPOGRAPHY, BUTTON_STYLES } from '../constants/theme';
 import {
   Person as PersonIcon,
   Save as SaveIcon,
@@ -177,7 +177,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser }) => {
       });
       
       // כאן אפשר להוסיף לוגיקה לשמירת הנתונים
-      console.log('Profile data saved:', formData);
+      // Profile data saved
     } else {
       setNotification({
         message: 'יש שגיאות בטופס. אנא בדוק את השדות המסומנים.',
