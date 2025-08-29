@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -63,6 +63,30 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  // Load existing inquiries counter on component mount
+  useEffect(() => {
+    try {
+      const savedInquiries = localStorage.getItem('campus-inquiries-data');
+      if (savedInquiries) {
+        const inquiries = JSON.parse(savedInquiries);
+        if (inquiries.length > 0) {
+          // Find the highest inquiry counter
+          const maxId = Math.max(...inquiries.map((inquiry: any) => 
+            parseInt(inquiry.inquiryId.split('-')[1])
+          ));
+          setInquiryCounter(maxId + 1);
+          // Update form data with new counter
+          setInquiryFormData(prev => ({
+            ...prev,
+            inquiryId: `INQUIRY-${String(maxId + 1).padStart(3, '0')}`
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading inquiries counter from localStorage:', error);
+    }
+  }, []);
 
   // Validation functions
   const validateRequired = (value: string, fieldName: string): string | undefined => {
@@ -169,6 +193,31 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
     setTouched(allTouched);
 
     if (validateForm()) {
+      // Create new inquiry object with additional metadata
+      const newInquiry = {
+        inquiryId: inquiryFormData.inquiryId,
+        category: inquiryFormData.category as 'complaint' | 'improvement',
+        description: inquiryFormData.description,
+        date: inquiryFormData.date,
+        location: inquiryFormData.location,
+        createdAt: new Date().toLocaleString('he-IL'),
+        user: currentUser?.name || 'משתמש אלמוני'
+      };
+
+      // Save to localStorage
+      try {
+        const existingInquiries = localStorage.getItem('campus-inquiries-data');
+        const inquiries = existingInquiries ? JSON.parse(existingInquiries) : [];
+        const updatedInquiries = [...inquiries, newInquiry];
+        
+        localStorage.setItem('campus-inquiries-data', JSON.stringify(updatedInquiries));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('inquiriesUpdated'));
+      } catch (error) {
+        console.error('Error saving inquiry to localStorage:', error);
+      }
+      
       setNotification({
         message: `פנייה חדשה נוצרה בהצלחה! מזהה: ${inquiryFormData.inquiryId}`,
         type: 'success'

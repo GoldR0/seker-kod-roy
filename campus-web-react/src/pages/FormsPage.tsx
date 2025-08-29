@@ -31,7 +31,8 @@ import {
   LocalParking as ParkingIcon,
   ToggleOn as ToggleOnIcon,
   ToggleOff as ToggleOffIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Contacts as ContactIcon
 } from '@mui/icons-material';
 
 interface FormsPageProps {
@@ -88,6 +89,16 @@ interface LostFoundReport {
   user: string;
 }
 
+interface Inquiry {
+  inquiryId: string;
+  category: 'complaint' | 'improvement';
+  description: string;
+  date: string;
+  location: string;
+  createdAt: string;
+  user: string;
+}
+
 const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [activeForm, setActiveForm] = useState<string | null>(null);
   const [eventCounter, setEventCounter] = useState(1);
@@ -99,6 +110,9 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [lostFoundReports, setLostFoundReports] = useState<LostFoundReport[]>([]);
   const [deleteReportDialogOpen, setDeleteReportDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<LostFoundReport | null>(null);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [deleteInquiryDialogOpen, setDeleteInquiryDialogOpen] = useState(false);
+  const [inquiryToDelete, setInquiryToDelete] = useState<Inquiry | null>(null);
   const [resetDataDialogOpen, setResetDataDialogOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     event: {
@@ -290,9 +304,22 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       }
     };
 
+    const loadInquiriesFromLocalStorage = () => {
+      try {
+        const savedInquiries = localStorage.getItem('campus-inquiries-data');
+        if (savedInquiries) {
+          const parsedInquiries = JSON.parse(savedInquiries);
+          setInquiries(parsedInquiries);
+        }
+      } catch (error) {
+        console.error('Error loading inquiries from localStorage:', error);
+      }
+    };
+
     loadEventsFromLocalStorage();
     loadFacilitiesFromLocalStorage();
     loadLostFoundReportsFromLocalStorage();
+    loadInquiriesFromLocalStorage();
 
     // Listen for updates from other tabs
     const handleStorageChange = (e: StorageEvent) => {
@@ -300,6 +327,8 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         loadFacilitiesFromLocalStorage();
       } else if (e.key === 'campus-lost-found-data') {
         loadLostFoundReportsFromLocalStorage();
+      } else if (e.key === 'campus-inquiries-data') {
+        loadInquiriesFromLocalStorage();
       }
     };
 
@@ -489,13 +518,13 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     localStorage.removeItem('campus-events-data');
     localStorage.removeItem('campus-facilities-data');
     localStorage.removeItem('campus-lost-found-data');
-    
-
+    localStorage.removeItem('campus-inquiries-data');
     
     // Reset state
     setEvents([]);
     setEventCounter(1);
     setLostFoundReports([]);
+    setInquiries([]);
     
     // Reinitialize with default data
     const defaultFacilities: Facility[] = [
@@ -554,6 +583,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     // Notify other components
     window.dispatchEvent(new CustomEvent('facilityUpdated'));
     window.dispatchEvent(new CustomEvent('lostFoundUpdated'));
+    window.dispatchEvent(new CustomEvent('inquiriesUpdated'));
   };
 
   const handleInputChange = (formType: string, field: string, value: any) => {
@@ -589,6 +619,36 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
   const shouldShowError = (field: string): boolean => {
     return touched[field] && !!errors[field as keyof ValidationErrors];
+  };
+
+  // Inquiry management functions
+  const handleDeleteInquiry = (inquiry: Inquiry) => {
+    setInquiryToDelete(inquiry);
+    setDeleteInquiryDialogOpen(true);
+  };
+
+  const confirmDeleteInquiry = () => {
+    if (inquiryToDelete) {
+      const updatedInquiries = inquiries.filter(inquiry => inquiry.inquiryId !== inquiryToDelete.inquiryId);
+      setInquiries(updatedInquiries);
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('campus-inquiries-data', JSON.stringify(updatedInquiries));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('inquiriesUpdated'));
+      } catch (error) {
+        console.error('Error saving inquiries to localStorage:', error);
+      }
+      
+      setNotification({
+        message: `הפנייה "${inquiryToDelete.inquiryId}" נמחקה בהצלחה`,
+        type: 'success'
+      });
+      setDeleteInquiryDialogOpen(false);
+      setInquiryToDelete(null);
+    }
   };
 
   // פונקציה ליצירת מזהה חדש בעת פתיחת טופס
@@ -1182,6 +1242,86 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         )}
       </Box>
 
+      {/* Inquiries Management Table */}
+      <Box sx={{ mt: 6 }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary, mb: 3 }}>
+          <ContactIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+          ניהול פניות ({inquiries.length})
+        </Typography>
+        
+        {inquiries.length === 0 ? (
+          <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+            אין פניות עדיין. פניות יווצרו באמצעות טופס "פנייה חדשה" בעמוד קהילה.
+          </Typography>
+        ) : (
+          <Box sx={{ overflowX: 'auto' }}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr auto',
+              gap: 2,
+              p: 2,
+              backgroundColor: '#f5f5f5',
+              borderRadius: 1,
+              mb: 2,
+              fontWeight: 'bold',
+              fontSize: '0.875rem'
+            }}>
+              <Box>מזהה</Box>
+              <Box>קטגוריה</Box>
+              <Box>תיאור</Box>
+              <Box>מיקום</Box>
+              <Box>תאריך</Box>
+              <Box>משתמש</Box>
+              <Box>פעולות</Box>
+            </Box>
+            
+            {inquiries.map((inquiry) => (
+              <Box key={inquiry.inquiryId} sx={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'auto 1fr 1fr 1fr 1fr 1fr auto',
+                gap: 2,
+                p: 2,
+                borderBottom: '1px solid #e0e0e0',
+                '&:hover': { backgroundColor: '#f9f9f9' },
+                '&:last-child': { borderBottom: 'none' }
+              }}>
+                <Box sx={{ fontWeight: 'bold', color: customColors.primary }}>{inquiry.inquiryId}</Box>
+                <Box>
+                  <Box sx={{ 
+                    display: 'inline-block',
+                    px: 1,
+                    py: 0.5,
+                    borderRadius: 1,
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    backgroundColor: inquiry.category === 'complaint' ? '#ffebee' : '#e8f5e8',
+                    color: inquiry.category === 'complaint' ? '#c62828' : '#2e7d32'
+                  }}>
+                    {inquiry.category === 'complaint' ? 'תלונה' : 'הצעה לשיפור'}
+                  </Box>
+                </Box>
+                <Box sx={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {inquiry.description}
+                </Box>
+                <Box>{inquiry.location}</Box>
+                <Box>{inquiry.date}</Box>
+                <Box>{inquiry.user}</Box>
+                <Box>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => handleDeleteInquiry(inquiry)}
+                    sx={{ '&:hover': { backgroundColor: 'rgba(244, 67, 54, 0.1)' } }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
+
       {/* Delete Event Confirmation Dialog */}
       <Dialog open={deleteEventDialogOpen} onClose={() => setDeleteEventDialogOpen(false)}>
         <DialogTitle>אישור מחיקת אירוע</DialogTitle>
@@ -1231,6 +1371,32 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         </DialogActions>
       </Dialog>
 
+      {/* Delete Inquiry Confirmation Dialog */}
+      <Dialog open={deleteInquiryDialogOpen} onClose={() => setDeleteInquiryDialogOpen(false)}>
+        <DialogTitle>אישור מחיקת פנייה</DialogTitle>
+        <DialogContent>
+          <Typography>
+            האם אתה בטוח שברצונך למחוק את הפנייה "{inquiryToDelete?.inquiryId}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            קטגוריה: {inquiryToDelete?.category === 'complaint' ? 'תלונה' : 'הצעה לשיפור'}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            פעולה זו אינה הפיכה.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteInquiryDialogOpen(false)}>ביטול</Button>
+          <Button 
+            onClick={confirmDeleteInquiry} 
+            color="error" 
+            variant="contained"
+          >
+            מחיקה
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Reset Data Confirmation Dialog */}
       <Dialog open={resetDataDialogOpen} onClose={() => setResetDataDialogOpen(false)}>
         <DialogTitle>אישור איפוס נתונים</DialogTitle>
@@ -1239,7 +1405,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
             האם אתה בטוח שברצונך לאפס את כל הנתונים?
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            פעולה זו תמחק את כל האירועים, דיווחי האבידות והמציאות, ותאתחל את מצבי המתקנים.
+            פעולה זו תמחק את כל האירועים, דיווחי האבידות והמציאות, הפניות, ותאתחל את מצבי המתקנים.
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             פעולה זו אינה הפיכה.
