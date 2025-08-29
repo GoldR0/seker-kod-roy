@@ -61,6 +61,27 @@ const EventsCard: React.FC<EventsCardProps> = ({ customColors }) => {
     };
 
     loadEventsFromLocalStorage();
+    
+    // Listen for storage changes to update when events are modified in FormsPage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'campus-events-data') {
+        loadEventsFromLocalStorage();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for custom events (for same-tab updates)
+    const handleEventsUpdate = () => {
+      loadEventsFromLocalStorage();
+    };
+
+    window.addEventListener('eventsUpdated', handleEventsUpdate);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('eventsUpdated', handleEventsUpdate);
+    };
   }, []);
 
   return (

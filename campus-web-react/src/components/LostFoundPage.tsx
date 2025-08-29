@@ -147,59 +147,86 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
         const savedReports = localStorage.getItem('campus-lost-found-data');
         if (savedReports) {
           const parsedReports = JSON.parse(savedReports);
-          // Convert timestamp strings back to Date objects
-          const reportsWithDates = parsedReports.map((report: any) => ({
-            ...report,
-            timestamp: new Date(report.timestamp)
-          }));
-          setSubmittedForms(reportsWithDates);
-          
-          // Set counter to next available number
-          if (parsedReports.length > 0) {
-            const maxId = Math.max(...parsedReports.map((report: SubmittedForm) => 
-              parseInt(report.id.split('-')[1])
-            ));
-            setReportCounter(maxId + 1);
+          if (parsedReports.length === 0) {
+            // If reports array is empty, create initial reports
+            const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
+            const locations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+            const users = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+            
+            const demoReports: SubmittedForm[] = Array.from({ length: 10 }, (_, index) => ({
+              id: `LF-${String(index + 1).padStart(3, '0')}`,
+              type: index % 2 === 0 ? 'lost' : 'found',
+              itemName: itemNames[index] || `פריט ${index + 1}`,
+              description: `תיאור מפורט של ${itemNames[index] || `פריט ${index + 1}`}`,
+              location: locations[index] || `מיקום ${index + 1}`,
+              date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+              contactPhone: `050-${String(1234567 + index).padStart(7, '0')}`,
+              timestamp: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)),
+              user: users[index] || `משתמש ${index + 1}`
+            }));
+            
+            setSubmittedForms(demoReports);
+            setReportCounter(11);
+            localStorage.setItem('campus-lost-found-data', JSON.stringify(demoReports));
+          } else {
+            // Convert timestamp strings back to Date objects
+            const reportsWithDates = parsedReports.map((report: any) => ({
+              ...report,
+              timestamp: new Date(report.timestamp)
+            }));
+            
+            // If we have less than 10 reports, add more to reach 10
+            if (reportsWithDates.length < 10) {
+              const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
+              const locations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+              const users = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+              
+              const additionalReports: SubmittedForm[] = Array.from({ length: 10 - reportsWithDates.length }, (_, index) => ({
+                id: `LF-${String(reportsWithDates.length + index + 1).padStart(3, '0')}`,
+                type: (reportsWithDates.length + index) % 2 === 0 ? 'lost' : 'found',
+                itemName: itemNames[(reportsWithDates.length + index) % itemNames.length],
+                description: `תיאור מפורט של ${itemNames[(reportsWithDates.length + index) % itemNames.length]}`,
+                location: locations[(reportsWithDates.length + index) % locations.length],
+                date: new Date(Date.now() - ((reportsWithDates.length + index) * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+                contactPhone: `050-${String(1234567 + reportsWithDates.length + index).padStart(7, '0')}`,
+                timestamp: new Date(Date.now() - ((reportsWithDates.length + index) * 24 * 60 * 60 * 1000)),
+                user: users[(reportsWithDates.length + index) % users.length]
+              }));
+              
+              const allReports = [...reportsWithDates, ...additionalReports];
+              setSubmittedForms(allReports);
+              localStorage.setItem('campus-lost-found-data', JSON.stringify(allReports));
+              setReportCounter(allReports.length + 1);
+            } else {
+              setSubmittedForms(reportsWithDates);
+              
+              // Set counter to next available number
+              const maxId = Math.max(...parsedReports.map((report: SubmittedForm) => 
+                parseInt(report.id.split('-')[1])
+              ));
+              setReportCounter(maxId + 1);
+            }
           }
         } else {
-          // Initialize with demo data - always create fresh data
-          const demoReports: SubmittedForm[] = [
-            {
-              id: 'LF-001',
-              type: 'lost',
-              itemName: 'מפתחות',
-              description: 'מפתחות עם תליון כחול',
-              location: 'ספרייה',
-              date: '2024-01-15',
-              contactPhone: '050-1234567',
-              timestamp: new Date('2024-01-15T10:30:00'),
-              user: 'דוד כהן'
-            },
-            {
-              id: 'LF-002',
-              type: 'found',
-              itemName: 'ארנק שחור',
-              description: 'ארנק עם תעודות',
-              location: 'קפיטריה',
-              date: '2024-01-14',
-              contactPhone: '052-9876543',
-              timestamp: new Date('2024-01-14T14:20:00'),
-              user: 'שרה לוי'
-            },
-            {
-              id: 'LF-003',
-              type: 'lost',
-              itemName: 'טלפון נייד',
-              description: 'iPhone 13 עם כיסוי שקוף',
-              location: 'אודיטוריום',
-              date: '2024-01-13',
-              contactPhone: '054-5555555',
-              timestamp: new Date('2024-01-13T09:15:00'),
-              user: 'משה ישראלי'
-            }
-          ];
+          // Initialize with demo data - create 10 reports
+          const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
+          const locations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+          const users = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+          
+          const demoReports: SubmittedForm[] = Array.from({ length: 10 }, (_, index) => ({
+            id: `LF-${String(index + 1).padStart(3, '0')}`,
+            type: index % 2 === 0 ? 'lost' : 'found',
+            itemName: itemNames[index] || `פריט ${index + 1}`,
+            description: `תיאור מפורט של ${itemNames[index] || `פריט ${index + 1}`}`,
+            location: locations[index] || `מיקום ${index + 1}`,
+            date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+            contactPhone: `050-${String(1234567 + index).padStart(7, '0')}`,
+            timestamp: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)),
+            user: users[index] || `משתמש ${index + 1}`
+          }));
+          
           setSubmittedForms(demoReports);
-          setReportCounter(4);
+          setReportCounter(11);
           localStorage.setItem('campus-lost-found-data', JSON.stringify(demoReports));
         }
         
@@ -234,21 +261,24 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
             }
           } catch (error) {
             console.error('Corrupted reports data, resetting...', error);
-            const demoReports: SubmittedForm[] = [
-              {
-                id: 'LF-001',
-                type: 'lost',
-                itemName: 'מפתחות',
-                description: 'מפתחות עם תליון כחול',
-                location: 'ספרייה',
-                date: '2024-01-15',
-                contactPhone: '050-1234567',
-                timestamp: new Date('2024-01-15T10:30:00'),
-                user: 'דוד כהן'
-              }
-            ];
+            const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
+            const locations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+            const users = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+            
+            const demoReports: SubmittedForm[] = Array.from({ length: 10 }, (_, index) => ({
+              id: `LF-${String(index + 1).padStart(3, '0')}`,
+              type: index % 2 === 0 ? 'lost' : 'found',
+              itemName: itemNames[index] || `פריט ${index + 1}`,
+              description: `תיאור מפורט של ${itemNames[index] || `פריט ${index + 1}`}`,
+              location: locations[index] || `מיקום ${index + 1}`,
+              date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+              contactPhone: `050-${String(1234567 + index).padStart(7, '0')}`,
+              timestamp: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)),
+              user: users[index] || `משתמש ${index + 1}`
+            }));
+            
             setSubmittedForms(demoReports);
-            setReportCounter(2);
+            setReportCounter(11);
             localStorage.setItem('campus-lost-found-data', JSON.stringify(demoReports));
           }
         }
@@ -256,21 +286,24 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
         console.error('Error loading reports from localStorage:', error);
         // If there's an error, clear localStorage and initialize with demo data
         localStorage.removeItem('campus-lost-found-data');
-        const demoReports: SubmittedForm[] = [
-          {
-            id: 'LF-001',
-            type: 'lost',
-            itemName: 'מפתחות',
-            description: 'מפתחות עם תליון כחול',
-            location: 'ספרייה',
-            date: '2024-01-15',
-            contactPhone: '050-1234567',
-            timestamp: new Date('2024-01-15T10:30:00'),
-            user: 'דוד כהן'
-          }
-        ];
+        const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
+        const locations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+        const users = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+        
+        const demoReports: SubmittedForm[] = Array.from({ length: 10 }, (_, index) => ({
+          id: `LF-${String(index + 1).padStart(3, '0')}`,
+          type: index % 2 === 0 ? 'lost' : 'found',
+          itemName: itemNames[index] || `פריט ${index + 1}`,
+          description: `תיאור מפורט של ${itemNames[index] || `פריט ${index + 1}`}`,
+          location: locations[index] || `מיקום ${index + 1}`,
+          date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+          contactPhone: `050-${String(1234567 + index).padStart(7, '0')}`,
+          timestamp: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)),
+          user: users[index] || `משתמש ${index + 1}`
+        }));
+        
         setSubmittedForms(demoReports);
-        setReportCounter(2);
+        setReportCounter(11);
         localStorage.setItem('campus-lost-found-data', JSON.stringify(demoReports));
       }
     };
@@ -340,6 +373,9 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
       // Save to localStorage
       try {
         localStorage.setItem('campus-lost-found-data', JSON.stringify(updatedForms));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('lostFoundUpdated'));
       } catch (error) {
         console.error('Error saving reports to localStorage:', error);
       }

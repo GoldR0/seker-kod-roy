@@ -211,15 +211,73 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         const savedEvents = localStorage.getItem('campus-events-data');
         if (savedEvents) {
           const parsedEvents = JSON.parse(savedEvents);
-          setEvents(parsedEvents);
-          
-          // Set counter to next available number
-          if (parsedEvents.length > 0) {
+          if (parsedEvents.length === 0) {
+            // If events array is empty, create initial events
+            const eventTitles = [
+              'הרצאה על בינה מלאכותית',
+              'סדנת תכנות',
+              'מפגש סטודנטים',
+              'הרצאה על אבטחת מידע',
+              'סדנת פיתוח אפליקציות',
+              'מפגש בוגרים',
+              'הרצאה על רשתות מחשבים',
+              'סדנת מסדי נתונים',
+              'מפגש חברתי',
+              'הרצאה על אלגוריתמים'
+            ];
+            
+            const initialEvents: Event[] = Array.from({ length: 10 }, (_, index) => ({
+              eventId: `EVENT-${String(index + 1).padStart(3, '0')}`,
+              title: eventTitles[index],
+              description: `תיאור מפורט של ${eventTitles[index]}`,
+              date: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+              time: `${10 + (index % 8)}:00`,
+              location: `חדר ${index + 1}`,
+              maxParticipants: 30 + (index * 5),
+              createdAt: new Date().toLocaleString('he-IL')
+            }));
+            
+            setEvents(initialEvents);
+            setEventCounter(11);
+            localStorage.setItem('campus-events-data', JSON.stringify(initialEvents));
+          } else {
+            setEvents(parsedEvents);
+            
+            // Set counter to next available number
             const maxId = Math.max(...parsedEvents.map((event: Event) => 
               parseInt(event.eventId.split('-')[1])
             ));
             setEventCounter(maxId + 1);
           }
+        } else {
+          // Create initial events if none exist
+          const eventTitles = [
+            'הרצאה על בינה מלאכותית',
+            'סדנת תכנות',
+            'מפגש סטודנטים',
+            'הרצאה על אבטחת מידע',
+            'סדנת פיתוח אפליקציות',
+            'מפגש בוגרים',
+            'הרצאה על רשתות מחשבים',
+            'סדנת מסדי נתונים',
+            'מפגש חברתי',
+            'הרצאה על אלגוריתמים'
+          ];
+          
+          const initialEvents: Event[] = Array.from({ length: 10 }, (_, index) => ({
+            eventId: `EVENT-${String(index + 1).padStart(3, '0')}`,
+            title: eventTitles[index],
+            description: `תיאור מפורט של ${eventTitles[index]}`,
+            date: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            time: `${10 + (index % 8)}:00`,
+            location: `חדר ${index + 1}`,
+            maxParticipants: 30 + (index * 5),
+            createdAt: new Date().toLocaleString('he-IL')
+          }));
+          
+          setEvents(initialEvents);
+          setEventCounter(11);
+          localStorage.setItem('campus-events-data', JSON.stringify(initialEvents));
         }
       } catch (error) {
         console.error('Error loading events from localStorage:', error);
@@ -235,22 +293,51 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           const filteredFacilities = parsedFacilities.filter((facility: any) => 
             facility.id !== 'community-1' && facility.name !== 'מרכז קהילתי' && facility.type !== 'community'
           );
-          setFacilities(filteredFacilities);
           
-          // Save the filtered data back to localStorage
-          if (filteredFacilities.length !== parsedFacilities.length) {
-            localStorage.setItem('campus-facilities-data', JSON.stringify(filteredFacilities));
+          if (filteredFacilities.length === 0) {
+            // If facilities array is empty, create initial facilities
+            const facilityTypes: ('library' | 'cafeteria' | 'gym' | 'parking')[] = ['library', 'cafeteria', 'gym', 'parking'];
+            const facilityNames = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'חדר לימוד', 'חדר משחקים', 'מעבדה', 'אודיטוריום', 'גינה', 'מרכז סטודנטים'];
+            
+            const initialFacilities: Facility[] = Array.from({ length: 10 }, (_, index) => ({
+              id: `facility-${index + 1}`,
+              name: facilityNames[index] || `מתקן ${index + 1}`,
+              type: facilityTypes[index % facilityTypes.length],
+              status: index % 2 === 0 ? 'open' : 'closed',
+              lastUpdated: new Date().toLocaleString('he-IL')
+            }));
+            
+            setFacilities(initialFacilities);
+            localStorage.setItem('campus-facilities-data', JSON.stringify(initialFacilities));
+          } else {
+            setFacilities(filteredFacilities);
+            
+            // Save the filtered data back to localStorage
+            if (filteredFacilities.length !== parsedFacilities.length) {
+              localStorage.setItem('campus-facilities-data', JSON.stringify(filteredFacilities));
+            }
           }
+          
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(new CustomEvent('facilityUpdated'));
         } else {
-          // Initialize with default facilities - always create fresh data
-          const defaultFacilities: Facility[] = [
-            { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-            { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-            { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-            { id: 'parking-1', name: 'חניה', type: 'parking', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') }
-          ];
+          // Initialize with default facilities - create 10 facilities
+          const facilityTypes: ('library' | 'cafeteria' | 'gym' | 'parking')[] = ['library', 'cafeteria', 'gym', 'parking'];
+          const facilityNames = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'חדר לימוד', 'חדר משחקים', 'מעבדה', 'אודיטוריום', 'גינה', 'מרכז סטודנטים'];
+          
+          const defaultFacilities: Facility[] = Array.from({ length: 10 }, (_, index) => ({
+            id: `facility-${index + 1}`,
+            name: facilityNames[index] || `מתקן ${index + 1}`,
+            type: facilityTypes[index % facilityTypes.length],
+            status: index % 2 === 0 ? 'open' : 'closed',
+            lastUpdated: new Date().toLocaleString('he-IL')
+          }));
+          
           setFacilities(defaultFacilities);
           localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
+          
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(new CustomEvent('facilityUpdated'));
         }
         
         // Always ensure facilities exist (in case of corrupted data)
@@ -260,26 +347,40 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
             const parsed = JSON.parse(currentFacilities);
             
             if (!Array.isArray(parsed) || parsed.length === 0) {
-              // Reset if data is corrupted
-              const defaultFacilities: Facility[] = [
-                { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-                { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-                { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-                { id: 'parking-1', name: 'חניה', type: 'parking', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') }
-              ];
+              // Reset if data is corrupted - create 10 facilities
+              const facilityTypes: ('library' | 'cafeteria' | 'gym' | 'parking')[] = ['library', 'cafeteria', 'gym', 'parking'];
+              const facilityNames = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'חדר לימוד', 'חדר משחקים', 'מעבדה', 'אודיטוריום', 'גינה', 'מרכז סטודנטים'];
+              
+              const defaultFacilities: Facility[] = Array.from({ length: 10 }, (_, index) => ({
+                id: `facility-${index + 1}`,
+                name: facilityNames[index] || `מתקן ${index + 1}`,
+                type: facilityTypes[index % facilityTypes.length],
+                status: index % 2 === 0 ? 'open' : 'closed',
+                lastUpdated: new Date().toLocaleString('he-IL')
+              }));
               setFacilities(defaultFacilities);
               localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
+              
+              // Dispatch custom event to notify other components
+              window.dispatchEvent(new CustomEvent('facilityUpdated'));
             }
           } catch (error) {
             console.error('Corrupted facilities data, resetting...', error);
-            const defaultFacilities: Facility[] = [
-              { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-              { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-              { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-              { id: 'parking-1', name: 'חניה', type: 'parking', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') }
-            ];
+            const facilityTypes: ('library' | 'cafeteria' | 'gym' | 'parking')[] = ['library', 'cafeteria', 'gym', 'parking'];
+            const facilityNames = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'חדר לימוד', 'חדר משחקים', 'מעבדה', 'אודיטוריום', 'גינה', 'מרכז סטודנטים'];
+            
+            const defaultFacilities: Facility[] = Array.from({ length: 10 }, (_, index) => ({
+              id: `facility-${index + 1}`,
+              name: facilityNames[index] || `מתקן ${index + 1}`,
+              type: facilityTypes[index % facilityTypes.length],
+              status: index % 2 === 0 ? 'open' : 'closed',
+              lastUpdated: new Date().toLocaleString('he-IL')
+            }));
             setFacilities(defaultFacilities);
             localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
+            
+            // Dispatch custom event to notify other components
+            window.dispatchEvent(new CustomEvent('facilityUpdated'));
           }
         }
       } catch (error) {
@@ -292,12 +393,54 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         const savedReports = localStorage.getItem('campus-lost-found-data');
         if (savedReports) {
           const parsedReports = JSON.parse(savedReports);
-          // Convert timestamp strings back to Date objects
-          const reportsWithDates = parsedReports.map((report: any) => ({
-            ...report,
-            timestamp: new Date(report.timestamp)
+          if (parsedReports.length === 0) {
+            // If reports array is empty, create initial reports
+            const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
+            const reportLocations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+            const reportUsers = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+            
+            const initialReports: LostFoundReport[] = Array.from({ length: 10 }, (_, index) => ({
+              id: `LF-${String(index + 1).padStart(3, '0')}`,
+              type: index % 2 === 0 ? 'lost' : 'found',
+              itemName: itemNames[index] || `פריט ${index + 1}`,
+              description: `תיאור מפורט של ${itemNames[index] || `פריט ${index + 1}`}`,
+              location: reportLocations[index] || `מיקום ${index + 1}`,
+              date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+              contactPhone: `050-${String(1234567 + index).padStart(7, '0')}`,
+              timestamp: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)),
+              user: reportUsers[index] || `משתמש ${index + 1}`
+            }));
+            
+            setLostFoundReports(initialReports);
+            localStorage.setItem('campus-lost-found-data', JSON.stringify(initialReports));
+          } else {
+            // Convert timestamp strings back to Date objects
+            const reportsWithDates = parsedReports.map((report: any) => ({
+              ...report,
+              timestamp: new Date(report.timestamp)
+            }));
+            setLostFoundReports(reportsWithDates);
+          }
+        } else {
+          // Create initial lost/found reports if none exist
+          const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
+          const reportLocations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+          const reportUsers = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+          
+          const initialReports: LostFoundReport[] = Array.from({ length: 10 }, (_, index) => ({
+            id: `LF-${String(index + 1).padStart(3, '0')}`,
+            type: index % 2 === 0 ? 'lost' : 'found',
+            itemName: itemNames[index] || `פריט ${index + 1}`,
+            description: `תיאור מפורט של ${itemNames[index] || `פריט ${index + 1}`}`,
+            location: reportLocations[index] || `מיקום ${index + 1}`,
+            date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+            contactPhone: `050-${String(1234567 + index).padStart(7, '0')}`,
+            timestamp: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)),
+            user: reportUsers[index] || `משתמש ${index + 1}`
           }));
-          setLostFoundReports(reportsWithDates);
+          
+          setLostFoundReports(initialReports);
+          localStorage.setItem('campus-lost-found-data', JSON.stringify(initialReports));
         }
       } catch (error) {
         console.error('Error loading lost-found reports from localStorage:', error);
@@ -309,7 +452,67 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         const savedInquiries = localStorage.getItem('campus-inquiries-data');
         if (savedInquiries) {
           const parsedInquiries = JSON.parse(savedInquiries);
-          setInquiries(parsedInquiries);
+          if (parsedInquiries.length === 0) {
+            // If inquiries array is empty, create initial inquiries
+            const inquiryDescriptions = [
+              'בעיה עם המזגן בספרייה',
+              'הצעת שיפור למערכת ההזמנות',
+              'תלונה על רעש בכיתות',
+              'הצעה להוספת מקומות חניה',
+              'בעיה עם האינטרנט במעבדה',
+              'הצעת שיפור לתפריט הקפיטריה',
+              'תלונה על ניקיון בשירותים',
+              'הצעה להוספת שקעי חשמל',
+              'בעיה עם התאורה בחניה',
+              'הצעת שיפור למערכת ההרשמה'
+            ];
+            const inquiryLocations2 = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+            const inquiryUsers2 = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+            
+            const initialInquiries: Inquiry[] = Array.from({ length: 10 }, (_, index) => ({
+              inquiryId: `INQUIRY-${String(index + 1).padStart(3, '0')}`,
+              category: index % 2 === 0 ? 'complaint' : 'improvement',
+              description: inquiryDescriptions[index] || `תיאור פנייה ${index + 1}`,
+              date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+              location: inquiryLocations2[index] || `מיקום ${index + 1}`,
+              createdAt: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toLocaleString('he-IL'),
+              user: inquiryUsers2[index] || `משתמש ${index + 1}`
+            }));
+            
+            setInquiries(initialInquiries);
+            localStorage.setItem('campus-inquiries-data', JSON.stringify(initialInquiries));
+          } else {
+            setInquiries(parsedInquiries);
+          }
+        } else {
+          // Create initial inquiries if none exist
+          const inquiryDescriptions = [
+            'בעיה עם המזגן בספרייה',
+            'הצעת שיפור למערכת ההזמנות',
+            'תלונה על רעש בכיתות',
+            'הצעה להוספת מקומות חניה',
+            'בעיה עם האינטרנט במעבדה',
+            'הצעת שיפור לתפריט הקפיטריה',
+            'תלונה על ניקיון בשירותים',
+            'הצעה להוספת שקעי חשמל',
+            'בעיה עם התאורה בחניה',
+            'הצעת שיפור למערכת ההרשמה'
+          ];
+          const inquiryLocations2 = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+          const inquiryUsers2 = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+          
+          const initialInquiries: Inquiry[] = Array.from({ length: 10 }, (_, index) => ({
+            inquiryId: `INQUIRY-${String(index + 1).padStart(3, '0')}`,
+            category: index % 2 === 0 ? 'complaint' : 'improvement',
+            description: inquiryDescriptions[index] || `תיאור פנייה ${index + 1}`,
+            date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+            location: inquiryLocations2[index] || `מיקום ${index + 1}`,
+            createdAt: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toLocaleString('he-IL'),
+            user: inquiryUsers2[index] || `משתמש ${index + 1}`
+          }));
+          
+          setInquiries(initialInquiries);
+          localStorage.setItem('campus-inquiries-data', JSON.stringify(initialInquiries));
         }
       } catch (error) {
         console.error('Error loading inquiries from localStorage:', error);
@@ -384,6 +587,9 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         // Save to localStorage
         try {
           localStorage.setItem('campus-events-data', JSON.stringify(updatedEvents));
+          
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(new CustomEvent('eventsUpdated'));
         } catch (error) {
           console.error('Error saving events to localStorage:', error);
         }
@@ -526,53 +732,76 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     setLostFoundReports([]);
     setInquiries([]);
     
-    // Reinitialize with default data
-    const defaultFacilities: Facility[] = [
-      { id: 'library-1', name: 'ספרייה', type: 'library', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-      { id: 'cafeteria-1', name: 'קפיטריה', type: 'cafeteria', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-      { id: 'gym-1', name: 'חדר כושר', type: 'gym', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') },
-      { id: 'parking-1', name: 'חניה', type: 'parking', status: 'open', lastUpdated: new Date().toLocaleString('he-IL') }
-    ];
+    // Reinitialize with default data - create 10 facilities
+    const facilityTypes: ('library' | 'cafeteria' | 'gym' | 'parking')[] = ['library', 'cafeteria', 'gym', 'parking'];
+    const facilityNames = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'חדר לימוד', 'חדר משחקים', 'מעבדה', 'אודיטוריום', 'גינה', 'מרכז סטודנטים'];
+    
+    const defaultFacilities: Facility[] = Array.from({ length: 10 }, (_, index) => ({
+      id: `facility-${index + 1}`,
+      name: facilityNames[index] || `מתקן ${index + 1}`,
+      type: facilityTypes[index % facilityTypes.length],
+      status: index % 2 === 0 ? 'open' : 'closed',
+      lastUpdated: new Date().toLocaleString('he-IL')
+    }));
     setFacilities(defaultFacilities);
     localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
     
-    const defaultReports: LostFoundReport[] = [
-      {
-        id: 'LF-001',
-        type: 'lost',
-        itemName: 'מפתחות',
-        description: 'מפתחות עם תליון כחול',
-        location: 'ספרייה',
-        date: '2024-01-15',
-        contactPhone: '050-1234567',
-        timestamp: new Date('2024-01-15T10:30:00'),
-        user: 'דוד כהן'
-      },
-      {
-        id: 'LF-002',
-        type: 'found',
-        itemName: 'ארנק שחור',
-        description: 'ארנק עם תעודות',
-        location: 'קפיטריה',
-        date: '2024-01-14',
-        contactPhone: '052-9876543',
-        timestamp: new Date('2024-01-14T14:20:00'),
-        user: 'שרה לוי'
-      },
-      {
-        id: 'LF-003',
-        type: 'lost',
-        itemName: 'טלפון נייד',
-        description: 'iPhone 13 עם כיסוי שקוף',
-        location: 'אודיטוריום',
-        date: '2024-01-13',
-        contactPhone: '054-5555555',
-        timestamp: new Date('2024-01-13T09:15:00'),
-        user: 'משה ישראלי'
-      }
-    ];
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('facilityUpdated'));
+    
+    // Create 10 lost/found reports
+    const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
+    const resetLocations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+    const resetUsers = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+    
+    const defaultReports: LostFoundReport[] = Array.from({ length: 10 }, (_, index) => ({
+      id: `LF-${String(index + 1).padStart(3, '0')}`,
+      type: index % 2 === 0 ? 'lost' : 'found',
+      itemName: itemNames[index] || `פריט ${index + 1}`,
+      description: `תיאור מפורט של ${itemNames[index] || `פריט ${index + 1}`}`,
+      location: resetLocations[index] || `מיקום ${index + 1}`,
+      date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+      contactPhone: `050-${String(1234567 + index).padStart(7, '0')}`,
+      timestamp: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)),
+      user: resetUsers[index] || `משתמש ${index + 1}`
+    }));
     setLostFoundReports(defaultReports);
     localStorage.setItem('campus-lost-found-data', JSON.stringify(defaultReports));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('lostFoundUpdated'));
+    
+    // Create 10 inquiries
+    const inquiryDescriptions = [
+      'בעיה עם המזגן בספרייה',
+      'הצעת שיפור למערכת ההזמנות',
+      'תלונה על רעש בכיתות',
+      'הצעה להוספת מקומות חניה',
+      'בעיה עם האינטרנט במעבדה',
+      'הצעת שיפור לתפריט הקפיטריה',
+      'תלונה על ניקיון בשירותים',
+      'הצעה להוספת שקעי חשמל',
+      'בעיה עם התאורה בחניה',
+      'הצעת שיפור למערכת ההרשמה'
+    ];
+    const inquiryLocations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
+    const inquiryUsers = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
+    
+    const defaultInquiries: Inquiry[] = Array.from({ length: 10 }, (_, index) => ({
+      inquiryId: `INQUIRY-${String(index + 1).padStart(3, '0')}`,
+      category: index % 2 === 0 ? 'complaint' : 'improvement',
+      description: inquiryDescriptions[index] || `תיאור פנייה ${index + 1}`,
+      date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+      location: inquiryLocations[index] || `מיקום ${index + 1}`,
+      createdAt: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toLocaleString('he-IL'),
+      user: inquiryUsers[index] || `משתמש ${index + 1}`
+    }));
+    
+    setInquiries(defaultInquiries);
+    localStorage.setItem('campus-inquiries-data', JSON.stringify(defaultInquiries));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('inquiriesUpdated'));
     
     setNotification({
       message: 'כל הנתונים אופסו בהצלחה!',
@@ -686,6 +915,9 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       // Save to localStorage
       try {
         localStorage.setItem('campus-events-data', JSON.stringify(updatedEvents));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('eventsUpdated'));
       } catch (error) {
         console.error('Error saving events to localStorage:', error);
       }
@@ -711,6 +943,9 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
       // Save to localStorage
       try {
         localStorage.setItem('campus-events-data', JSON.stringify(updatedEvents));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('eventsUpdated'));
       } catch (error) {
         console.error('Error saving events to localStorage:', error);
       }

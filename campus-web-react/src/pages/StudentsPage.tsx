@@ -230,6 +230,9 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         try {
           const studentsJson = JSON.stringify(updatedStudents);
           localStorage.setItem('campus-students-data', studentsJson);
+          
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(new CustomEvent('studentsUpdated'));
         } catch (error) {
           console.error('Error saving to localStorage:', error);
         }
@@ -413,6 +416,9 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
         // Save to localStorage
         const studentsJson = JSON.stringify(updatedStudents);
         localStorage.setItem('campus-students-data', studentsJson);
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('studentsUpdated'));
 
         setNotification({
           message: `סטודנט חדש נוסף בהצלחה! מספר סטודנט: ${newStudentNumber}`,
@@ -657,7 +663,147 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       }
     };
 
+    const loadCoursesFromLocalStorage = () => {
+      try {
+        const savedCourses = localStorage.getItem('campus-courses-data');
+        if (savedCourses) {
+          const parsedCourses = JSON.parse(savedCourses);
+          if (parsedCourses.length === 0) {
+            // If courses array is empty, create initial courses
+            const courseNames = [
+              'מבוא למדעי המחשב',
+              'אלגוריתמים',
+              'מבני נתונים',
+              'מסדי נתונים',
+              'תכנות מונחה עצמים',
+              'רשתות מחשבים',
+              'אבטחת מידע',
+              'בינה מלאכותית',
+              'פיתוח אפליקציות',
+              'ניהול פרויקטים'
+            ];
+            
+            const initialCourses: Course[] = Array.from({ length: 10 }, (_, index) => ({
+              courseId: `COURSE-${String(index + 1).padStart(3, '0')}`,
+              courseName: courseNames[index],
+              lecturer: `ד"ר ${['כהן', 'לוי', 'ישראלי', 'אברהם', 'גולד'][index % 5]}`,
+              semester: ['a', 'b', 'summer'][index % 3],
+              year: '2025',
+              students: '0',
+              credits: String((index % 4) + 2),
+              selectedStudents: [],
+              createdAt: new Date().toLocaleString('he-IL')
+            }));
+            
+            setCourses(initialCourses);
+            localStorage.setItem('campus-courses-data', JSON.stringify(initialCourses));
+          } else {
+            setCourses(parsedCourses);
+          }
+        } else {
+          // Create initial courses if none exist
+          const courseNames = [
+            'מבוא למדעי המחשב',
+            'אלגוריתמים',
+            'מבני נתונים',
+            'מסדי נתונים',
+            'תכנות מונחה עצמים',
+            'רשתות מחשבים',
+            'אבטחת מידע',
+            'בינה מלאכותית',
+            'פיתוח אפליקציות',
+            'ניהול פרויקטים'
+          ];
+          
+          const initialCourses: Course[] = Array.from({ length: 10 }, (_, index) => ({
+            courseId: `COURSE-${String(index + 1).padStart(3, '0')}`,
+            courseName: courseNames[index],
+            lecturer: `ד"ר ${['כהן', 'לוי', 'ישראלי', 'אברהם', 'גולד'][index % 5]}`,
+            semester: ['a', 'b', 'summer'][index % 3],
+            year: '2025',
+            students: '0',
+            credits: String((index % 4) + 2),
+            selectedStudents: [],
+            createdAt: new Date().toLocaleString('he-IL')
+          }));
+          
+          setCourses(initialCourses);
+          localStorage.setItem('campus-courses-data', JSON.stringify(initialCourses));
+        }
+      } catch (error) {
+        console.error('Error loading courses from localStorage:', error);
+      }
+    };
+
+    const loadTasksFromLocalStorage = () => {
+      try {
+        const savedTasks = localStorage.getItem('campus-tasks-data');
+        if (savedTasks) {
+          const parsedTasks = JSON.parse(savedTasks);
+          if (parsedTasks.length === 0) {
+            // If tasks array is empty, create initial tasks
+            const taskTitles = [
+              'מטלת תכנות בסיסית',
+              'מבחן אלגוריתמים',
+              'בוחן מבני נתונים',
+              'הצגת פרויקט',
+              'מטלת מסדי נתונים',
+              'מבחן רשתות',
+              'בוחן אבטחה',
+              'הצגת בינה מלאכותית',
+              'מטלת פיתוח',
+              'מבחן ניהול פרויקטים'
+            ];
+            
+            const initialTasks: Task[] = Array.from({ length: 10 }, (_, index) => ({
+              taskId: `TASK-${String(index + 1).padStart(3, '0')}`,
+              title: taskTitles[index],
+              type: ['assignment', 'exam', 'quiz', 'presentation'][index % 4],
+              date: new Date(Date.now() + (index + 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+              course: `COURSE-${String(index + 1).padStart(3, '0')}`,
+              createdAt: new Date().toLocaleString('he-IL')
+            }));
+            
+            setTasks(initialTasks);
+            localStorage.setItem('campus-tasks-data', JSON.stringify(initialTasks));
+          } else {
+            setTasks(parsedTasks);
+          }
+        } else {
+          // Create initial tasks if none exist
+          const taskTitles = [
+            'מטלת תכנות בסיסית',
+            'מבחן אלגוריתמים',
+            'בוחן מבני נתונים',
+            'הצגת פרויקט',
+            'מטלת מסדי נתונים',
+            'מבחן רשתות',
+            'בוחן אבטחה',
+            'הצגת בינה מלאכותית',
+            'מטלת פיתוח',
+            'מבחן ניהול פרויקטים'
+          ];
+          
+          const initialTasks: Task[] = Array.from({ length: 10 }, (_, index) => ({
+            taskId: `TASK-${String(index + 1).padStart(3, '0')}`,
+            title: taskTitles[index],
+            type: ['assignment', 'exam', 'quiz', 'presentation'][index % 4],
+            date: new Date(Date.now() + (index + 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            course: `COURSE-${String(index + 1).padStart(3, '0')}`,
+            createdAt: new Date().toLocaleString('he-IL')
+          }));
+          
+          setTasks(initialTasks);
+          localStorage.setItem('campus-tasks-data', JSON.stringify(initialTasks));
+        }
+      } catch (error) {
+        console.error('Error loading tasks from localStorage:', error);
+      }
+    };
+
     loadStudentsFromLocalStorage();
+    loadCoursesFromLocalStorage();
+    loadTasksFromLocalStorage();
   }, []);
 
   // Task form handlers
@@ -724,6 +870,9 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       // Save to localStorage
       try {
         localStorage.setItem('campus-tasks-data', JSON.stringify(updatedTasks));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('tasksUpdated'));
       } catch (error) {
         console.error('Error saving tasks to localStorage:', error);
       }
@@ -805,6 +954,9 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       // Save to localStorage
       try {
         localStorage.setItem('campus-courses-data', JSON.stringify(updatedCourses));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('coursesUpdated'));
       } catch (error) {
         console.error('Error saving courses to localStorage:', error);
       }
@@ -901,6 +1053,9 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       // Save to localStorage
       try {
         localStorage.setItem('campus-courses-data', JSON.stringify(updatedCourses));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('coursesUpdated'));
       } catch (error) {
         console.error('Error saving courses to localStorage:', error);
       }
@@ -957,6 +1112,9 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       // Save to localStorage
       try {
         localStorage.setItem('campus-tasks-data', JSON.stringify(updatedTasks));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('tasksUpdated'));
       } catch (error) {
         console.error('Error saving tasks to localStorage:', error);
       }
@@ -978,6 +1136,9 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
       // Save to localStorage
       try {
         localStorage.setItem('campus-courses-data', JSON.stringify(updatedCourses));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('coursesUpdated'));
       } catch (error) {
         console.error('Error saving courses to localStorage:', error);
       }

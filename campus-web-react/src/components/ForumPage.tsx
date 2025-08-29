@@ -124,6 +124,9 @@ const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
     // Save to localStorage
     try {
       localStorage.setItem('campus-forum-messages', JSON.stringify(updatedMessages));
+      
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new CustomEvent('forumMessagesUpdated'));
     } catch (error) {
       console.error('Error saving message to localStorage:', error);
     }
