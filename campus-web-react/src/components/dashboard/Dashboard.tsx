@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
+import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES } from '../../constants/theme';
 import { User } from '../../types';
 import WelcomeBanner from './WelcomeBanner';
 import TasksCard from './TasksCard';

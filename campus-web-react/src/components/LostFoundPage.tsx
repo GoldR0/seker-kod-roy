@@ -21,6 +21,7 @@ import {
   DialogContent,
   DialogActions
 } from '@mui/material';
+import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES, TABLE_STYLES } from '../constants/theme';
 import {
   Search as SearchIcon,
   Send as SendIcon,
@@ -450,7 +451,7 @@ const LostFoundPage: React.FC<LostFoundPageProps> = ({ currentUser }) => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Page Header */}
       <Box sx={{ mb: 4, textAlign: 'center' }}>
-        <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary }}>
+        <Typography variant="h3" gutterBottom sx={{ ...TYPOGRAPHY.h3, color: CUSTOM_COLORS.primary }}>
           <SearchIcon sx={{ mr: 2, verticalAlign: 'middle', fontSize: 40 }} />
           אבידות ומציאות
         </Typography>

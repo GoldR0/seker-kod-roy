@@ -32,6 +32,7 @@ import {
   ListItemButton,
   FormHelperText
 } from '@mui/material';
+import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES, TABLE_STYLES } from '../constants/theme';
 import {
   Add as AddIcon,
   School as SchoolIcon,
@@ -1156,7 +1157,7 @@ const StudentsPage: React.FC<{ currentUser: any }> = ({ currentUser }) => {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Page Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'rgb(179, 209, 53)' }}>
+        <Typography variant="h4" gutterBottom sx={{ ...TYPOGRAPHY.h4, color: CUSTOM_COLORS.primary }}>
           <SchoolIcon sx={{ mr: 2, verticalAlign: 'middle' }} />
           ניהול לימודים
         </Typography>

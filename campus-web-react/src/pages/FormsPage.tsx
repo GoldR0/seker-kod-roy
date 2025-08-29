@@ -16,6 +16,7 @@ import {
   Snackbar,
   IconButton
 } from '@mui/material';
+import { CUSTOM_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES, CARD_STYLES, FORM_STYLES, TABLE_STYLES } from '../constants/theme';
 import {
   Description as DescriptionIcon,
   Event as EventIcon,
@@ -113,7 +114,6 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [deleteInquiryDialogOpen, setDeleteInquiryDialogOpen] = useState(false);
   const [inquiryToDelete, setInquiryToDelete] = useState<Inquiry | null>(null);
-  const [resetDataDialogOpen, setResetDataDialogOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     event: {
       eventId: `EVENT-${String(eventCounter).padStart(3, '0')}`,
@@ -718,102 +718,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     }).format(date);
   };
 
-  // Reset all data function
-  const handleResetAllData = () => {
-    // Clear all localStorage data
-    localStorage.removeItem('campus-events-data');
-    localStorage.removeItem('campus-facilities-data');
-    localStorage.removeItem('campus-lost-found-data');
-    localStorage.removeItem('campus-inquiries-data');
-    
-    // Reset state
-    setEvents([]);
-    setEventCounter(1);
-    setLostFoundReports([]);
-    setInquiries([]);
-    
-    // Reinitialize with default data - create 10 facilities
-    const facilityTypes: ('library' | 'cafeteria' | 'gym' | 'parking')[] = ['library', 'cafeteria', 'gym', 'parking'];
-    const facilityNames = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'חדר לימוד', 'חדר משחקים', 'מעבדה', 'אודיטוריום', 'גינה', 'מרכז סטודנטים'];
-    
-    const defaultFacilities: Facility[] = Array.from({ length: 10 }, (_, index) => ({
-      id: `facility-${index + 1}`,
-      name: facilityNames[index] || `מתקן ${index + 1}`,
-      type: facilityTypes[index % facilityTypes.length],
-      status: index % 2 === 0 ? 'open' : 'closed',
-      lastUpdated: new Date().toLocaleString('he-IL')
-    }));
-    setFacilities(defaultFacilities);
-    localStorage.setItem('campus-facilities-data', JSON.stringify(defaultFacilities));
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('facilityUpdated'));
-    
-    // Create 10 lost/found reports
-    const itemNames = ['מפתחות', 'ארנק', 'טלפון', 'תיק', 'ספר', 'משקפיים', 'שעון', 'תעודת זהות', 'כרטיס סטודנט', 'מחשב נייד'];
-    const resetLocations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
-    const resetUsers = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
-    
-    const defaultReports: LostFoundReport[] = Array.from({ length: 10 }, (_, index) => ({
-      id: `LF-${String(index + 1).padStart(3, '0')}`,
-      type: index % 2 === 0 ? 'lost' : 'found',
-      itemName: itemNames[index] || `פריט ${index + 1}`,
-      description: `תיאור מפורט של ${itemNames[index] || `פריט ${index + 1}`}`,
-      location: resetLocations[index] || `מיקום ${index + 1}`,
-      date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-      contactPhone: `050-${String(1234567 + index).padStart(7, '0')}`,
-      timestamp: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)),
-      user: resetUsers[index] || `משתמש ${index + 1}`
-    }));
-    setLostFoundReports(defaultReports);
-    localStorage.setItem('campus-lost-found-data', JSON.stringify(defaultReports));
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('lostFoundUpdated'));
-    
-    // Create 10 inquiries
-    const inquiryDescriptions = [
-      'בעיה עם המזגן בספרייה',
-      'הצעת שיפור למערכת ההזמנות',
-      'תלונה על רעש בכיתות',
-      'הצעה להוספת מקומות חניה',
-      'בעיה עם האינטרנט במעבדה',
-      'הצעת שיפור לתפריט הקפיטריה',
-      'תלונה על ניקיון בשירותים',
-      'הצעה להוספת שקעי חשמל',
-      'בעיה עם התאורה בחניה',
-      'הצעת שיפור למערכת ההרשמה'
-    ];
-    const inquiryLocations = ['ספרייה', 'קפיטריה', 'חדר כושר', 'חניה', 'אודיטוריום', 'מעבדה', 'כיתה', 'משרד', 'גינה', 'מרכז סטודנטים'];
-    const inquiryUsers = ['דוד כהן', 'שרה לוי', 'משה ישראלי', 'רחל אברהם', 'יוסף גולד', 'מרים שלום', 'אברהם כהן', 'רחל לוי', 'יצחק ישראלי', 'לאה אברהם'];
-    
-    const defaultInquiries: Inquiry[] = Array.from({ length: 10 }, (_, index) => ({
-      inquiryId: `INQUIRY-${String(index + 1).padStart(3, '0')}`,
-      category: index % 2 === 0 ? 'complaint' : 'improvement',
-      description: inquiryDescriptions[index] || `תיאור פנייה ${index + 1}`,
-      date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-      location: inquiryLocations[index] || `מיקום ${index + 1}`,
-      createdAt: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)).toLocaleString('he-IL'),
-      user: inquiryUsers[index] || `משתמש ${index + 1}`
-    }));
-    
-    setInquiries(defaultInquiries);
-    localStorage.setItem('campus-inquiries-data', JSON.stringify(defaultInquiries));
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('inquiriesUpdated'));
-    
-    setNotification({
-      message: 'כל הנתונים אופסו בהצלחה!',
-      type: 'success'
-    });
-    setResetDataDialogOpen(false);
-    
-    // Notify other components
-    window.dispatchEvent(new CustomEvent('facilityUpdated'));
-    window.dispatchEvent(new CustomEvent('lostFoundUpdated'));
-    window.dispatchEvent(new CustomEvent('inquiriesUpdated'));
-  };
+
 
   const handleInputChange = (formType: string, field: string, value: any) => {
     setFormData(prev => ({
@@ -1110,6 +1015,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
                 <Card 
                   key={facility.id}
                   sx={{ 
+                    ...CARD_STYLES.default,
                     cursor: 'pointer',
                     border: `2px solid ${getFacilityColor(facility.status)}`,
                     transition: 'all 0.3s ease-in-out',
@@ -1244,31 +1150,14 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Page Header */}
       <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Box>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary }}>
-              <DescriptionIcon sx={{ mr: 2, verticalAlign: 'middle' }} />
-              ניהול
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              טפסים בסיסיים לניהול פעילויות בקמפוס
-            </Typography>
-          </Box>
-          <Button
-            variant="outlined"
-            color="warning"
-            onClick={() => setResetDataDialogOpen(true)}
-            sx={{
-              borderColor: '#ff9800',
-              color: '#ff9800',
-              '&:hover': {
-                borderColor: '#f57c00',
-                backgroundColor: '#fff3e0'
-              }
-            }}
-          >
-            איפוס נתונים
-          </Button>
+        <Box>
+          <Typography variant="h4" gutterBottom sx={{ ...TYPOGRAPHY.h4, color: CUSTOM_COLORS.primary }}>
+            <DescriptionIcon sx={{ mr: 2, verticalAlign: 'middle' }} />
+            ניהול
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            טפסים בסיסיים לניהול פעילויות בקמפוס
+          </Typography>
         </Box>
       </Box>
 
@@ -1278,6 +1167,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
           <Card 
             key={form.id}
             sx={{ 
+              ...CARD_STYLES.default,
               height: '100%',
               border: `2px solid ${form.color}`,
               transition: 'all 0.3s ease-in-out',
@@ -1366,7 +1256,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
       {/* Facilities Status Overview */}
       <Box sx={{ mt: 6 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary, mb: 3 }}>
+        <Typography variant="h5" gutterBottom sx={{ ...TYPOGRAPHY.h5, color: CUSTOM_COLORS.primary, mb: 3 }}>
           <BusinessIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
           סטטוס מתקנים ({facilities.length})
         </Typography>
@@ -1404,7 +1294,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
       {/* Events Management Table */}
       <Box sx={{ mt: 6 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary, mb: 3 }}>
+        <Typography variant="h5" gutterBottom sx={{ ...TYPOGRAPHY.h5, color: CUSTOM_COLORS.primary, mb: 3 }}>
           <EventIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
           ניהול אירועים ({events.length})
         </Typography>
@@ -1479,7 +1369,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
 
       {/* Inquiries Management Table */}
       <Box sx={{ mt: 6 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: customColors.primary, mb: 3 }}>
+        <Typography variant="h5" gutterBottom sx={{ ...TYPOGRAPHY.h5, color: CUSTOM_COLORS.primary, mb: 3 }}>
           <ContactIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
           ניהול פניות ({inquiries.length})
         </Typography>
@@ -1632,31 +1522,7 @@ const FormsPage: React.FC<FormsPageProps> = ({ currentUser }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Reset Data Confirmation Dialog */}
-      <Dialog open={resetDataDialogOpen} onClose={() => setResetDataDialogOpen(false)}>
-        <DialogTitle>אישור איפוס נתונים</DialogTitle>
-        <DialogContent>
-          <Typography>
-            האם אתה בטוח שברצונך לאפס את כל הנתונים?
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            פעולה זו תמחק את כל האירועים, דיווחי האבידות והמציאות, הפניות, ותאתחל את מצבי המתקנים.
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            פעולה זו אינה הפיכה.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setResetDataDialogOpen(false)}>ביטול</Button>
-          <Button 
-            onClick={handleResetAllData} 
-            color="warning" 
-            variant="contained"
-          >
-            איפוס נתונים
-          </Button>
-        </DialogActions>
-      </Dialog>
+
 
       {/* Notification Snackbar */}
       <Snackbar
