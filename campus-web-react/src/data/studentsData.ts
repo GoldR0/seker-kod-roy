@@ -6,12 +6,12 @@ import { Student } from '../types/Student';
 
 export const studentsData: Student[] = [
   {
-    id: '1',
+    id: '123456789',
     studentNumber: '2024001',
     firstName: 'ישראל',
     lastName: 'ישראלי',
     fullName: 'ישראל ישראלי',
-    email: 'israel.israeli@student.ono.ac.il',
+    email: 'student@campus.ac.il',
     phone: '050-1234567',
     address: 'רחוב הרצל 15, תל אביב',
     department: 'מדעי המחשב',

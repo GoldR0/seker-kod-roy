@@ -39,7 +39,7 @@ interface Column {
   label: string;
   minWidth?: number;
   align?: 'right' | 'left' | 'center';
-  format?: (value: any, student: Student) => React.ReactNode;
+  format?: (value: string | number, student: Student) => React.ReactNode;
 }
 
 const StudentsTable: React.FC<StudentsTableProps> = ({
@@ -106,13 +106,16 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
       label: 'ממוצע ציונים',
       minWidth: 120,
       align: 'center',
-      format: (value) => (
-        <Chip 
-          label={value.toFixed(2)} 
-          size="small" 
-          color={value >= 3.5 ? 'success' : value >= 3.0 ? 'warning' : 'error'}
-        />
-      )
+      format: (value) => {
+        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        return (
+          <Chip 
+            label={numValue.toFixed(2)} 
+            size="small" 
+            color={numValue >= 3.5 ? 'success' : numValue >= 3.0 ? 'warning' : 'error'}
+          />
+        );
+      }
     },
     {
       id: 'phone',
@@ -240,7 +243,7 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
                 {columns.map((column) => (
                   <TableCell key={column.id} align={column.align}>
                     {column.format 
-                      ? column.format(student[column.id as keyof Student], student)
+                      ? column.format(student[column.id as keyof Student] || '', student)
                       : student[column.id as keyof Student]
                     }
                   </TableCell>

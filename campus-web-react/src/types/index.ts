@@ -26,7 +26,7 @@ export interface Event {
   description: string;
   date: string;
   time: string;
-  location: string;
+  roomId: string;
   urgent: boolean;
 }
 
@@ -35,6 +35,9 @@ export interface Facility {
   name: string;
   status: 'open' | 'closed' | 'busy';
   hours: string;
+  rating?: number;
+  totalRatings?: number;
+  averageRating?: number;
 }
 
 export interface Course {
