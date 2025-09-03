@@ -52,6 +52,7 @@ import {
   getStudentsByStatus,
   getHighGPAStudents
 } from '../data/studentsData';
+import { addStudent } from '../fireStore/studentsService';
 
 interface TaskFormData {
   taskId: string;
@@ -415,19 +416,18 @@ const StudentsPage: React.FC<{ currentUser: User | null }> = ({ currentUser }) =
         const updatedStudents = [...students, newStudent];
         setStudents(updatedStudents);
 
-        // Save to localStorage
-        const studentsJson = JSON.stringify(updatedStudents);
-        localStorage.setItem('campus-students-data', studentsJson);
-        
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new CustomEvent('studentsUpdated'));
+        // // Save to localStorage
+        // const studentsJson = JSON.stringify(updatedStudents);
+        // localStorage.setItem('campus-students-data', studentsJson);
+        addStudent(newStudent)
+        .then(() => {
+          window.dispatchEvent(new CustomEvent('studentsUpdated'));
 
-        setNotification({
-          message: `סטודנט חדש נוסף בהצלחה! מספר סטודנט: ${newStudentNumber}`,
-          type: 'success'
-        });
-        
-        // Reset form and close dialog
+          setNotification({
+            message: `סטודנט חדש נוסף בהצלחה! מספר סטודנט: ${newStudentNumber}`,
+            type: 'success'
+          });
+                  // Reset form and close dialog
         setStudentFormData({
           firstName: '',
           lastName: '',
@@ -446,6 +446,43 @@ const StudentsPage: React.FC<{ currentUser: User | null }> = ({ currentUser }) =
         setStudentTouched({});
         setStudentFormDialogOpen(false);
         
+      })
+        .catch((error) => {
+          setNotification({
+            message: 'שגיאה בהוספת סטודנט חדש',
+            type: 'error'
+          });
+        });
+        
+        
+        
+        // Dispatch custom event to notify other components
+        //window.dispatchEvent(new CustomEvent('studentsUpdated'));
+
+        // setNotification({
+        //   message: `סטודנט חדש נוסף בהצלחה! מספר סטודנט: ${newStudentNumber}`,
+        //   type: 'success'
+        // });
+        
+        // Reset form and close dialog
+        // setStudentFormData({
+        //   firstName: '',
+        //   lastName: '',
+        //   email: '',
+        //   phone: '',
+        //   address: '',
+        //   department: 'מדעי המחשב',
+        //   year: 1,
+        //   semester: 'א',
+        //   city: 'תל אביב',
+        //   emergencyContact: '',
+        //   emergencyPhone: '',
+        //   notes: ''
+        // });
+        // setStudentErrors({});
+        // setStudentTouched({});
+        // setStudentFormDialogOpen(false);
+        
       } catch (error) {
         // Error adding new student
         setNotification({
@@ -453,7 +490,9 @@ const StudentsPage: React.FC<{ currentUser: User | null }> = ({ currentUser }) =
           type: 'error'
         });
       }
-    } else {
+
+    }
+     else {
       setNotification({
         message: 'יש שגיאות בטופס. אנא בדוק את השדות המסומנים.',
         type: 'error'
