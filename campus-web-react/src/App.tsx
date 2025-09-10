@@ -16,7 +16,7 @@ import ProfilePage from './components/ProfilePage';
 import HelpPage from './components/HelpPage';
 import LearningCenterPage from './components/LearningCenterPage';
 import ForumPage from './components/ForumPage';
-import events_management from './components/EventsManagement';
+import EventsManagement from './components/EventsManagement';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
 import { User } from './types';
@@ -65,7 +65,7 @@ function App() {
           <Route path="/lost-found" element={<LostFoundPage currentUser={currentUser} />} />
           <Route path="/community" element={<CommunityPage currentUser={currentUser} />} />
           <Route path="/forum" element={<ForumPage currentUser={currentUser} />} />
-          <Route path="/events" element={<events_management />} />
+          <Route path="/events" element={<EventsManagement />} />
           <Route path="/help" element={<HelpPage />} />
         </Routes>
       </Container>

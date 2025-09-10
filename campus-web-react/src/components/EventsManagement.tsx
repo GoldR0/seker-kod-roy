@@ -3,7 +3,7 @@ import { Box, Typography, Button, TextField, Card, CardContent, Grid, Dialog, Di
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
 // Violation 1: Component name not in PascalCase
-const events_management = () => {
+const EventsManagement = () => {
   // Violation 2: Single Responsibility Principle - Component doing too many things
   const [events, setEvents] = useState([
     { id: 1, title: 'הרצאה על React', date: '2025-01-15', location: 'אולם 101', description: 'הרצאה מעמיקה על React hooks' },
@@ -287,4 +287,4 @@ const events_management = () => {
   );
 };
 
-export default events_management;
+export default EventsManagement;
