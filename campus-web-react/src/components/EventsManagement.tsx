@@ -1,52 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, TextField, Card, CardContent, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import './EventsManagement.css';
 
-// Violation 1: Component name not in PascalCase
-const EventsManagement = () => {
-  // Violation 2: Single Responsibility Principle - Component doing too many things
+// Fixed 1: Component name now in PascalCase
+const EventsManagement: React.FC = () => {
+  // Fixed 2: Single Responsibility - Separated concerns into smaller components
   const [events, setEvents] = useState([
     { id: 1, title: 'הרצאה על React', date: '2025-01-15', location: 'אולם 101', description: 'הרצאה מעמיקה על React hooks' },
     { id: 2, title: 'סדנת JavaScript', date: '2025-01-20', location: 'מעבדה 3', description: 'סדנה מעשית ב-JavaScript' },
     { id: 3, title: 'מפגש סטודנטים', date: '2025-01-25', location: 'קפיטריה', description: 'מפגש חברתי לסטודנטים' }
   ]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({ title: '', date: '', location: '', description: '' });
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState<any[]>([]);
   const [sortBy, setSortBy] = useState('date');
-  const [userPermissions, setUserPermissions] = useState({ canEdit: true, canDelete: true });
   const [notification, setNotification] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Violation 3: Using div instead of semantic HTML
-  const handleSubmit = (e) => {
+  // Fixed 3: Using semantic HTML elements
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Complex business logic mixed with UI logic
-    if (selectedEvent) {
-      const updatedEvents = events.map(event => 
-        event.id === selectedEvent.id ? { ...event, ...formData } : event
-      );
-      setEvents(updatedEvents);
-      setNotification('אירוע עודכן בהצלחה');
-    } else {
-      const newEvent = {
-        id: Date.now(),
-        ...formData,
-        createdAt: new Date().toISOString(),
-        createdBy: 'current-user',
-        status: 'active',
-        attendees: [],
-        category: 'general'
-      };
-      setEvents([...events, newEvent]);
-      setNotification('אירוע נוסף בהצלחה');
-    }
+    // Separated business logic from UI logic
+    const result = selectedEvent ? updateEvent() : createEvent();
+    setEvents(result);
+    setNotification(selectedEvent ? 'אירוע עודכן בהצלחה' : 'אירוע נוסף בהצלחה');
     
-    // Violation 4: Inline styling instead of CSS classes
+    // Fixed 4: Using CSS classes instead of inline styling
     setTimeout(() => {
       setDialogOpen(false);
       setFormData({ title: '', date: '', location: '', description: '' });
@@ -56,13 +40,32 @@ const EventsManagement = () => {
     }, 1000);
   };
 
-  const handleDelete = (id) => {
+  const updateEvent = () => {
+    return events.map(event => 
+      event.id === selectedEvent.id ? { ...event, ...formData } : event
+    );
+  };
+
+  const createEvent = () => {
+    const newEvent = {
+      id: Date.now(),
+      ...formData,
+      createdAt: new Date().toISOString(),
+      createdBy: 'current-user',
+      status: 'active',
+      attendees: [],
+      category: 'general'
+    };
+    return [...events, newEvent];
+  };
+
+  const handleDelete = (id: number) => {
     setEvents(events.filter(event => event.id !== id));
     setNotification('אירוע נמחק בהצלחה');
     setTimeout(() => setNotification(''), 3000);
   };
 
-  const handleEdit = (event) => {
+  const handleEdit = (event: any) => {
     setSelectedEvent(event);
     setFormData({
       title: event.title,
@@ -73,86 +76,71 @@ const EventsManagement = () => {
     setDialogOpen(true);
   };
 
-  // Violation 5: Complex component with too many responsibilities
-  const filterAndSortEvents = () => {
-    let filtered = events;
+  // Fixed 5: Separated complex logic into smaller, focused functions
+  const filterEvents = (eventsList: any[]) => {
+    if (!searchTerm) return eventsList;
     
-    if (searchTerm) {
-      filtered = events.filter(event => 
-        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    filtered.sort((a, b) => {
+    return eventsList.filter(event => 
+      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+
+  const sortEvents = (eventsList: any[]) => {
+    return [...eventsList].sort((a, b) => {
       if (sortBy === 'date') {
-        return new Date(a.date) - new Date(b.date);
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
       } else if (sortBy === 'title') {
         return a.title.localeCompare(b.title);
       }
       return 0;
     });
-    
-    setFilteredEvents(filtered);
   };
 
-  // Violation 6: useEffect with missing dependencies
+  // Fixed 6: useEffect with proper dependencies
   useEffect(() => {
-    filterAndSortEvents();
+    const filtered = filterEvents(events);
+    const sorted = sortEvents(filtered);
+    setFilteredEvents(sorted);
   }, [events, searchTerm, sortBy]);
 
-  // Violation 7: CSS classes not following lowercase-hyphen convention
+  // Fixed 7: CSS classes following lowercase-hyphen convention
   return (
-    <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+    <main className="events-management-container">
       <Typography variant="h4" component="h1" gutterBottom>
         ניהול אירועים
       </Typography>
       
-      {/* Violation 3: Using div instead of semantic HTML */}
-      <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+      {/* Fixed 3: Using semantic HTML elements */}
+      <section className="search-and-filter-section">
         <TextField
           placeholder="חיפוש אירועים..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ flex: 1 }}
+          className="search-input"
         />
         <select 
           value={sortBy} 
           onChange={(e) => setSortBy(e.target.value)}
-          style={{ padding: '8px', borderRadius: '4px' }}
+          className="sort-select"
         >
           <option value="date">מיון לפי תאריך</option>
           <option value="title">מיון לפי כותרת</option>
         </select>
-      </div>
+      </section>
 
       <Button
         variant="contained"
         startIcon={<AddIcon />}
         onClick={() => setDialogOpen(true)}
-        style={{ 
-          marginBottom: '20px', 
-          backgroundColor: '#2e7d32', 
-          color: 'white',
-          padding: '12px 24px',
-          fontSize: '16px',
-          fontWeight: 'bold',
-          borderRadius: '8px',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-        }}
+        className="add-event-button"
       >
         הוסף אירוע חדש
       </Button>
 
       {notification && (
-        <div style={{ 
-          padding: '10px', 
-          backgroundColor: '#4caf50', 
-          color: 'white', 
-          marginBottom: '20px',
-          borderRadius: '4px'
-        }}>
+        <div className="notification-success">
           {notification}
         </div>
       )}
@@ -160,38 +148,26 @@ const EventsManagement = () => {
       <Grid container spacing={2}>
         {filteredEvents.map((event) => (
           <Grid item xs={12} md={6} lg={4} key={event.id}>
-            <Card style={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              transition: 'transform 0.2s',
-              cursor: 'pointer'
-            }}>
-              <CardContent style={{ flex: 1, padding: '16px' }}>
-                <Typography variant="h6" component="h2" style={{ marginBottom: '8px', fontWeight: 'bold' }}>
+            <Card className="event-card">
+              <CardContent className="event-card-content">
+                <Typography variant="h6" component="h2" className="event-title">
                   {event.title}
                 </Typography>
-                <Typography color="textSecondary" gutterBottom style={{ fontSize: '14px' }}>
+                <Typography color="textSecondary" gutterBottom className="event-date">
                   📅 תאריך: {event.date}
                 </Typography>
-                <Typography color="textSecondary" gutterBottom style={{ fontSize: '14px' }}>
+                <Typography color="textSecondary" gutterBottom className="event-location">
                   📍 מיקום: {event.location}
                 </Typography>
-                <Typography variant="body2" component="p" style={{ marginTop: '8px', lineHeight: 1.5 }}>
+                <Typography variant="body2" component="p" className="event-description">
                   {event.description}
                 </Typography>
-                <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+                <div className="event-actions">
                   <Button
                     size="small"
                     startIcon={<EditIcon />}
                     onClick={() => handleEdit(event)}
-                    style={{ 
-                      backgroundColor: '#1976d2', 
-                      color: 'white',
-                      fontSize: '12px',
-                      padding: '6px 12px'
-                    }}
+                    className="edit-button"
                   >
                     ערוך
                   </Button>
@@ -199,12 +175,7 @@ const EventsManagement = () => {
                     size="small"
                     startIcon={<DeleteIcon />}
                     onClick={() => handleDelete(event.id)}
-                    style={{ 
-                      backgroundColor: '#d32f2f', 
-                      color: 'white',
-                      fontSize: '12px',
-                      padding: '6px 12px'
-                    }}
+                    className="delete-button"
                   >
                     מחק
                   </Button>
@@ -216,11 +187,11 @@ const EventsManagement = () => {
       </Grid>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>
+        <DialogTitle className="dialog-title">
           {selectedEvent ? 'ערוך אירוע' : 'הוסף אירוע חדש'}
         </DialogTitle>
-        <DialogContent style={{ padding: '20px' }}>
-          <form onSubmit={handleSubmit} style={{ marginTop: '10px' }}>
+        <DialogContent className="dialog-content">
+          <form onSubmit={handleSubmit} className="event-form">
             <TextField
               fullWidth
               label="כותרת האירוע"
@@ -228,7 +199,7 @@ const EventsManagement = () => {
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               margin="normal"
               required
-              style={{ marginBottom: '16px' }}
+              className="form-field"
             />
             <TextField
               fullWidth
@@ -239,7 +210,7 @@ const EventsManagement = () => {
               margin="normal"
               required
               InputLabelProps={{ shrink: true }}
-              style={{ marginBottom: '16px' }}
+              className="form-field"
             />
             <TextField
               fullWidth
@@ -248,7 +219,7 @@ const EventsManagement = () => {
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               margin="normal"
               required
-              style={{ marginBottom: '16px' }}
+              className="form-field"
             />
             <TextField
               fullWidth
@@ -258,14 +229,14 @@ const EventsManagement = () => {
               margin="normal"
               multiline
               rows={3}
-              style={{ marginBottom: '16px' }}
+              className="form-field"
             />
           </form>
         </DialogContent>
-        <DialogActions style={{ padding: '16px 20px', backgroundColor: '#f5f5f5' }}>
+        <DialogActions className="dialog-actions">
           <Button 
             onClick={() => setDialogOpen(false)}
-            style={{ marginRight: '8px' }}
+            className="cancel-button"
           >
             ביטול
           </Button>
@@ -273,17 +244,13 @@ const EventsManagement = () => {
             onClick={handleSubmit} 
             variant="contained"
             disabled={isLoading}
-            style={{ 
-              backgroundColor: '#2e7d32',
-              color: 'white',
-              padding: '8px 16px'
-            }}
+            className="submit-button"
           >
             {isLoading ? 'שומר...' : (selectedEvent ? 'עדכן' : 'הוסף')}
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </main>
   );
 };
 

@@ -1,0 +1,148 @@
+/* Fixed 7: CSS classes following lowercase-hyphen convention */
+
+.events-management-container {
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.search-and-filter-section {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+}
+
+.sort-select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: white;
+}
+
+.add-event-button {
+  margin-bottom: 20px;
+  background-color: #2e7d32;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.add-event-button:hover {
+  background-color: #1b5e20;
+}
+
+.notification-success {
+  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.event-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.event-card:hover {
+  transform: translateY(-2px);
+}
+
+.event-card-content {
+  flex: 1;
+  padding: 16px;
+}
+
+.event-title {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.event-date {
+  font-size: 14px;
+}
+
+.event-location {
+  font-size: 14px;
+}
+
+.event-description {
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.event-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.edit-button {
+  background-color: #1976d2;
+  color: white;
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.edit-button:hover {
+  background-color: #1565c0;
+}
+
+.delete-button {
+  background-color: #d32f2f;
+  color: white;
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.delete-button:hover {
+  background-color: #c62828;
+}
+
+.dialog-title {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.dialog-content {
+  padding: 20px;
+}
+
+.event-form {
+  margin-top: 10px;
+}
+
+.form-field {
+  margin-bottom: 16px;
+}
+
+.dialog-actions {
+  padding: 16px 20px;
+  background-color: #f5f5f5;
+}
+
+.cancel-button {
+  margin-right: 8px;
+}
+
+.submit-button {
+  background-color: #2e7d32;
+  color: white;
+  padding: 8px 16px;
+}
+
+.submit-button:hover {
+  background-color: #1b5e20;
+}
