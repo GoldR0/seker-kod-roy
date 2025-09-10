@@ -16,7 +16,7 @@ import ProfilePage from './components/ProfilePage';
 import HelpPage from './components/HelpPage';
 import LearningCenterPage from './components/LearningCenterPage';
 import ForumPage from './components/ForumPage';
-import events_management from './components/events_management';
+import events_management from './components/EventsManagement';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
 import { User } from './types';
