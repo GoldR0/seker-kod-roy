@@ -2,26 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, TextField, Card, CardContent, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
-// Violation 1: Component name not in PascalCase
-const events_management = () => {
+// Violation 1: Missing TypeScript types and interfaces
+const EventsManagement = () => {
   // Violation 2: Single Responsibility Principle - Component doing too many things
   const [events, setEvents] = useState([
     { id: 1, title: 'הרצאה על React', date: '2025-01-15', location: 'אולם 101', description: 'הרצאה מעמיקה על React hooks' },
     { id: 2, title: 'סדנת JavaScript', date: '2025-01-20', location: 'מעבדה 3', description: 'סדנה מעשית ב-JavaScript' },
     { id: 3, title: 'מפגש סטודנטים', date: '2025-01-25', location: 'קפיטריה', description: 'מפגש חברתי לסטודנטים' }
   ]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null); // Missing type
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({ title: '', date: '', location: '', description: '' });
+  const [formData, setFormData] = useState({ title: '', date: '', location: '', description: '' }); // Missing interface
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]); // Missing type
   const [sortBy, setSortBy] = useState('date');
-  const [userPermissions, setUserPermissions] = useState({ canEdit: true, canDelete: true });
+  const [userPermissions, setUserPermissions] = useState({ canEdit: true, canDelete: true }); // Missing interface
   const [notification, setNotification] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // Violation 3: Using div instead of semantic HTML
-  const handleSubmit = (e) => {
+  const handleSubmit = (e) => { // Missing parameter type
     e.preventDefault();
     setIsLoading(true);
     
@@ -56,13 +56,13 @@ const events_management = () => {
     }, 1000);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id) => { // Missing parameter type
     setEvents(events.filter(event => event.id !== id));
     setNotification('אירוע נמחק בהצלחה');
     setTimeout(() => setNotification(''), 3000);
   };
 
-  const handleEdit = (event) => {
+  const handleEdit = (event) => { // Missing parameter type
     setSelectedEvent(event);
     setFormData({
       title: event.title,
