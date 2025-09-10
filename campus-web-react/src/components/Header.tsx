@@ -38,7 +38,8 @@ import {
   Login as LoginIcon,
   Logout as LogoutIcon,
   Menu as MenuIcon,
-  Description as DescriptionIcon
+  Description as DescriptionIcon,
+  Event as EventIcon
 } from '@mui/icons-material';
 import { User } from '../types';
 
@@ -72,6 +73,7 @@ const Header: React.FC<HeaderProps> = ({
     { id: 'lostfound', label: 'מציאות ואבדות', icon: <SearchIcon />, path: '/lost-found' },
     { id: 'community', label: 'קהילה', icon: <GroupIcon />, path: '/community' },
     { id: 'forum', label: 'פורום קורס', icon: <ForumIcon />, path: '/forum' },
+    { id: 'events', label: 'ניהול אירועים', icon: <EventIcon />, path: '/events' },
     { id: 'help', label: 'עזרה', icon: <HelpIcon />, path: '/help' }
   ];
 
